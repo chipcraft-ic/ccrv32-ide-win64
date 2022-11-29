@@ -8,8 +8,8 @@
 #
 # Author: Rafal Harabien
 #
-# $Date: 2022-11-10 21:35:59 +0100 (czw, 10 lis 2022) $
-# $Revision: 909 $
+# $Date: 2022-11-29 18:03:56 +0100 (wto, 29 lis 2022) $
+# $Revision: 923 $
 #
 
 # TODO: the script contains a lot of harcoded magic values
@@ -834,8 +834,8 @@ class DbgBridge:
 
 	def cmd_read_mem(self, args):
 		i = args.index(b',')
-		addr, = struct.unpack(">I", binascii.unhexlify(args[:i].rjust(8,'0')))
-		length, = struct.unpack(">I", binascii.unhexlify(args[i+1:].rjust(8,'0')))
+		addr, = struct.unpack(">I", binascii.unhexlify(args[:i].rjust(8,b'0')))
+		length, = struct.unpack(">I", binascii.unhexlify(args[i+1:].rjust(8,b'0')))
 		if length == 0:
 			return ''
 
@@ -861,8 +861,8 @@ class DbgBridge:
 	def cmd_write_mem(self, args):
 		i = args.index(b',')
 		j = args.index(b':')
-		addr, = struct.unpack(">I", binascii.unhexlify(args[:i].rjust(8,'0')))
-		length, = struct.unpack(">I", binascii.unhexlify(args[i+1:j].rjust(8,'0')))
+		addr, = struct.unpack(">I", binascii.unhexlify(args[:i].rjust(8,b'0')))
+		length, = struct.unpack(">I", binascii.unhexlify(args[i+1:j].rjust(8,b'0')))
 		if length == 0:
 			return b'OK'
 
@@ -889,7 +889,7 @@ class DbgBridge:
 		for offset in range(0, read_length, 4):
 			data += struct.pack(">I", struct.unpack("<I", final_le[offset:offset+4])[0])
 
-		logging.info('Writing %d bytes at 0x%08X: %s', len(data), addr, binascii.hexlify(data))
+		logging.info('Writing %d bytes at 0x%08X: %s', len(data), addr, binascii.hexlify(data).decode('ascii'))
 		if self._cpu_dbg.write_mem(start_word, data):
 			if len(data) > 1024:
 				logging.info('Writing operation finished!')
@@ -900,8 +900,8 @@ class DbgBridge:
 	def cmd_write_mem_bin(self, args):
 		i = args.index(b',')
 		j = args.index(b':')
-		addr, = struct.unpack(">I", binascii.unhexlify(args[:i].rjust(8,'0')))
-		length, = struct.unpack(">I", binascii.unhexlify(args[i+1:j].rjust(8,'0')))
+		addr, = struct.unpack(">I", binascii.unhexlify(args[:i].rjust(8,b'0')))
+		length, = struct.unpack(">I", binascii.unhexlify(args[i+1:j].rjust(8,b'0')))
 		if length == 0:
 			return b'OK'
 
@@ -927,7 +927,7 @@ class DbgBridge:
 		for offset in range(0, read_length, 4):
 			data += struct.pack(">I", struct.unpack("<I", final_le[offset:offset+4])[0])
 
-		logging.info('Writing %d bytes at 0x%08X: %s', len(data), addr, binascii.hexlify(data))
+		logging.info('Writing %d bytes at 0x%08X: %s', len(data), addr, binascii.hexlify(data).decode('ascii'))
 		if self._cpu_dbg.write_mem(start_word, data):
 			if len(data) > 1024:
 				logging.info('Writing operation finished!')
@@ -938,8 +938,8 @@ class DbgBridge:
 	def cmd_insert_breakpoint(self, arg):
 		args = arg.split(b',')
 		t = args[0]
-		addr, = struct.unpack(">I", binascii.unhexlify(args[1].rjust(8,'0')))
-		length, = struct.unpack(">I", binascii.unhexlify(args[2].rjust(8,'0')))
+		addr, = struct.unpack(">I", binascii.unhexlify(args[1].rjust(8,b'0')))
+		length, = struct.unpack(">I", binascii.unhexlify(args[2].rjust(8,b'0')))
 		logging.info('Inserting breakpoint: type %s addr 0x%08X len %d', t, addr, length)
 
 		found = False
@@ -976,8 +976,8 @@ class DbgBridge:
 	def cmd_remove_breakpoint(self, arg):
 		args = arg.split(b',')
 		t = args[0]
-		addr, = struct.unpack(">I", binascii.unhexlify(args[1].rjust(8,'0')))
-		length, = struct.unpack(">I", binascii.unhexlify(args[2].rjust(8,'0')))
+		addr, = struct.unpack(">I", binascii.unhexlify(args[1].rjust(8,b'0')))
+		length, = struct.unpack(">I", binascii.unhexlify(args[2].rjust(8,b'0')))
 		logging.info('Removing breakpoint: type %s addr 0x%08X len %d', t, addr, length)
 
 		found = False
@@ -1085,11 +1085,11 @@ class DbgBridge:
 			# even if explicitly set to rv32!
 			# can be checked with:
 			# p sizeof($pc)
-			repl += binascii.hexlify(struct.pack("<Q", value))
+			repl += binascii.hexlify(struct.pack("<Q", value)).decode('ascii')
 			repl += ';'
 
 		repl += 'thread:'
-		repl += binascii.hexlify(struct.pack(">I", self._cpu_dbg.get_core() + 1)) # current core
+		repl += binascii.hexlify(struct.pack(">I", self._cpu_dbg.get_core() + 1)).decode('ascii') # current core
 		repl += ';'
 		return repl.encode('ascii')
 
