@@ -1,0 +1,2395 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<peripheral>
+  <name>CFGREGS</name>
+  <description>Configuration Registers</description>
+  <baseAddress>0x80007000</baseAddress>
+  <addressBlock>
+    <offset>0</offset>
+    <size>0x114</size>
+    <usage>registers</usage>
+  </addressBlock>
+  <registers>    <register>
+      <name>IRQMAP</name>
+      <description>Interrupt Mapping Register</description>
+      <addressOffset>0x0</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:16]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>IRQMAP</name>
+          <description>Interrupt Mapping, Each set bit represents the interrupt number that will be passed to interrupt controller. It is allowed to set more than one bit.</description>
+          <bitRange>[15:1]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>NC</name>
+          <bitRange>[0:0]</bitRange>
+          <access>read-only</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>UNLOCK</name>
+      <description>Unlock Register</description>
+      <addressOffset>0x4</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:16]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>UNLOCK_KEY</name>
+          <description>Write Unlock Key, Write unlock key value to allow write to a single module register.</description>
+          <bitRange>[15:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>IRQFLAGS</name>
+      <description>32kHz RTC Clock Interrupt Flags</description>
+      <addressOffset>0x8</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:3]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>PLL_FAIL</name>
+          <description>PLL Generator Fail, Bit is set if external PLL generator encountered unexpected error.</description>
+          <bitRange>[2:2]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>XTAL_CORE_FAIL</name>
+          <description>External XTAL Oscillator Fail, Bit is set if external XTAL oscillator encountered unexpected error.</description>
+          <bitRange>[1:1]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>XTAL_RTC_FAIL</name>
+          <description>External 32kHz XTAL Oscillator Fail, Bit is set if external 32kHz XTAL oscillator encountered unexpected error.</description>
+          <bitRange>[0:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>MEM_CONF</name>
+      <description>Memory Configuration Register</description>
+      <addressOffset>0xC</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:6]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>TEST1</name>
+          <description>Test pin to bypass self-timed circuit</description>
+          <bitRange>[5:5]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>RME</name>
+          <description>Read Margin Enable., '0' - Internal settings, '1' - External settings</description>
+          <bitRange>[4:4]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>RM</name>
+          <description>Read Margin., '0' - VDDMIN, '1' - SLOW, '2' - DEFAULT, '3' – FAST</description>
+          <bitRange>[3:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>RTCSTAT</name>
+      <description>32kHz RTC Clock Status</description>
+      <addressOffset>0x14</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:9]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>RC_RTC_VAL</name>
+          <description>FLL Calibration Value, , Calibration value of internal FLL 32kHz RTC RC generator.</description>
+          <bitRange>[8:2]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>RC_RTC_RDY</name>
+          <description>FLL Calibration Ready, Calibration value of internal FLL 32kHz RTC RC generator is ready.</description>
+          <bitRange>[1:1]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>CLK_RTC_SEL</name>
+          <description>32kHz RTC Clock Source, '0' - Internal RC oscillator, '1' - External XTAL oscillator</description>
+          <bitRange>[0:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>RTCCONF</name>
+      <description>32kHz RTC Clock Configuration</description>
+      <addressOffset>0x18</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:11]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>RC_RTC_VAL_SRC</name>
+          <description>Select source of RC oscillator frequency trimming value, '0' – Flash, '1' – configuration register</description>
+          <bitRange>[10:10]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>RC_RTC_VAL</name>
+          <description>32 kHz RC Oscillator Calibration Value, Calibration value of internal 32 kHz RC generator.</description>
+          <bitRange>[9:3]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>RC_RTC_CAL</name>
+          <description>FLL Calibration Enable, Enable calibration of internal FLL 32kHz RTC RC generator.</description>
+          <bitRange>[2:2]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>XTAL_RTC_SEL</name>
+          <description>Select External XTAL as RTC Clock Source, Informative only to generate interrupt on XTAL fail., '0' - Internal RC oscillator, '1' - External XTAL oscillator</description>
+          <bitRange>[1:1]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>XTAL_RTC_TEST</name>
+          <description>External XTAL Fail Test Input, Set this bit to simulate XTAL fail.</description>
+          <bitRange>[0:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>COREFREQ_CLK</name>
+      <description>External XTAL Configuration Register</description>
+      <addressOffset>0x1C</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:12]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>TEST_OUT_EN</name>
+          <description>Clock Test Output Enable</description>
+          <bitRange>[11:11]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>RC_CORE_VAL_SRC</name>
+          <description>Select source of RC oscillator frequency trimming value, '0' – Flash, '1' – configuration register</description>
+          <bitRange>[10:10]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>RC_CORE_VAL</name>
+          <description>16 MHz RC Osciilator Calibration Value, Calibration value of internal 16MHz RC generator.</description>
+          <bitRange>[9:4]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>RC_CORE_CAL</name>
+          <description>FLL Calibration Enable, Enable calibration of internal FLL 16MHz RC generator.</description>
+          <bitRange>[3:3]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>CORE_SEL</name>
+          <description>Clock Source Selection, '0' - Internal 16MHz RC generator, '1' - External XTAL oscillator, '2' - PLL generator, '3' - RTC 32kHz clock source</description>
+          <bitRange>[2:1]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>XTAL_CORE_TEST</name>
+          <description>External XTAL Fail Test Input, Set this bit to simulate XTAL fail.</description>
+          <bitRange>[0:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>COREFREQ_PLL</name>
+      <description>PLL Configuration Register</description>
+      <addressOffset>0x20</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:31]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>CTRL_FINE_LOAD</name>
+          <description>PLL_MCU DCO fine frequency control</description>
+          <bitRange>[30:17]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>CTRL_LOAD</name>
+          <description>PLL MCU control signal load, '1' - load CTRL_PVT and CTRL_FINE, '0' - use internal CTRL</description>
+          <bitRange>[16:16]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>CTRL_PVT_LOAD</name>
+          <description>PLL_MCU DCO PVT frequency control</description>
+          <bitRange>[15:10]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>PLL_VFB_EN</name>
+          <description>Enable VFB Output</description>
+          <bitRange>[9:9]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>TEST</name>
+          <description>External PLL Fail Test Input, Set this bit to simulate PLL fail.</description>
+          <bitRange>[8:8]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>N</name>
+          <description>PLL Multiplication Factor, The PLL output frequency equals to:.</description>
+          <bitRange>[7:2]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>REF_SEL</name>
+          <description>PLL Reference Clock Source., '0' - Internal 16MHz RC generator, '1' - External XTAL oscillator</description>
+          <bitRange>[1:1]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>EN</name>
+          <description>Enable PLL Loop</description>
+          <bitRange>[0:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>COREFREQ_STAT</name>
+      <description>Core Clock Status Register</description>
+      <addressOffset>0x24</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:31]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>CTRL_FINE</name>
+          <description>PLL MCU fine frequency control</description>
+          <bitRange>[30:17]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>CTRL_PVT</name>
+          <description>PLL MCU coarse frequency control</description>
+          <bitRange>[16:11]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>RC_CORE_VAL</name>
+          <description>16 MHz RC Oscillator Calibration Value, Calibration value of internal 16MHz RC generator.</description>
+          <bitRange>[10:5]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>RC_CORE_RDY</name>
+          <description>16 MHz RC Oscillator Calibration Ready, Calibration value of internal 16MHz RC generator is ready.</description>
+          <bitRange>[4:4]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>PLL_LOCK</name>
+          <description>State of PLL Lock Indicator</description>
+          <bitRange>[3:3]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>XTAL_CORE_LOCK</name>
+          <description>State of XTAL Lock Indicator</description>
+          <bitRange>[2:2]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>CLK_CORE_SEL</name>
+          <description>Actual Clock Source Selection, In case of error may be different than set in Clock Source Selection Register., '0' - Internal 16MHz RC generator, '1' - External XTAL oscillator, '2' - PLL generator, '3' - RTC 32kHz clock source</description>
+          <bitRange>[1:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>GNSSAFE_CONF</name>
+      <description>GNSS-AFE Configuration Register</description>
+      <addressOffset>0x28</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:3]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>GNSS_OUT_BAND</name>
+          <description>Config ADC Test Output Band., '0' - L1 band, '1' – L25 band</description>
+          <bitRange>[2:2]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>GNSS_AUX1_EN</name>
+          <description>Enable External AUX1 ADC Input</description>
+          <bitRange>[1:1]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>GNSS_AUX0_EN</name>
+          <description>Enable External AUX0 ADC Input</description>
+          <bitRange>[0:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>PLL1_CONF</name>
+      <description>PLL1 Configuration Register</description>
+      <addressOffset>0x2C</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:28]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>EN_BOOST</name>
+          <description>PLL1 enable current boost in DCO buffer</description>
+          <bitRange>[27:27]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>ADC_CLK_DIV</name>
+          <description>PLL1 division coefficient control of adc clock frequency divider, '0' – divided by 6, '1' – divided by 8</description>
+          <bitRange>[26:26]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>LOPCB_EN</name>
+          <description>PLL1 allow extarnal LO signal, '1' - PLL1 external LO enabled, '0' PLL1 external LO disabled</description>
+          <bitRange>[25:25]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>TEST_EN</name>
+          <description>PLL1 test mode, '1' - enable Ip and Qp test</description>
+          <bitRange>[24:24]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>FCW</name>
+          <description>PLL1 Frequency Control Word</description>
+          <bitRange>[23:1]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>EN</name>
+          <description>PLL1 Enable</description>
+          <bitRange>[0:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>PLL1DCO_CONF</name>
+      <description>PLL1 DCO Configuration Register</description>
+      <addressOffset>0x30</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:26]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>AMP</name>
+          <description>PLL1 DCO amplitude control</description>
+          <bitRange>[25:22]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>AMP_LOAD</name>
+          <description>PLL1 DCO amplitude control signal load, '1' - load AMP, '0' - use internal AMP</description>
+          <bitRange>[21:21]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>CTRL_PVT</name>
+          <description>PLL1 DCO coarse frequency control</description>
+          <bitRange>[20:16]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>NC</name>
+          <bitRange>[15:15]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>CTRL_FINE</name>
+          <description>PLL1 DCO fine frequency control</description>
+          <bitRange>[14:1]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>CTRL_LOAD</name>
+          <description>PLL1 DCO control signal load, '1' - load CTRL_PVT and CTRL_FINE, '0' - use internal CTRL</description>
+          <bitRange>[0:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>PLL1_STAT</name>
+      <description>PLL1 Status Register</description>
+      <addressOffset>0x34</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:28]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>PH_VAR</name>
+          <description>PLL1 reference clock periods expressed in the number of PLL signal periods </description>
+          <bitRange>[27:21]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>PHERR</name>
+          <description>PLL1 phase error signal</description>
+          <bitRange>[20:1]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>LOCK</name>
+          <description>PLL1 lock signal, '1' - PLL1 locked, '0' - PLL1 not locked</description>
+          <bitRange>[0:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>PLL1_STAT2</name>
+      <description>PLL1 Status Register</description>
+      <addressOffset>0x38</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:16]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>Tv</name>
+          <description>PLL1 signal period expressed in the number of TDC delay cells</description>
+          <bitRange>[15:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>PLL1DCO_STAT</name>
+      <description>PLL1 TDC Status Register</description>
+      <addressOffset>0x3C</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:24]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>AMP</name>
+          <description>PLL1 DCO coarse frequency control</description>
+          <bitRange>[23:20]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>AMP_LOW</name>
+          <description>PLL1 DCO amplitude status, '1' – amplitude low</description>
+          <bitRange>[19:19]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>CTRL_PVT</name>
+          <description>PLL1 DCO coarse frequency control</description>
+          <bitRange>[18:14]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>CTRL_FINE</name>
+          <description>PLL1 DCO fine frequency control</description>
+          <bitRange>[13:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>PLL25_CONF</name>
+      <description>PLL25 Configuration Register</description>
+      <addressOffset>0x40</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:28]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>EN_BOOST</name>
+          <description>PLL25 enable current boost in DCO buffer</description>
+          <bitRange>[27:27]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>ADC_CLK_DIV</name>
+          <description>PLL25 division coefficient control of adc clock frequency divider, '0' – divided by 6, '1' – divided by 8</description>
+          <bitRange>[26:26]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>LOPCB_EN</name>
+          <description>PLL25 allow extarnal LO signal, '1' - PLL1 external LO enabled, '0' PLL1 external LO disabled</description>
+          <bitRange>[25:25]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>TEST_EN</name>
+          <description>PLL25 test mode, '1' - enable Ip and Qp test</description>
+          <bitRange>[24:24]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>FCW</name>
+          <description>PLL25 Frequency Control Word</description>
+          <bitRange>[23:1]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>EN</name>
+          <description>PLL25 Enable</description>
+          <bitRange>[0:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>PLL25DCO_CONF</name>
+      <description>PLL25 DCO Configuration Register</description>
+      <addressOffset>0x44</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:27]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>AMP</name>
+          <description>PLL25 DCO amplitude control</description>
+          <bitRange>[26:23]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>AMP_LOAD</name>
+          <description>PLL25 DCO amplitude control signal load, '1' - load AMP, '0' - use internal AMP</description>
+          <bitRange>[22:22]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>CTRL_PVT</name>
+          <description>PLL25 DCO coarse frequency control</description>
+          <bitRange>[21:16]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>NC</name>
+          <bitRange>[15:15]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>CTRL_FINE</name>
+          <description>PLL25 DCO fine frequency control</description>
+          <bitRange>[14:1]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>CTRL_LOAD</name>
+          <description>PLL25 DCO control signal load, '1' - load CTRL_PVT and CTRL_FINE, '0' - use internal CTRL</description>
+          <bitRange>[0:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>PLL25_STAT</name>
+      <description>PLL25 Status Register</description>
+      <addressOffset>0x48</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:28]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>PH_VAR</name>
+          <description>PLL25 reference clock periods expressed in the number of PLL signal periods</description>
+          <bitRange>[27:21]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>PHERR</name>
+          <description>PLL25 phase error signal</description>
+          <bitRange>[20:1]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>LOCK</name>
+          <description>PLL25 lock signal, '1' - PLL1 locked, '0' - PLL1 not locked</description>
+          <bitRange>[0:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>PLL25_STAT2</name>
+      <description>PLL25 Status Register</description>
+      <addressOffset>0x4C</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:16]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>Tv</name>
+          <description>PLL25 signal period expressed in the number of TDC delay cells</description>
+          <bitRange>[15:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>PLL25DCO_STAT</name>
+      <description>PLL25 TDC Status Register</description>
+      <addressOffset>0x50</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:25]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>AMP</name>
+          <description>PLL25 DCO coarse frequency control</description>
+          <bitRange>[24:21]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>AMP_LOW</name>
+          <description>PLL25 DCO amplitude status, '1' – amplitude low</description>
+          <bitRange>[20:20]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>CTRL_PVT</name>
+          <description>PLL25 DCO coarse frequency control</description>
+          <bitRange>[19:14]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>CTRL_FINE</name>
+          <description>PLL25 DCO fine frequency control</description>
+          <bitRange>[13:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>IF1_CONF</name>
+      <description>IF1 Configuration Register</description>
+      <addressOffset>0x54</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:15]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>IF_BANDCUT</name>
+          <description>IF1 control of bandwidth</description>
+          <bitRange>[14:14]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>OFFSET_CAL_Q</name>
+          <description>IF1 offset calibration word channel Q</description>
+          <bitRange>[13:10]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>OFFSET_CAL_DIRECTION_Q</name>
+          <description>IF1 direction of offset calibration channel Q</description>
+          <bitRange>[9:9]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>OFFSET_CAL_I</name>
+          <description>IF1 offset calibration word channel I</description>
+          <bitRange>[8:5]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>OFFSET_CAL_DIRECTION_I</name>
+          <description>IF1 direction of offset calibration channel I</description>
+          <bitRange>[4:4]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>PGA2_EN</name>
+          <description>IF1 PGA2 enable</description>
+          <bitRange>[3:3]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>PGA1_EN</name>
+          <description>IF1 PGA1 enable</description>
+          <bitRange>[2:2]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>PREAMP_EN</name>
+          <description>IF1 preamp enable</description>
+          <bitRange>[1:1]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>EN</name>
+          <description>IF1 enable</description>
+          <bitRange>[0:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>IF25_CONF</name>
+      <description>IF25 Configuration Register</description>
+      <addressOffset>0x58</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:15]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>IF_BANDCUT</name>
+          <description>IF25 control of bandwidth</description>
+          <bitRange>[14:14]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>OFFSET_CAL_Q</name>
+          <description>IF25 offset calibration word channel Q</description>
+          <bitRange>[13:10]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>OFFSET_CAL_DIRECTION_Q</name>
+          <description>IF25 direction of offset calibration channel Q</description>
+          <bitRange>[9:9]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>OFFSET_CAL_I</name>
+          <description>IF25 offset calibration word channel I</description>
+          <bitRange>[8:5]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>OFFSET_CAL_DIRECTION_I</name>
+          <description>IF25 direction of offset calibration channel I</description>
+          <bitRange>[4:4]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>PGA2_EN</name>
+          <description>IF25 PGA2 enable</description>
+          <bitRange>[3:3]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>PGA1_EN</name>
+          <description>IF25 PGA1 enable</description>
+          <bitRange>[2:2]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>PREAMP_EN</name>
+          <description>IF25 preamp enable</description>
+          <bitRange>[1:1]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>EN</name>
+          <description>IF25 enable</description>
+          <bitRange>[0:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>PROBE_CONF</name>
+      <description>IF25 Configuration Register</description>
+      <addressOffset>0x5C</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:16]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>PLL15FB_SEL</name>
+          <description>Select FB from PLL1 or PLL5, '0' - PLL1, '1' - PLL5</description>
+          <bitRange>[15:15]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>PLL15FB_EN</name>
+          <description>Enable FB from PLL1 or PLL5</description>
+          <bitRange>[14:14]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>IF25_PROBEB_SELECT</name>
+          <description>IF25 probe B select</description>
+          <bitRange>[13:11]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>IF25_PROBEB_EN</name>
+          <description>IF25 probe B enable</description>
+          <bitRange>[10:10]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>IF25_PROBEA_SELECT</name>
+          <description>IF25 probe A select</description>
+          <bitRange>[9:7]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>IF1_PROBEB_SELECT</name>
+          <description>IF1 probe B select</description>
+          <bitRange>[6:4]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>IF1_PROBEB_EN</name>
+          <description>IF1 probe B enable</description>
+          <bitRange>[3:3]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>IF1_PROBEA_SELECT</name>
+          <description>IF1 probe A select</description>
+          <bitRange>[2:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>ADC1_CONF</name>
+      <description>IF25 Configuration Register</description>
+      <addressOffset>0x60</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:8]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>CLK_SEL</name>
+          <description>IF1 clock source selection, '00' – PLL1 output clock (PLL1 output frequency divided by 24), '01' – PLL5 output clock (PLL5 output frequency divided by 18), '10' – XTAL, '11 – XTAL</description>
+          <bitRange>[7:6]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>CLK_CONF</name>
+          <description>IF1 clock frequency control, IF1_FREQ = CLK_SRC ? PLL1_OUT_FREQ/24/POWER(2,CLK_CONF) : PLL5_OUT_FREQ/18/POWER(2,CLK_CONF)</description>
+          <bitRange>[5:4]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>SAH_IBIAS_CTRL</name>
+          <description>IF1 sample and hold bias control</description>
+          <bitRange>[3:3]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>CAL_EN</name>
+          <description>IF1 ADC calibration enable</description>
+          <bitRange>[2:2]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>SAH_EN</name>
+          <description>IF1 sample and hold enable</description>
+          <bitRange>[1:1]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>ADC_EN</name>
+          <description>IF1 ADC enable</description>
+          <bitRange>[0:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>ADC25_CONF</name>
+      <description>IF25 Configuration Register</description>
+      <addressOffset>0x64</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:8]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>CLK_SEL</name>
+          <description>IF1 clock source selection, '00' – PLL1 output clock (PLL1 output frequency divided by 24), '01' – PLL5 output clock (PLL5 output frequency divided by 18), '10' – XTAL, '11 – XTAL</description>
+          <bitRange>[7:6]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>CLK_CONF</name>
+          <description>IF1 clock frequency control, IF1_FREQ = CLK_SRC ? PLL1_OUT_FREQ/24/POWER(2,CLK_CONF) : PLL5_OUT_FREQ/18/POWER(2,CLK_CONF)</description>
+          <bitRange>[5:4]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>SAH_IBIAS_CTRL</name>
+          <description>IF25 sample and hold bias control</description>
+          <bitRange>[3:3]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>CAL_EN</name>
+          <description>IF25 ADC calibration enable</description>
+          <bitRange>[2:2]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>SAH_EN</name>
+          <description>IF25 sample and hold enable</description>
+          <bitRange>[1:1]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>ADC_EN</name>
+          <description>IF25 ADC enable</description>
+          <bitRange>[0:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPLIT1_CTRL</name>
+      <description>Splitter AFE1 Control Register</description>
+      <addressOffset>0x68</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:1]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>CLEAR</name>
+          <description>Clear internal state of the AGC and post-processing channels.</description>
+          <bitRange>[0:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPLIT1_CFG_GAIN_CHANGE</name>
+      <description>Splitter AFE1 Gain Change Configuration Register</description>
+      <addressOffset>0x6C</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:20]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>CNT</name>
+          <description>Number of clock cycles between gain updates.</description>
+          <bitRange>[19:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPLIT1_CFG_LIMITER</name>
+      <description>Splitter AFE1 Limiter Threshold Configuration Register</description>
+      <addressOffset>0x70</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:20]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>THRESHOLD</name>
+          <description>Maximal number of extremum samples between gain updates. If threshold exceeded, the analog gain will be decreased.</description>
+          <bitRange>[19:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPLIT1_CFG_MANUAL_MODE</name>
+      <description>Splitter AFE1 Manual Mode Configuration Register</description>
+      <addressOffset>0x74</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:3]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>PGA2_GAIN</name>
+          <description>Set PGA2 gain for AFE1.</description>
+          <bitRange>[2:2]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>PGA1_GAIN</name>
+          <description>Set PGA1 gain for AFE1.</description>
+          <bitRange>[1:1]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>EN</name>
+          <description>Enable gain manual control for AFE1.</description>
+          <bitRange>[0:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPLIT1_L1E1_CFG</name>
+      <description>Splitter AFE1 L1E1 Configuration Register</description>
+      <addressOffset>0x78</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:11]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>DEC_BY_THREE_EN</name>
+          <description>Enable additional decimation by 3</description>
+          <bitRange>[10:10]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>DEC_SAMPLES_SHIFT</name>
+          <description>Number of samples to decimate, where num_of_samples = 2 ** DEC_SAMPLES_SHIFT.</description>
+          <bitRange>[9:7]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>CARR_MODE</name>
+          <description>Carrier removal mode choice.</description>
+          <bitRange>[6:5]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>CARR_ENABLE</name>
+          <description>Enable carrier removal.</description>
+          <bitRange>[4:4]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>LPF_K_PARAM</name>
+          <description>K parameter of a low pass filter in the AGC channel., alpha = 2 ** (-k), y[n] = (1-alpha) * y[n-1] + alpha * x[n] </description>
+          <bitRange>[3:1]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>IQ_SAME_GAIN</name>
+          <description>Set Q gain on the basis of I gain.</description>
+          <bitRange>[0:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPLIT1_L1E1_CFG_CARR_FREQ</name>
+      <description>Splitter AFE1 L1E1 Carrier Frequency Configuration Register</description>
+      <addressOffset>0x7C</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>STEP</name>
+          <description>Frequency step for the carrier removal block., freq_step = (f_carr / f_sampl) * (2 ** 32), precision = f_sampl / (2 ** 32)</description>
+          <bitRange>[31:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPLIT1_L1E1_CFG_THRESHOLD_I</name>
+      <description>Splitter AFE1 L1E1 Threshold I Configuration Register</description>
+      <addressOffset>0x80</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:28]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>MAX</name>
+          <description>Maximal standard deviation for I channel.</description>
+          <bitRange>[27:14]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>MIN</name>
+          <description>Minimal standard deviation for I channel.</description>
+          <bitRange>[13:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPLIT1_L1E1_CFG_THRESHOLD_Q</name>
+      <description>Splitter AFE1 L1E1 Threshold Q Configuration Register</description>
+      <addressOffset>0x84</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:28]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>MAX</name>
+          <description>Maximal standard deviation for Q channel.</description>
+          <bitRange>[27:14]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>MIN</name>
+          <description>Minimal standard deviation for Q channel.</description>
+          <bitRange>[13:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPLIT1_L1E1_CFG_MANUAL_MODE_DIG</name>
+      <description>Splitter AFE1 L1E1 Manual Mode Digital Gain Configuration Register</description>
+      <addressOffset>0x88</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:12]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>GAIN_Q</name>
+          <description>Set digital gain for Q channel.</description>
+          <bitRange>[11:6]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>GAIN_I</name>
+          <description>Set digital gain for I channel.</description>
+          <bitRange>[5:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPLIT25_CTRL</name>
+      <description>Splitter AFE25 Control Register</description>
+      <addressOffset>0x8C</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:1]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>CLEAR</name>
+          <description>Clear internal state of the AGC and post-processing channels.</description>
+          <bitRange>[0:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPLIT25_CFG_GAIN_CHANGE</name>
+      <description>Splitter AFE25 Gain Change Configuration Register</description>
+      <addressOffset>0x90</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:20]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>CNT</name>
+          <description>Number of clock cycles between gain updates.</description>
+          <bitRange>[19:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPLIT25_CFG_LIMITER</name>
+      <description>Splitter AFE25 Limiter Threshold Configuration Register</description>
+      <addressOffset>0x94</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:20]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>THRESHOLD</name>
+          <description>Maximal number of extremum samples between gain updates. If threshold exceeded, the analog gain will be decreased.</description>
+          <bitRange>[19:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPLIT25_CFG_MANUAL_MODE</name>
+      <description>Splitter AFE25 Manual Mode Configuration Register</description>
+      <addressOffset>0x98</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:3]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>PGA2_GAIN</name>
+          <description>Set PGA2 gain for AFE25.</description>
+          <bitRange>[2:2]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>PGA1_GAIN</name>
+          <description>Set PGA1 gain for AFE25.</description>
+          <bitRange>[1:1]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>EN</name>
+          <description>Enable gain manual control for AFE25.</description>
+          <bitRange>[0:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPLIT25_L2_CFG</name>
+      <description>Splitter AFE25 L2 Configuration Register</description>
+      <addressOffset>0x9C</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:11]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>DEC_BY_THREE_EN</name>
+          <description>Enable additional decimation by 3</description>
+          <bitRange>[10:10]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>DEC_SAMPLES_SHIFT</name>
+          <description>Number of samples to decimate, where num_of_samples = 2 ** DEC_SAMPLES_SHIFT.</description>
+          <bitRange>[9:7]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>CARR_MODE</name>
+          <description>Carrier removal mode choice.</description>
+          <bitRange>[6:5]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>CARR_ENABLE</name>
+          <description>Enable carrier removal.</description>
+          <bitRange>[4:4]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>LPF_K_PARAM</name>
+          <description>K parameter of a low pass filter in the AGC channel., alpha = 2 ** (-k), y[n] = (1-alpha) * y[n-1] + alpha * x[n] </description>
+          <bitRange>[3:1]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>IQ_SAME_GAIN</name>
+          <description>Set Q gain on the basis of I gain.</description>
+          <bitRange>[0:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPLIT25_L2_CFG_CARR_FREQ</name>
+      <description>Splitter AFE25 L2 Carrier Frequency Configuration Register</description>
+      <addressOffset>0xA0</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>STEP</name>
+          <description>Frequency step for the carrier removal block., freq_step = (f_carr / f_sampl) * (2 ** 32), precision = f_sampl / (2 ** 32)</description>
+          <bitRange>[31:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPLIT25_L2_CFG_THRESHOLD_I</name>
+      <description>Splitter AFE25 L2 Threshold I Configuration Register</description>
+      <addressOffset>0xA4</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:28]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>MAX</name>
+          <description>Maximal standard deviation for I channel.</description>
+          <bitRange>[27:14]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>MIN</name>
+          <description>Minimal standard deviation for I channel.</description>
+          <bitRange>[13:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPLIT25_L2_CFG_THRESHOLD_Q</name>
+      <description>Splitter AFE25 L2 Threshold Q Configuration Register</description>
+      <addressOffset>0xA8</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:28]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>MAX</name>
+          <description>Maximal standard deviation for Q channel.</description>
+          <bitRange>[27:14]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>MIN</name>
+          <description>Minimal standard deviation for Q channel.</description>
+          <bitRange>[13:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPLIT25_L2_CFG_MANUAL_MODE_DIG</name>
+      <description>Splitter AFE25 L2 Manual Mode Digital Gain Configuration Register</description>
+      <addressOffset>0xAC</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:12]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>GAIN_Q</name>
+          <description>Set digital gain for Q channel.</description>
+          <bitRange>[11:6]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>GAIN_I</name>
+          <description>Set digital gain for I channel.</description>
+          <bitRange>[5:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPLIT25_E6_CFG</name>
+      <description>Splitter AFE25 E6 Configuration Register</description>
+      <addressOffset>0xB0</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:11]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>DEC_BY_THREE_EN</name>
+          <description>Enable additional decimation by 3</description>
+          <bitRange>[10:10]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>DEC_SAMPLES_SHIFT</name>
+          <description>Number of samples to decimate, where num_of_samples = 2 ** DEC_SAMPLES_SHIFT.</description>
+          <bitRange>[9:7]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>CARR_MODE</name>
+          <description>Carrier removal mode choice.</description>
+          <bitRange>[6:5]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>CARR_ENABLE</name>
+          <description>Enable carrier removal.</description>
+          <bitRange>[4:4]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>LPF_K_PARAM</name>
+          <description>K parameter of a low pass filter in the AGC channel., alpha = 2 ** (-k), y[n] = (1-alpha) * y[n-1] + alpha * x[n] </description>
+          <bitRange>[3:1]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>IQ_SAME_GAIN</name>
+          <description>Set Q gain on the basis of I gain.</description>
+          <bitRange>[0:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPLIT25_E6_CFG_CARR_FREQ</name>
+      <description>Splitter AFE25 E6 Carrier Frequency Configuration Register</description>
+      <addressOffset>0xB4</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>STEP</name>
+          <description>Frequency step for the carrier removal block., freq_step = (f_carr / f_sampl) * (2 ** 32), precision = f_sampl / (2 ** 32)</description>
+          <bitRange>[31:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPLIT25_E6_CFG_THRESHOLD_I</name>
+      <description>Splitter AFE25 E6 Threshold I Configuration Register</description>
+      <addressOffset>0xB8</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:28]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>MAX</name>
+          <description>Maximal standard deviation for I channel.</description>
+          <bitRange>[27:14]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>MIN</name>
+          <description>Minimal standard deviation for I channel.</description>
+          <bitRange>[13:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPLIT25_E6_CFG_THRESHOLD_Q</name>
+      <description>Splitter AFE25 E6 Threshold Q Configuration Register</description>
+      <addressOffset>0xBC</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:28]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>MAX</name>
+          <description>Maximal standard deviation for Q channel.</description>
+          <bitRange>[27:14]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>MIN</name>
+          <description>Minimal standard deviation for Q channel.</description>
+          <bitRange>[13:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPLIT25_E6_CFG_MANUAL_MODE_DIG</name>
+      <description>Splitter AFE25 E6 Manual Mode Digital Gain Configuration Register</description>
+      <addressOffset>0xC0</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:12]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>GAIN_Q</name>
+          <description>Set digital gain for Q channel.</description>
+          <bitRange>[11:6]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>GAIN_I</name>
+          <description>Set digital gain for I channel.</description>
+          <bitRange>[5:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPLIT25_L5E5A_CFG</name>
+      <description>Splitter AFE25 L5E5A Configuration Register</description>
+      <addressOffset>0xC4</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:11]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>DEC_BY_THREE_EN</name>
+          <description>Enable additional decimation by 3</description>
+          <bitRange>[10:10]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>DEC_SAMPLES_SHIFT</name>
+          <description>Number of samples to decimate, where num_of_samples = 2 ** DEC_SAMPLES_SHIFT.</description>
+          <bitRange>[9:7]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>CARR_MODE</name>
+          <description>Carrier removal mode choice.</description>
+          <bitRange>[6:5]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>CARR_ENABLE</name>
+          <description>Enable carrier removal.</description>
+          <bitRange>[4:4]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>LPF_K_PARAM</name>
+          <description>K parameter of a low pass filter in the AGC channel., alpha = 2 ** (-k), y[n] = (1-alpha) * y[n-1] + alpha * x[n] </description>
+          <bitRange>[3:1]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>IQ_SAME_GAIN</name>
+          <description>Set Q gain on the basis of I gain.</description>
+          <bitRange>[0:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPLIT25_L5E5A_CFG_CARR_FREQ</name>
+      <description>Splitter AFE25 L5E5A Carrier Frequency Configuration Register</description>
+      <addressOffset>0xC8</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>STEP</name>
+          <description>Frequency step for the carrier removal block., freq_step = (f_carr / f_sampl) * (2 ** 32), precision = f_sampl / (2 ** 32)</description>
+          <bitRange>[31:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPLIT25_L5E5A_CFG_THRESHOLD_I</name>
+      <description>Splitter AFE25 L5E5A Threshold I Configuration Register</description>
+      <addressOffset>0xCC</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:28]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>MAX</name>
+          <description>Maximal standard deviation for I channel.</description>
+          <bitRange>[27:14]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>MIN</name>
+          <description>Minimal standard deviation for I channel.</description>
+          <bitRange>[13:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPLIT25_L5E5A_CFG_THRESHOLD_Q</name>
+      <description>Splitter AFE25 L5E5A Threshold Q Configuration Register</description>
+      <addressOffset>0xD0</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:28]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>MAX</name>
+          <description>Maximal standard deviation for Q channel.</description>
+          <bitRange>[27:14]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>MIN</name>
+          <description>Minimal standard deviation for Q channel.</description>
+          <bitRange>[13:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPLIT25_L5E5A_CFG_MANUAL_MODE_DIG</name>
+      <description>Splitter AFE25 L5E5A Manual Mode Digital Gain Configuration Register</description>
+      <addressOffset>0xD4</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:12]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>GAIN_Q</name>
+          <description>Set digital gain for Q channel.</description>
+          <bitRange>[11:6]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>GAIN_I</name>
+          <description>Set digital gain for I channel.</description>
+          <bitRange>[5:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPLIT25_E5B_CFG</name>
+      <description>Splitter AFE25 E5B Configuration Register</description>
+      <addressOffset>0xD8</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:11]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>DEC_BY_THREE_EN</name>
+          <description>Enable additional decimation by 3</description>
+          <bitRange>[10:10]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>DEC_SAMPLES_SHIFT</name>
+          <description>Number of samples to decimate, where num_of_samples = 2 ** DEC_SAMPLES_SHIFT.</description>
+          <bitRange>[9:7]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>CARR_MODE</name>
+          <description>Carrier removal mode choice.</description>
+          <bitRange>[6:5]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>CARR_ENABLE</name>
+          <description>Enable carrier removal.</description>
+          <bitRange>[4:4]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>LPF_K_PARAM</name>
+          <description>K parameter of a low pass filter in the AGC channel., alpha = 2 ** (-k), y[n] = (1-alpha) * y[n-1] + alpha * x[n] </description>
+          <bitRange>[3:1]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>IQ_SAME_GAIN</name>
+          <description>Set Q gain on the basis of I gain.</description>
+          <bitRange>[0:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPLIT25_E5B_CFG_CARR_FREQ</name>
+      <description>Splitter AFE25 E5B Carrier Frequency Configuration Register</description>
+      <addressOffset>0xDC</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>STEP</name>
+          <description>Frequency step for the carrier removal block., freq_step = (f_carr / f_sampl) * (2 ** 32), precision = f_sampl / (2 ** 32)</description>
+          <bitRange>[31:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPLIT25_E5B_CFG_THRESHOLD_I</name>
+      <description>Splitter AFE25 E5B Threshold I Configuration Register</description>
+      <addressOffset>0xE0</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:28]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>MAX</name>
+          <description>Maximal standard deviation for I channel.</description>
+          <bitRange>[27:14]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>MIN</name>
+          <description>Minimal standard deviation for I channel.</description>
+          <bitRange>[13:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPLIT25_E5B_CFG_THRESHOLD_Q</name>
+      <description>Splitter AFE25 E5B Threshold Q Configuration Register</description>
+      <addressOffset>0xE4</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:28]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>MAX</name>
+          <description>Maximal standard deviation for Q channel.</description>
+          <bitRange>[27:14]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>MIN</name>
+          <description>Minimal standard deviation for Q channel.</description>
+          <bitRange>[13:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPLIT25_E5B_CFG_MANUAL_MODE_DIG</name>
+      <description>Splitter AFE25 E5B Manual Mode Digital Gain Configuration Register</description>
+      <addressOffset>0xE8</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:12]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>GAIN_Q</name>
+          <description>Set digital gain for Q channel.</description>
+          <bitRange>[11:6]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>GAIN_I</name>
+          <description>Set digital gain for I channel.</description>
+          <bitRange>[5:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>LNA125_CONF</name>
+      <description>LNA125 Configuration Register</description>
+      <addressOffset>0xEC</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:4]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>L25_TUNE_SRC</name>
+          <description>Select source of LNA125 L25 frequency tuning value, '0' – Flash, '1' – configuration register</description>
+          <bitRange>[3:3]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>L1_TUNE_SRC</name>
+          <description>Select source of LNA125 L1 frequency tuning value, '0' – Flash, '1' – configuration register</description>
+          <bitRange>[2:2]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>EN_L25</name>
+          <description>LNA125 Enable L25 branch and current mirror</description>
+          <bitRange>[1:1]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>EN_L1</name>
+          <description>LNA125 Enable L1 branch and current mirror</description>
+          <bitRange>[0:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>LNA125_TUNE_CONF</name>
+      <description>LNA125 Configuration Register</description>
+      <addressOffset>0xF0</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>L25</name>
+          <description>LNA15 L25 frequency tuning word</description>
+          <bitRange>[31:16]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>L1</name>
+          <description>LNA15 L1 frequency tuning word</description>
+          <bitRange>[15:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>BALUN_MIXER1_CONF</name>
+      <description>BALUN and MIXER 1 Configuration Register</description>
+      <addressOffset>0xF4</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:19]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>BALUN_TUNE_SRC</name>
+          <description>Select source of BALUN1 frequency tuning value, '0' – Flash, '1' – configuration register</description>
+          <bitRange>[18:18]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>BALUN_TUNE</name>
+          <description>BALUN1 center frequency tuning</description>
+          <bitRange>[17:2]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>BALUN_EN</name>
+          <description>BALUN1 Enable</description>
+          <bitRange>[1:1]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>MIXER_EN</name>
+          <description>MIXER1 Enable</description>
+          <bitRange>[0:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>BALUN_MIXER25_CONF</name>
+      <description>BALUN and MIXER 25 Configuration Register</description>
+      <addressOffset>0xF8</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:19]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>BALUN_TUNE_SRC</name>
+          <description>Select source of BALUN25 frequency tuning value, '0' – Flash, '1' – configuration register</description>
+          <bitRange>[18:18]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>BALUN_TUNE</name>
+          <description>BALUN25 center frequency tuning</description>
+          <bitRange>[17:2]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>BALUN_EN</name>
+          <description>BALUN25 Enable</description>
+          <bitRange>[1:1]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>MIXER_EN</name>
+          <description>MIXER25 Enable</description>
+          <bitRange>[0:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>PMU_CONF</name>
+      <description>PMU Configuration register</description>
+      <addressOffset>0xFC</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:19]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>FLASH_POR_EN</name>
+          <description>Flash Brown-out detector power-on reset enable</description>
+          <bitRange>[18:18]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>FLASH_BOD_EN</name>
+          <description>Flash Brown-out detector enable</description>
+          <bitRange>[17:17]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>DCDC_MODE</name>
+          <description>DCDC work mode, '0' – Voltage mode, '1' – Current mode</description>
+          <bitRange>[16:16]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>DCDC_GENTRIM_SRC</name>
+          <description>Select source of DCDC trim value</description>
+          <bitRange>[15:15]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>DCDC_GENTRIM</name>
+          <description>DCDC frequency triming value, '0' – Flash, '1' – configuration register</description>
+          <bitRange>[14:12]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>DCDC_TRIM_RESET</name>
+          <description>DCDC frequency triming enable</description>
+          <bitRange>[11:11]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>IREF_CAL_EN</name>
+          <description>PMU Calibration Enable</description>
+          <bitRange>[10:10]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>IREF_TRIM_VAL_SRC</name>
+          <description>Select source of PMU current  trimming value, '0' – Flash, '1' – configuration register</description>
+          <bitRange>[9:9]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>IREF_TRIM_VAL</name>
+          <description>PMU current trim value</description>
+          <bitRange>[8:1]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>IREF_TRIM_EN</name>
+          <description>Enable PMU current trimming</description>
+          <bitRange>[0:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>PMU_STAT</name>
+      <description>Power Management Unit Status</description>
+      <addressOffset>0x100</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:9]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>IREF_TRIM_VAL</name>
+          <description>PMU current trim value</description>
+          <bitRange>[8:1]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>IREF_CAL_RDY</name>
+          <description>PMU calibration ready indicatior</description>
+          <bitRange>[0:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>PM_STAT</name>
+      <description>GNSS-AFE PM Status Register</description>
+      <addressOffset>0x104</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:4]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>IREF_COMP</name>
+          <description>GNSS-AFE PM current reference comparator output</description>
+          <bitRange>[3:3]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>VREF_COMP</name>
+          <description>GNSS-AFE PM voltage reference comparator output</description>
+          <bitRange>[2:2]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>PWR_UP_P</name>
+          <description>GNSS-AFE PM power up indicator, '0' – power down, '1' – power up</description>
+          <bitRange>[1:1]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>PWR_UP_N</name>
+          <description>GNSS-AFE PM power up indicator, '1' – power down, '0' – power up</description>
+          <bitRange>[0:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>PM_CONF</name>
+      <description>GNSS-AFE PM Configuration Register</description>
+      <addressOffset>0x108</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:27]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>LDO_ADC_EXT_DECAP</name>
+          <description>(IF-ADC) LDO work mode '0' –  internal decap mode, '1' – external decap mode</description>
+          <bitRange>[26:26]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>LDO_IF_EXT_DECAP</name>
+          <description>(IF) LDO work mode '0' –  internal decap mode, '1' – external decap mode</description>
+          <bitRange>[25:25]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>LDO_DPLL_EXT_DECAP</name>
+          <description>(PLL) digital LDO work mode '0' –  internal decap mode, '1' – external decap mode</description>
+          <bitRange>[24:24]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>LDO_APLL_EXT_DECAP</name>
+          <description>(PLL) analog LDO work mode '0' –  internal decap mode, '1' – external decap mode</description>
+          <bitRange>[23:23]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>LDO_RF_EXT_DECAP</name>
+          <description>(RF) LDO work mode '0' –  internal decap mode, '1' – external decap mode</description>
+          <bitRange>[22:22]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>RC_FILTER</name>
+          <description>GNSS-AFE PM bangap voltage reference RC filter mode, '0' – slow start mode, '1' – fast start mode</description>
+          <bitRange>[21:21]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>CAL_EN</name>
+          <description>Enable PM calibration mode</description>
+          <bitRange>[20:20]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>TEST_EN</name>
+          <description>Enable PM test mode</description>
+          <bitRange>[19:19]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>LDO_ADC_EN</name>
+          <description>Enable GNSS-AFE PM Intermediate Frequency Analog to Digital Converter  (IF-ADC) LDO</description>
+          <bitRange>[18:18]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>LDO_IF_EN</name>
+          <description>Enable GNSS-AFE PM Intermediate Frequency (IF) LDO</description>
+          <bitRange>[17:17]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>LDO_DPLL_EN</name>
+          <description>Enable GNSS-AFE PM Phase Locked Loop (PLL) digital LDO</description>
+          <bitRange>[16:16]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>LDO_APLL_EN</name>
+          <description>Enable GNSS-AFE PM Phase Locked Loop (PLL) analog LDO</description>
+          <bitRange>[15:15]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>LDO_RF_EN</name>
+          <description>Enable GNSS-AFE PM radio-frequency (RF) LDO</description>
+          <bitRange>[14:14]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>VREF_EN</name>
+          <description>Enable GNSS-AFE PM voltage reference buffer</description>
+          <bitRange>[13:13]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>IREF_TRIM_SRC</name>
+          <description>Select source of GNSS-AFE PM current reference trimming value, '0' – Flash, '1' – configuration register</description>
+          <bitRange>[12:12]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>IREF_TRIM</name>
+          <description>GNSS-AFE PM current reference trimming</description>
+          <bitRange>[11:8]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>IREF_EN</name>
+          <description>Enable GNSS-AFE PM current reference</description>
+          <bitRange>[7:7]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>BGVR_TRIM_SRC</name>
+          <description>Select source of GNSS-AFE PM bangap voltage reference trimming value, '0' – Flash, '1' – configuration register</description>
+          <bitRange>[6:6]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>BGVR_TRIM</name>
+          <description>GNSS-AFE PM bangap voltage reference trimming</description>
+          <bitRange>[5:2]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>BGVR_EN</name>
+          <description>Enable GNSS-AFE PM bangap voltage reference</description>
+          <bitRange>[1:1]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>NRST</name>
+          <description>GNSS-AFE reset signal, '0' – GNSSAFE in reset state</description>
+          <bitRange>[0:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>GNSSAFE_TEST_CONF</name>
+      <description>GNSS-AFE PM Configuration Register</description>
+      <addressOffset>0x108</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>NC</name>
+          <bitRange>[31:12]</bitRange>
+          <access>read-only</access>
+        </field>
+        <field>
+          <name>PLLTEST_ATT</name>
+          <bitRange>[11:8]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>PLL25TEST_MOD_EN</name>
+          <bitRange>[7:7]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>PLL25TEST_MOD_DIR</name>
+          <bitRange>[6:6]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>PLL25TEST_MOD_PRESC</name>
+          <bitRange>[5:4]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>PLL1TEST_MOD_EN</name>
+          <bitRange>[3:3]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>PLL1TEST_MOD_DIR</name>
+          <bitRange>[2:2]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>PLL1TEST_MOD_PRESC</name>
+          <bitRange>[1:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPARE_CONF</name>
+      <description>SPARE Configuration Register</description>
+      <addressOffset>0x10C</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>SIG</name>
+          <description>TBD</description>
+          <bitRange>[31:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+    <register>
+      <name>SPARE_STAT</name>
+      <description>SPARE Configuration Register</description>
+      <addressOffset>0x110</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>SIG</name>
+          <description>TBD</description>
+          <bitRange>[31:0]</bitRange>
+          <access>read-write</access>
+        </field>
+      </fields>
+    </register>
+  </registers>
+</peripheral>
