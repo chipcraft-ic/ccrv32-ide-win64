@@ -1151,7 +1151,7 @@
         </field>
         <field>
           <name>DEC_SAMPLES_SHIFT</name>
-          <description>Number of samples to decimate, where.</description>
+          <description>Number of samples to decimate.</description>
           <bitRange>[9:7]</bitRange>
           <access>read-write</access>
         </field>
@@ -1189,7 +1189,7 @@
       <fields>
         <field>
           <name>STEP</name>
-          <description>Frequency\ step for the carrier removal block.</description>
+          <description>Frequency step for the carrier removal block.</description>
           <bitRange>[31:0]</bitRange>
           <access>read-write</access>
         </field>
@@ -1377,7 +1377,7 @@
         </field>
         <field>
           <name>DEC_SAMPLES_SHIFT</name>
-          <description>Number of samples to decimate, where.</description>
+          <description>Number of samples to decimate.</description>
           <bitRange>[9:7]</bitRange>
           <access>read-write</access>
         </field>
@@ -1395,7 +1395,7 @@
         </field>
         <field>
           <name>LPF_K_PARAM</name>
-          <description>K parameter of a low pass filter in the AGC channel. </description>
+          <description>K parameter of a low pass filter in the AGC channel.</description>
           <bitRange>[3:1]</bitRange>
           <access>read-write</access>
         </field>
@@ -1515,7 +1515,7 @@
         </field>
         <field>
           <name>DEC_SAMPLES_SHIFT</name>
-          <description>Number of samples to decimate, where.</description>
+          <description>Number of samples to decimate.</description>
           <bitRange>[9:7]</bitRange>
           <access>read-write</access>
         </field>
@@ -1653,7 +1653,7 @@
         </field>
         <field>
           <name>DEC_SAMPLES_SHIFT</name>
-          <description>Number of samples to decimate, where.</description>
+          <description>Number of samples to decimate.</description>
           <bitRange>[9:7]</bitRange>
           <access>read-write</access>
         </field>
@@ -1791,7 +1791,7 @@
         </field>
         <field>
           <name>DEC_SAMPLES_SHIFT</name>
-          <description>Number of samples to decimate, where.</description>
+          <description>Number of samples to decimate.</description>
           <bitRange>[9:7]</bitRange>
           <access>read-write</access>
         </field>

@@ -32,8 +32,8 @@
  * File Name : acqeng.c
  * Author    : Sebastian Cieslak
  * ******************************************************************************
- * $Date: 2022-04-04 11:08:39 +0200 (pon, 04 kwi 2022) $
- * $Revision: 853 $
+ * $Date: 2022-12-12 15:09:34 +0100 (pon, 12 gru 2022) $
+ * $Revision: 936 $
  *H*****************************************************************************/
 
 #include "acqeng.h"
@@ -192,19 +192,19 @@ acqeng_check_config_t acqeng_check_config(volatile amba_acqeng_t *acqeng) {
     }
 
     // Check if system choice is correct
-    if (!(((acqeng_is_gps_search_enabled_from_config(config)     && acqeng_is_l1e1_freq_search_enabled_from_config(config)  && acqeng_has_gps_l1_prn_gen_from_info(info)     ) +
-           (acqeng_is_gps_search_enabled_from_config(config)     && acqeng_is_l2_freq_search_enabled_from_config(config)    && acqeng_has_gps_l2_prn_gen_from_info(info)     ) +
-           (acqeng_is_gps_search_enabled_from_config(config)     && acqeng_is_l5e5a_freq_search_enabled_from_config(config) && acqeng_has_gps_l5_prn_gen_from_info(info)     ) +
-           (acqeng_is_galileo_search_enabled_from_config(config) && acqeng_is_l1e1_freq_search_enabled_from_config(config)  && acqeng_has_galileo_e1_prn_gen_from_info(info) ) +
-           (acqeng_is_galileo_search_enabled_from_config(config) && acqeng_is_e6_freq_search_enabled_from_config(config)    && acqeng_has_galileo_e6_prn_gen_from_info(info) ) +
-           (acqeng_is_galileo_search_enabled_from_config(config) && acqeng_is_l5e5a_freq_search_enabled_from_config(config) && acqeng_has_galileo_e5a_prn_gen_from_info(info)) +
-           (acqeng_is_galileo_search_enabled_from_config(config) && acqeng_is_e5b_freq_search_enabled_from_config(config)   && acqeng_has_galileo_e5b_prn_gen_from_info(info)) +
-           (acqeng_is_galileo_search_enabled_from_config(config) && acqeng_is_c_freq_search_enabled_from_config(config)     && acqeng_has_galileo_c_prn_gen_from_info(info)  ) +
-           (acqeng_is_glonass_search_enabled_from_config(config) && acqeng_is_l1e1_freq_search_enabled_from_config(config)  && acqeng_has_glonass_l1_prn_gen_from_info(info) ) +
-           (acqeng_is_beidou_search_enabled_from_config(config)  &&                                                            acqeng_has_beidou_prn_gen_from_info(info)     ) +
-           (acqeng_is_qzss_search_enabled_from_config(config)    && acqeng_is_l1e1_freq_search_enabled_from_config(config)  && acqeng_has_qzss_l1_prn_gen_from_info(info)    ) +
-           (acqeng_is_sbas_search_enabled_from_config(config)    && acqeng_is_l1e1_freq_search_enabled_from_config(config)  && acqeng_has_sbas_l1_prn_gen_from_info(info)    ) +
-           (acqeng_is_navic_search_enabled_from_config(config)   && acqeng_is_l5e5a_freq_search_enabled_from_config(config) && acqeng_has_navic_l5_prn_gen_from_info(info)   )) == 1)) {
+    if (!(((acqeng_is_gps_search_enabled_from_config(config)     && acqeng_is_l1e1_freq_search_enabled_from_config(config)  && acqeng_has_gps_l1ca_prn_gen_from_info(info)     ) +
+           (acqeng_is_gps_search_enabled_from_config(config)     && acqeng_is_l2_freq_search_enabled_from_config(config)    && acqeng_has_gps_l2c_prn_gen_from_info(info)      ) +
+           (acqeng_is_gps_search_enabled_from_config(config)     && acqeng_is_l5e5a_freq_search_enabled_from_config(config) && acqeng_has_gps_l5_prn_gen_from_info(info)       ) +
+           (acqeng_is_galileo_search_enabled_from_config(config) && acqeng_is_l1e1_freq_search_enabled_from_config(config)  && acqeng_has_galileo_e1b_prn_gen_from_info(info)  ) +
+           (acqeng_is_galileo_search_enabled_from_config(config) && acqeng_is_e6_freq_search_enabled_from_config(config)    && acqeng_has_galileo_e6_prn_gen_from_info(info)   ) +
+           (acqeng_is_galileo_search_enabled_from_config(config) && acqeng_is_l5e5a_freq_search_enabled_from_config(config) && acqeng_has_galileo_e5a_prn_gen_from_info(info)  ) +
+           (acqeng_is_galileo_search_enabled_from_config(config) && acqeng_is_e5b_freq_search_enabled_from_config(config)   && acqeng_has_galileo_e5b_prn_gen_from_info(info)  ) +
+           (acqeng_is_galileo_search_enabled_from_config(config) && acqeng_is_c_freq_search_enabled_from_config(config)     && acqeng_has_galileo_c_prn_gen_from_info(info)    ) +
+           (acqeng_is_glonass_search_enabled_from_config(config) && acqeng_is_l1e1_freq_search_enabled_from_config(config)  && acqeng_has_glonass_l1of_prn_gen_from_info(info) ) +
+           (acqeng_is_beidou_search_enabled_from_config(config)  &&                                                            acqeng_has_beidou_b1i_prn_gen_from_info(info)   ) +
+           (acqeng_is_qzss_search_enabled_from_config(config)    && acqeng_is_l1e1_freq_search_enabled_from_config(config)  && acqeng_has_qzss_l1ca_prn_gen_from_info(info)    ) +
+           (acqeng_is_sbas_search_enabled_from_config(config)    && acqeng_is_l1e1_freq_search_enabled_from_config(config)  && acqeng_has_sbas_l1ca_prn_gen_from_info(info)    ) +
+           (acqeng_is_navic_search_enabled_from_config(config)   && acqeng_is_l5e5a_freq_search_enabled_from_config(config) && acqeng_has_navic_l5sps_prn_gen_from_info(info)  )) == 1)) {
         return ACQENG_SYSTEM_CHOICE_ERR;
     }
 

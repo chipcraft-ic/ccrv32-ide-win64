@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2021 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2022-04-04 11:08:39 +0200 (pon, 04 kwi 2022) $
-* $Revision: 853 $
+* $Date: 2022-12-12 15:09:34 +0100 (pon, 12 gru 2022) $
+* $Revision: 936 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -215,20 +215,20 @@ enum
 /** ACQENG Acquisition Engine Core Info Register Flags */
 enum
 {
-    AEC_INFO_HAS_AUTO  = 1 << 8,   /*!< Has Automatic Mode Flag            */
-    AEC_INFO_SBAS_L1   = 1 << 19,  /*!< Has SBAS L1 PRN Generator Flag     */
-    AEC_INFO_NAVIC_L5  = 1 << 20,  /*!< Has NAVIC L5 PRN Generator Flag    */
-    AEC_INFO_QZSS_L1   = 1 << 21,  /*!< Has QZSS L1 PRN Generator Flag     */
-    AEC_INFO_BEID      = 1 << 22,  /*!< Has Beidou PRN Generator Flag      */
-    AEC_INFO_GLONA_L1  = 1 << 23,  /*!< Has GLONASS L1 PRN Generator Flag  */
-    AEC_INFO_GALIL_C   = 1 << 24,  /*!< Has Galileo C PRN Generator Flag   */
-    AEC_INFO_GALIL_E5B = 1 << 25,  /*!< Has Galileo E5b PRN Generator Flag */
-    AEC_INFO_GALIL_E5A = 1 << 26,  /*!< Has Galileo E5a PRN Generator Flag */
-    AEC_INFO_GALIL_E6  = 1 << 27,  /*!< Has Galileo E6 PRN Generator Flag  */
-    AEC_INFO_GALIL_E1  = 1 << 28,  /*!< Has Galileo E1 PRN Generator Flag  */
-    AEC_INFO_GPS_L5    = 1 << 29,  /*!< Has GPS L5 PRN Generator Flag      */
-    AEC_INFO_GPS_L2    = 1 << 30,  /*!< Has GPS L2 PRN Generator Flag      */
-    AEC_INFO_GPS_L1    = 1 << 31,  /*!< Has GPS L1 PRN Generator Flag      */
+    AEC_INFO_HAS_AUTO      = 1 << 8,   /*!< Has Automatic Mode Flag                */
+    AEC_INFO_SBAS_L1CA     = 1 << 19,  /*!< Has SBAS L1CA PRN Generator Flag       */
+    AEC_INFO_NAVIC_L5SPS   = 1 << 20,  /*!< Has NAVIC L5SPS PRN Generator Flag     */
+    AEC_INFO_QZSS_L1CA     = 1 << 21,  /*!< Has QZSS L1CA PRN Generator Flag       */
+    AEC_INFO_BEID_B1I      = 1 << 22,  /*!< Has Beidou B1I PRN Generator Flag      */
+    AEC_INFO_GLONA_L1OF    = 1 << 23,  /*!< Has GLONASS L1OF PRN Generator Flag    */
+    AEC_INFO_GALIL_C       = 1 << 24,  /*!< Has Galileo C PRN Generator Flag       */
+    AEC_INFO_GALIL_E5B     = 1 << 25,  /*!< Has Galileo E5b PRN Generator Flag     */
+    AEC_INFO_GALIL_E5A     = 1 << 26,  /*!< Has Galileo E5a PRN Generator Flag     */
+    AEC_INFO_GALIL_E6      = 1 << 27,  /*!< Has Galileo E6 PRN Generator Flag      */
+    AEC_INFO_GALIL_E1B     = 1 << 28,  /*!< Has Galileo E1B PRN Generator Flag     */
+    AEC_INFO_GPS_L5        = 1 << 29,  /*!< Has GPS L5 PRN Generator Flag          */
+    AEC_INFO_GPS_L2C       = 1 << 30,  /*!< Has GPS L2C PRN Generator Flag         */
+    AEC_INFO_GPS_L1CA      = 1 << 31,  /*!< Has GPS L1CA PRN Generator Flag        */
 };
 
 /** ACQENG Acquisition Engine Core Info Register Shifts */

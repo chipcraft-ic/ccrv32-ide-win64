@@ -32,8 +32,8 @@
 # File Name : startup.S
 # Author    : Rafal Harabien, Krzysztof Marcinek
 # ******************************************************************************
-# $Date: 2022-08-25 14:11:28 +0200 (czw, 25 sie 2022) $
-# $Revision: 885 $
+# $Date: 2022-12-05 17:07:41 +0100 (pon, 05 gru 2022) $
+# $Revision: 928 $
 #H******************************************************************************
 
 # Useful defines:
@@ -499,41 +499,6 @@ int_enter_stack:
   srli t0, t0, 3
   slli t0, t0, 3
 
-#ifdef __riscv_float_abi_double
-  fsd f0, 0(t0)
-  fsd f1, 8(t0)
-  fsd f2, 16(t0)
-  fsd f3, 32(t0)
-  fsd f4, 40(t0)
-  fsd f5, 48(t0)
-  fsd f6, 56(t0)
-  fsd f7, 64(t0)
-  fsd f8, 72(t0)
-  fsd f9, 80(t0)
-  fsd f10, 88(t0)
-  fsd f11, 96(t0)
-  fsd f12, 104(t0)
-  fsd f13, 112(t0)
-  fsd f14, 120(t0)
-  fsd f15, 128(t0)
-  fsd f16, 136(t0)
-  fsd f17, 144(t0)
-  fsd f18, 152(t0)
-  fsd f19, 160(t0)
-  fsd f20, 168(t0)
-  fsd f21, 176(t0)
-  fsd f22, 184(t0)
-  fsd f23, 192(t0)
-  fsd f24, 200(t0)
-  fsd f25, 208(t0)
-  fsd f26, 216(t0)
-  fsd f27, 224(t0)
-  fsd f28, 232(t0)
-  fsd f29, 240(t0)
-  fsd f30, 248(t0)
-  fsd f31, 256(t0)
-#endif
-
 int_isr_check:
   lw t0, 28(sp)                         # read mcause from stack
   ori t1, zero, IRQ_CAUSE_MSOFT
@@ -572,41 +537,6 @@ int_ret_stack:
   addi t0, sp, 36+124+12
   srli t0, t0, 3
   slli t0, t0, 3
-
-#ifdef __riscv_float_abi_double
-  fld f0, 0(t0)
-  fld f1, 8(t0)
-  fld f2, 16(t0)
-  fld f3, 32(t0)
-  fld f4, 40(t0)
-  fld f5, 48(t0)
-  fld f6, 56(t0)
-  fld f7, 64(t0)
-  fld f8, 72(t0)
-  fld f9, 80(t0)
-  fld f10, 88(t0)
-  fld f11, 96(t0)
-  fld f12, 104(t0)
-  fld f13, 112(t0)
-  fld f14, 120(t0)
-  fld f15, 128(t0)
-  fld f16, 136(t0)
-  fld f17, 144(t0)
-  fld f18, 152(t0)
-  fld f19, 160(t0)
-  fld f20, 168(t0)
-  fld f21, 176(t0)
-  fld f22, 184(t0)
-  fld f23, 192(t0)
-  fld f24, 200(t0)
-  fld f25, 208(t0)
-  fld f26, 216(t0)
-  fld f27, 224(t0)
-  fld f28, 232(t0)
-  fld f29, 240(t0)
-  fld f30, 248(t0)
-  fld f31, 256(t0)
-#endif
 
   # Restore registers from stack (except t0)
   lw ra, 36+0(sp)

@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2019 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2022-01-19 09:38:48 +0100 (śro, 19 sty 2022) $
-* $Revision: 814 $
+* $Date: 2022-12-12 15:09:34 +0100 (pon, 12 gru 2022) $
+* $Revision: 936 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -79,7 +79,7 @@ typedef struct
     uint32_t _reserved0[1];
     uint32_t TMSTMP_RNG_LO;     /*!< Range Generation Timestamp LO                        */
     uint32_t TMSTMP_RNG_HI;     /*!< Range Generation Timestamp HI                        */
-    uint32_t FLAGS;             /*!< Flags Register                                       */
+    uint32_t FLAGS;             /*!< Interrupt Flags Register                             */
     uint32_t PPS_IN_CFG;        /*!< PPS Input Configuration Register                     */
     uint32_t PPS_PERIOD;        /*!< PPS Generation Period Register                       */
     uint32_t PPS_HI;            /*!< PPS Generation Period High Register                  */
@@ -95,6 +95,7 @@ typedef struct
     uint32_t GNSS_DIAG_FUNCT;   /*!< GNSS-ISE Diagnostic Function Register                */
     uint32_t GNSS_DIAG_DATA1;   /*!< GNSS-ISE Diagnostic Data Register                    */
     uint32_t GNSS_DIAG_DATA2;   /*!< GNSS-ISE Diagnostic Data Register                    */
+    uint32_t GNSS_DIAG_RESULT;  /*!< GNSS-ISE Diagnostic Result Register                  */
 } gnss_regs_t;
 
 static volatile gnss_regs_t * const GNSS_PTR = (gnss_regs_t*)GNSS_BASE;

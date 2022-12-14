@@ -32,8 +32,8 @@
 * File Name : main.c
 * Author    : Krzysztof Marcinek
 * ******************************************************************************
-* $Date: 2022-10-19 13:51:53 +0200 (śro, 19 paź 2022) $
-* $Revision: 896 $
+* $Date: 2022-12-12 15:09:34 +0100 (pon, 12 gru 2022) $
+* $Revision: 936 $
 *H*****************************************************************************/
 
 #include "board.h"
@@ -42,12 +42,156 @@
 #include <ccrv32-utils.h>
 #include <ccrv32-pwd.h>
 #include <ccrv32-mcore.h>
+#include <ccrv32-dcache.h>
 #include <ccrv32-mbist.h>
 #include <core_util.h>
 #include <stdio.h>
 #include "test.h"
 
-int main(void)
+void singleTests(void)
+{
+
+    uint32_t cpu_info_0 = csr_read(mconfig0);
+    uint32_t cpu_info_1 = csr_read(mconfig1);
+    //uint32_t cpu_info_2 = csr_read(mconfig2);
+    uint32_t fpu_num = (cpu_info_1 & CPU_FPU_MASK) >> CPU_FPU_SHIFT;
+
+    int dctag_region = -128;
+    if (cpu_info_1 & CPU_DCACHE)
+    {
+        // skip test in low-power data cache, tags could be too small for error injection
+        if (((DCACHE_PTR->INFO & DCACHE_IMPL_MASK) >> DCACHE_IMPL_SHIFT) != DCACHE_IMPL_LP)
+            dctag_region = 2;
+    }
+    if (fpu_num > 0)
+        dctag_region += 1;
+    if (cpu_info_0 & CPU_ICACHE)
+        dctag_region += 2;
+
+    if (PWD_PTR->RSTRSN == PWD_RSN_MBIST){
+
+        g_failedTests = MBIST_PTR->SCRATCH0;
+        g_totalTests = MBIST_PTR->SCRATCH1;
+
+        if ((MBIST_PTR->CTRL&MBIST_CTRL_ALG_MASK)>>MBIST_CTRL_ALG_SHIFT != MBIST_ALG_ZERO_ONE || g_totalTests == 0){
+            if ((MBIST_PTR->CTRL&MBIST_CTRL_ALG_MASK)>>MBIST_CTRL_ALG_SHIFT != MBIST_ALG_MARCH_D2PF) {
+                return;
+            }
+        }
+
+        uint8_t region = (MBIST_PTR->CTRL&MBIST_CTRL_REGN_MASK)>>MBIST_CTRL_REGN_SHIFT;
+        uint8_t second_port = (MBIST_PTR->CTRL & MBIST_CTRL_SECOND_PORT) != 0;
+        uint8_t switch_ports = (MBIST_PTR->CTRL & MBIST_CTRL_SWITCH_PORTS) != 0;
+        uint8_t inject_idx_port0 = (MBIST_PTR->INJ & MBIST_INJ_IDX_PORT0_MASK) >> MBIST_INJ_IDX_PORT0_SHIFT;
+        uint8_t inject_idx_port1 = (MBIST_PTR->INJ & MBIST_INJ_IDX_PORT1_MASK) >> MBIST_INJ_IDX_PORT1_SHIFT;
+        if (region == 0 && MBIST_PTR->INJ_ADDR0 == 0){
+            MBIST_PTR->INJ = MBIST_INJ_PORT0_EN | (region+1) << MBIST_INJ_IDX_PORT0_SHIFT;
+            MBIST_PTR->INJ_ADDR0 = (region+1)*2;
+            MBIST_PTR->CTRL = MBIST_CTRL_SINGLE;
+            MEMORY_BARRIER();
+            MBIST_PTR->RUN = MBIST_RUN_KEY;
+            for(;;);
+        }
+        else if (region == 0 && second_port == 0){
+            printf("\nSingle run tests - Register File Port0.\n");
+            for (int i=0; i<26; i++)
+            {
+                //printf("REG0 %d: 0x%08x\n",i,(unsigned)MBIST_PTR->DET_LOGS[i]);
+            }
+            assertTrue(MBIST_PTR->DET_LOGS[0] != 0); // error count > 0
+            assertTrue(MBIST_PTR->DET_LOGS[2] == MBIST_PTR->INJ_ADDR0); // error address matches
+            assertTrue((MBIST_PTR->DET_LOGS[18] & 0xFF) == inject_idx_port0); // error index matches
+
+            MBIST_PTR->SCRATCH0 = g_failedTests;
+            MBIST_PTR->SCRATCH1 = g_totalTests;
+
+            MBIST_PTR->INJ = MBIST_INJ_PORT0_EN | 4*(region+1) << MBIST_INJ_IDX_PORT0_SHIFT;
+            MBIST_PTR->INJ_ADDR0 = (region+1)*5;
+            MBIST_PTR->CTRL |= MBIST_CTRL_SECOND_PORT;
+            MEMORY_BARRIER();
+            MBIST_PTR->RUN = MBIST_RUN_KEY;
+            for(;;);
+        }
+        else if (region == 0 && second_port == 1){
+            printf("\nSingle run tests - Register File Port1.\n");
+            for (int i=0; i<26; i++)
+            {
+                //printf("REG0 %d: 0x%08x\n",i,(unsigned)MBIST_PTR->DET_LOGS[i]);
+            }
+            assertTrue(MBIST_PTR->DET_LOGS[0] != 0); // error count > 0
+            assertTrue(MBIST_PTR->DET_LOGS[2] == MBIST_PTR->INJ_ADDR0); // error address matches
+            assertTrue((MBIST_PTR->DET_LOGS[18] & 0xFF) == inject_idx_port0); // error index matches
+
+            MBIST_PTR->SCRATCH0 = g_failedTests;
+            MBIST_PTR->SCRATCH1 = g_totalTests;
+
+            if (dctag_region > 0){
+                region = dctag_region;
+                MBIST_PTR->INJ = MBIST_INJ_PORT0_EN | (region+1) << MBIST_INJ_IDX_PORT0_SHIFT;
+                MBIST_PTR->INJ_ADDR0 = (region+1)*2;
+                MBIST_PTR->CTRL = MBIST_CTRL_SINGLE | (region << MBIST_CTRL_REGN_SHIFT);
+                MEMORY_BARRIER();
+                MBIST_PTR->RUN = MBIST_RUN_KEY;
+                for(;;);
+            }
+        }
+        else if (region > 0 && switch_ports == 0 && ((MBIST_PTR->CTRL&MBIST_CTRL_ALG_MASK)>>MBIST_CTRL_ALG_SHIFT != MBIST_ALG_MARCH_D2PF)){
+            printf("\nSingle run tests - Data Cache Tags Port0.\n");
+            for (int i=0; i<26; i++)
+            {
+                //printf("REG0 %d: 0x%08x\n",i,(unsigned)MBIST_PTR->DET_LOGS[i]);
+            }
+            assertTrue(MBIST_PTR->DET_LOGS[0] != 0); // error count > 0
+            assertTrue(MBIST_PTR->DET_LOGS[2] == MBIST_PTR->INJ_ADDR0); // error address matches
+            assertTrue((MBIST_PTR->DET_LOGS[18] & 0xFF) == inject_idx_port0); // error index matches
+
+            MBIST_PTR->SCRATCH0 = g_failedTests;
+            MBIST_PTR->SCRATCH1 = g_totalTests;
+
+            MBIST_PTR->INJ = MBIST_INJ_PORT0_EN | (region+8) << MBIST_INJ_IDX_PORT0_SHIFT;
+            MBIST_PTR->INJ_ADDR0 = (region+1)*3;
+            MBIST_PTR->CTRL |= MBIST_CTRL_SINGLE | MBIST_CTRL_SWITCH_PORTS;
+            MEMORY_BARRIER();
+            MBIST_PTR->RUN = MBIST_RUN_KEY;
+            for(;;);
+        }
+        else if (region > 0 && switch_ports == 1){
+            printf("\nSingle run tests - Data Cache Tags Port1.\n");
+            for (int i=0; i<26; i++)
+            {
+                //printf("REG0 %d: 0x%08x\n",i,(unsigned)MBIST_PTR->DET_LOGS[i]);
+            }
+            assertTrue(MBIST_PTR->DET_LOGS[0] != 0); // error count > 0
+            assertTrue(MBIST_PTR->DET_LOGS[2] == MBIST_PTR->INJ_ADDR0); // error address matches
+            assertTrue((MBIST_PTR->DET_LOGS[18] & 0xFF) == inject_idx_port0); // error index matches
+
+            MBIST_PTR->SCRATCH0 = g_failedTests;
+            MBIST_PTR->SCRATCH1 = g_totalTests;
+
+            MBIST_PTR->INJ = MBIST_INJ_PORT1_EN | (region+10) << MBIST_INJ_IDX_PORT1_SHIFT;
+            MBIST_PTR->INJ_ADDR1 = (region+4)*3;
+
+            MBIST_PTR->CTRL = MBIST_ALG_MARCH_D2PF << MBIST_CTRL_ALG_SHIFT | MBIST_CTRL_SINGLE | (region << MBIST_CTRL_REGN_SHIFT);
+            MEMORY_BARRIER();
+            MBIST_PTR->RUN = MBIST_RUN_KEY;
+            for(;;);
+        }
+        else if ((MBIST_PTR->CTRL&MBIST_CTRL_ALG_MASK)>>MBIST_CTRL_ALG_SHIFT == MBIST_ALG_MARCH_D2PF){
+            printf("\nSingle run tests - Data Cache Tags d2PF.\n");
+            for (int i=0; i<26; i++)
+            {
+                //printf("REG0 %d: 0x%08x\n",i,(unsigned)MBIST_PTR->DET_LOGS[i]);
+            }
+            assertTrue(MBIST_PTR->DET_LOGS[1] != 0); // error count > 0
+            assertTrue(MBIST_PTR->DET_LOGS[10] == MBIST_PTR->INJ_ADDR1); // error address matches
+            assertTrue((MBIST_PTR->DET_LOGS[22] & 0xFF) == inject_idx_port1); // error index matches
+        }
+
+    }
+
+}
+
+void fullTests(void)
 {
 
     uint32_t status, mask, core_num, i;
@@ -55,26 +199,17 @@ int main(void)
 
     core_num = MCORE_PTR->CORE_NUM;
 
-    if ((csr_read(mconfig1) & CPU_MBIST) == 0){
-        printf("No MBIST found!\n");
-        printTestSummary();
-        return 0;
-    }
-    if ((csr_read(mconfig0) & CPU_PWD) == 0){
-        printf("Power management controller required to test MBIST!\n");
-        printTestSummary();
-        return 0;
-    }
-
-    // Disable lockstep mode if present
-    //if (lockstepDisable() == 0){
-    //    printf("\nDisabling lockstep mode!\n");
-    //}
-
     if (PWD_PTR->RSTRSN == PWD_RSN_MBIST){
 
         g_failedTests = MBIST_PTR->SCRATCH0;
         g_totalTests = MBIST_PTR->SCRATCH1;
+
+        if ((MBIST_PTR->CTRL&MBIST_CTRL_ALG_MASK)>>MBIST_CTRL_ALG_SHIFT == MBIST_ALG_ZERO_ONE && g_totalTests > 0){
+            return;
+        }
+        if ((MBIST_PTR->CTRL&MBIST_CTRL_ALG_MASK)>>MBIST_CTRL_ALG_SHIFT == MBIST_ALG_MARCH_D2PF){
+            return;
+        }
 
         if (MBIST_PTR->EXT_LOGS == 0){
             assertTrue(1);
@@ -145,8 +280,10 @@ int main(void)
             for(;;);
         }
         else if ((MBIST_PTR->CTRL&MBIST_CTRL_ALG_MASK)>>MBIST_CTRL_ALG_SHIFT == MBIST_ALG_MARCH_CM){
-            printTestSummary();
-            return 0;
+            //printTestSummary();
+            //return;
+            MBIST_PTR->CTRL = MBIST_ALG_ZERO_ONE << MBIST_CTRL_ALG_SHIFT;
+            return;
         }
 
     }
@@ -157,5 +294,31 @@ int main(void)
     MEMORY_BARRIER();
     MBIST_PTR->RUN = MBIST_RUN_KEY;
     for(;;);
+
+}
+
+int main(void)
+{
+
+    if ((csr_read(mconfig1) & CPU_MBIST) == 0){
+        printf("No MBIST found!\n");
+        printTestSummary();
+        return 0;
+    }
+    if ((csr_read(mconfig0) & CPU_PWD) == 0){
+        printf("Power management controller required to test MBIST!\n");
+        printTestSummary();
+        return 0;
+    }
+
+    // Disable lockstep mode if present
+    if (lockstepDisable() == 0){
+        printf("\nDisabling lockstep mode!\n");
+    }
+
+    fullTests();
+    singleTests();
+
+    printTestSummary();
 
 }

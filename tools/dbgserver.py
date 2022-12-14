@@ -8,8 +8,8 @@
 #
 # Author: Rafal Harabien
 #
-# $Date: 2022-11-29 18:03:56 +0100 (wto, 29 lis 2022) $
-# $Revision: 923 $
+# $Date: 2022-12-07 10:52:56 +0100 (Wed, 07 Dec 2022) $
+# $Revision: 930 $
 #
 
 # TODO: the script contains a lot of harcoded magic values
@@ -48,6 +48,8 @@ SIGINT = 2
 SIGTRAP = 5
 BREAK_OPCODE = b'\x00\x00\x03\xCD'
 MEM_REGION_ALIGNMENT = 0x10000
+
+START_ADDRESS = 0x100
 
 class DebuggerDisconnectedException(Exception):
 	"""Raised when GDB debugger disconnects from debug server."""
@@ -1035,9 +1037,11 @@ class DbgBridge:
 		logging.info('Remote command: %s', cmd)
 		if cmd == b'reset halt':
 			old_bp = self._cpu_dbg.get_breakpoint(0)
-			# Stop as early as possible (address 0)
-			self._cpu_dbg.set_breakpoint(0, 0)
+			# Stop as early as possible
+			self._cpu_dbg.set_breakpoint(0, START_ADDRESS)
 			self._cpu_dbg.reset_cpu()
+			# workaround, no delay causes invalid instruction exception
+			time.sleep(1)
 			self._cpu_dbg.break_cpu()
 			self._cpu_dbg.wait_for_context()
 			self._cpu_dbg.set_breakpoint(0, old_bp if old_bp else 0xFFFFFFFF)

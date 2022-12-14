@@ -32,8 +32,8 @@
  * File Name : acqeng.h
  * Author    : Sebastian Cieslak
  * ******************************************************************************
- * $Date: 2022-04-04 11:08:39 +0200 (pon, 04 kwi 2022) $
- * $Revision: 853 $
+ * $Date: 2022-12-12 15:09:34 +0100 (pon, 12 gru 2022) $
+ * $Revision: 936 $
  *H*****************************************************************************/
 
 #ifndef _ACQENG_H_
@@ -2392,138 +2392,138 @@ static inline uint8_t acqeng_get_reserved_info_from_info(uint32_t info) {
 }
 
 //--------
-// SBAS_L1
+// SBAS_L1CA
 //--------
-/*! \brief Tests if the Acquisition Engine has a SBAS L1 PRN generator.
+/*! \brief Tests if the Acquisition Engine has a SBAS L1CA PRN generator.
  *
  * \param acqeng Base address of the Acquisition Engine instance.
  *
- * \return Value of the SBAS_L1 bit.
- *   \retval true  SBAS L1 PRN generator is present.
- *   \retval false SBAS L1 PRN generator is not present.
+ * \return Value of the SBAS_L1CA bit.
+ *   \retval true  SBAS L1CA PRN generator is present.
+ *   \retval false SBAS L1CA PRN generator is not present.
  */
-static inline bool acqeng_has_sbas_l1_prn_gen(volatile amba_acqeng_t *acqeng) {
-    return acqeng->INFO & AEC_INFO_SBAS_L1;
+static inline bool acqeng_has_sbas_l1ca_prn_gen(volatile amba_acqeng_t *acqeng) {
+    return acqeng->INFO & AEC_INFO_SBAS_L1CA;
 }
 
-/*! \brief Tests if info indicates that the Acquisition Engine has a SBAS L1 PRN generator.
+/*! \brief Tests if info indicates that the Acquisition Engine has a SBAS L1CA PRN generator.
  *
  * \param info Content of the info register.
  *
- * \return Value of the SBAS_L1 bit.
- *   \retval true  SBAS L1 PRN generator is present.
- *   \retval false SBAS L1 PRN generator is not present.
+ * \return Value of the SBAS_L1CA bit.
+ *   \retval true  SBAS L1CA PRN generator is present.
+ *   \retval false SBAS L1CA PRN generator is not present.
  */
-static inline bool acqeng_has_sbas_l1_prn_gen_from_info(uint32_t info) {
-    return info & AEC_INFO_SBAS_L1;
+static inline bool acqeng_has_sbas_l1ca_prn_gen_from_info(uint32_t info) {
+    return info & AEC_INFO_SBAS_L1CA;
 }
 
 //---------
-// NAVIC_L5
+// NAVIC_L5SPS
 //---------
-/*! \brief Tests if the Acquisition Engine has a NAVIC L5 PRN generator.
+/*! \brief Tests if the Acquisition Engine has a NAVIC L5SPS PRN generator.
  *
  * \param acqeng Base address of the Acquisition Engine instance.
  *
- * \return Value of the NAVIC L5 bit.
- *   \retval true  NAVIC L5 PRN generator is present.
- *   \retval false NAVIC L5 PRN generator is not present.
+ * \return Value of the NAVIC L5SPS bit.
+ *   \retval true  NAVIC L5SPS PRN generator is present.
+ *   \retval false NAVIC L5SPS PRN generator is not present.
  */
-static inline bool acqeng_has_navic_l5_prn_gen(volatile amba_acqeng_t *acqeng) {
-    return acqeng->INFO & AEC_INFO_NAVIC_L5;
+static inline bool acqeng_has_navic_l5sps_prn_gen(volatile amba_acqeng_t *acqeng) {
+    return acqeng->INFO & AEC_INFO_NAVIC_L5SPS;
 }
 
-/*! \brief Tests if info indicates that the Acquisition Engine has a NAVIC L5 PRN generator.
+/*! \brief Tests if info indicates that the Acquisition Engine has a NAVIC L5SPS PRN generator.
  *
  * \param info Content of the info register.
  *
- * \return Value of the NAVIC L5 bit.
- *   \retval true  NAVIC L5 PRN generator is present.
- *   \retval false NAVIC L5 PRN generator is not present.
+ * \return Value of the NAVIC L5SPS bit.
+ *   \retval true  NAVIC L5SPS PRN generator is present.
+ *   \retval false NAVIC L5SPS PRN generator is not present.
  */
-static inline bool acqeng_has_navic_l5_prn_gen_from_info(uint32_t info) {
-    return info & AEC_INFO_NAVIC_L5;
+static inline bool acqeng_has_navic_l5sps_prn_gen_from_info(uint32_t info) {
+    return info & AEC_INFO_NAVIC_L5SPS;
 }
 
 //--------
-// QZSS L1
+// QZSS L1CA
 //--------
-/*! \brief Tests if the Acquisition Engine has a QZSS L1 PRN generator.
+/*! \brief Tests if the Acquisition Engine has a QZSS L1CA PRN generator.
  *
  * \param acqeng Base address of the Acquisition Engine instance.
  *
- * \return Value of the QZSS L1 bit.
- *   \retval true  QZSS L1 PRN generator is present.
- *   \retval false QZSS L1 PRN generator is not present.
+ * \return Value of the QZSS L1CA bit.
+ *   \retval true  QZSS L1CA PRN generator is present.
+ *   \retval false QZSS L1CA PRN generator is not present.
  */
-static inline bool acqeng_has_qzss_l1_prn_gen(volatile amba_acqeng_t *acqeng) {
-    return acqeng->INFO & AEC_INFO_QZSS_L1;
+static inline bool acqeng_has_qzss_l1ca_prn_gen(volatile amba_acqeng_t *acqeng) {
+    return acqeng->INFO & AEC_INFO_QZSS_L1CA;
 }
 
-/*! \brief Tests if info indicates that the Acquisition Engine has a QZSS L1 PRN generator.
+/*! \brief Tests if info indicates that the Acquisition Engine has a QZSS L1CA PRN generator.
  *
  * \param info Content of the info register.
  *
- * \return Value of the QZSS L1 bit.
- *   \retval true  QZSS L1 PRN generator is present.
- *   \retval false QZSS L1 PRN generator is not present.
+ * \return Value of the QZSS L1CA bit.
+ *   \retval true  QZSS L1CA PRN generator is present.
+ *   \retval false QZSS L1CA PRN generator is not present.
  */
-static inline bool acqeng_has_qzss_l1_prn_gen_from_info(uint32_t info) {
-    return info & AEC_INFO_QZSS_L1;
+static inline bool acqeng_has_qzss_l1ca_prn_gen_from_info(uint32_t info) {
+    return info & AEC_INFO_QZSS_L1CA;
 }
 
 //-----
-// BEID
+// BEID_B1I
 //-----
-/*! \brief Tests if the Acquisition Engine has a Beidou PRN generator.
+/*! \brief Tests if the Acquisition Engine has a Beidou B1I PRN generator.
  *
  * \param acqeng Base address of the Acquisition Engine instance.
  *
- * \return Value of the BEID bit.
- *   \retval true  Beidou PRN generator is present.
- *   \retval false Beidou PRN generator is not present.
+ * \return Value of the BEID_B1I bit.
+ *   \retval true  Beidou B1I PRN generator is present.
+ *   \retval false Beidou B1I PRN generator is not present.
  */
-static inline bool acqeng_has_beidou_prn_gen(volatile amba_acqeng_t *acqeng) {
-    return acqeng->INFO & AEC_INFO_BEID;
+static inline bool acqeng_has_beidou_b1i_prn_gen(volatile amba_acqeng_t *acqeng) {
+    return acqeng->INFO & AEC_INFO_BEID_B1I;
 }
 
-/*! \brief Tests if info indicates that the Acquisition Engine has a Beidou PRN generator.
+/*! \brief Tests if info indicates that the Acquisition Engine has a Beidou B1I PRN generator.
  *
  * \param info Content of the info register.
  *
- * \return Value of the BEID bit.
- *   \retval true  Beidou PRN generator is present.
- *   \retval false Beidou PRN generator is not present.
+ * \return Value of the BEID_B1I bit.
+ *   \retval true  Beidou B1I PRN generator is present.
+ *   \retval false Beidou B1I PRN generator is not present.
  */
-static inline bool acqeng_has_beidou_prn_gen_from_info(uint32_t info) {
-    return info & AEC_INFO_BEID;
+static inline bool acqeng_has_beidou_b1i_prn_gen_from_info(uint32_t info) {
+    return info & AEC_INFO_BEID_B1I;
 }
 
 //---------
-// GLONA_L1
+// GLONA_L1OF
 //---------
-/*! \brief Tests if the Acquisition Engine has a GLONASS L1 PRN generator.
+/*! \brief Tests if the Acquisition Engine has a GLONASS L1OF PRN generator.
  *
  * \param acqeng Base address of the Acquisition Engine instance.
  *
- * \return Value of the GLONA_L1 bit.
- *   \retval true  GLONASS L1 PRN generator is present.
- *   \retval false GLONASS L1 PRN generator is not present.
+ * \return Value of the GLONA_L1OF bit.
+ *   \retval true  GLONASS L1OF PRN generator is present.
+ *   \retval false GLONASS L1OF PRN generator is not present.
  */
-static inline bool acqeng_has_glonass_l1_prn_gen(volatile amba_acqeng_t *acqeng) {
-    return acqeng->INFO & AEC_INFO_GLONA_L1;
+static inline bool acqeng_has_glonass_l1of_prn_gen(volatile amba_acqeng_t *acqeng) {
+    return acqeng->INFO & AEC_INFO_GLONA_L1OF;
 }
 
-/*! \brief Tests if info indicates that the Acquisition Engine has a GLONASS L1 PRN generator.
+/*! \brief Tests if info indicates that the Acquisition Engine has a GLONASS L1OF PRN generator.
  *
  * \param info Content of the info register.
  *
- * \return Value of the GLONA_L1 bit.
- *   \retval true  GLONASS L1 PRN generator is present.
- *   \retval false GLONASS L1 PRN generator is not present.
+ * \return Value of the GLONA_L1OF bit.
+ *   \retval true  GLONASS L1OF PRN generator is present.
+ *   \retval false GLONASS L1OF PRN generator is not present.
  */
-static inline bool acqeng_has_glonass_l1_prn_gen_from_info(uint32_t info) {
-    return info & AEC_INFO_GLONA_L1;
+static inline bool acqeng_has_glonass_l1of_prn_gen_from_info(uint32_t info) {
+    return info & AEC_INFO_GLONA_L1OF;
 }
 
 //--------
@@ -2635,30 +2635,30 @@ static inline bool acqeng_has_galileo_e6_prn_gen_from_info(uint32_t info) {
 }
 
 //---------
-// GALIL_E1
+// GALIL_E1B
 //---------
-/*! \brief Tests if the Acquisition Engine has a Galileo E1 PRN generator.
+/*! \brief Tests if the Acquisition Engine has a Galileo E1B PRN generator.
  *
  * \param acqeng Base address of the Acquisition Engine instance.
  *
- * \return Value of the GALIL_E1 bit.
- *   \retval true  Galileo E1 PRN generator is present.
- *   \retval false Galileo E1 PRN generator is not present.
+ * \return Value of the GALIL_E1B bit.
+ *   \retval true  Galileo E1B PRN generator is present.
+ *   \retval false Galileo E1B PRN generator is not present.
  */
-static inline bool acqeng_has_galileo_e1_prn_gen(volatile amba_acqeng_t *acqeng) {
-    return acqeng->INFO & AEC_INFO_GALIL_E1;
+static inline bool acqeng_has_galileo_e1b_prn_gen(volatile amba_acqeng_t *acqeng) {
+    return acqeng->INFO & AEC_INFO_GALIL_E1B;
 }
 
-/*! \brief Tests if info indicates that the Acquisition Engine has a Galileo E1 PRN generator.
+/*! \brief Tests if info indicates that the Acquisition Engine has a Galileo E1B PRN generator.
  *
  * \param info Content of the info register.
  *
- * \return Value of the GALIL_E1 bit.
- *   \retval true  Galileo E1 PRN generator is present.
- *   \retval false Galileo E1 PRN generator is not present.
+ * \return Value of the GALIL_E1B bit.
+ *   \retval true  Galileo E1B PRN generator is present.
+ *   \retval false Galileo E1B PRN generator is not present.
  */
-static inline bool acqeng_has_galileo_e1_prn_gen_from_info(uint32_t info) {
-    return info & AEC_INFO_GALIL_E1;
+static inline bool acqeng_has_galileo_e1b_prn_gen_from_info(uint32_t info) {
+    return info & AEC_INFO_GALIL_E1B;
 }
 
 //-------
@@ -2689,57 +2689,57 @@ static inline bool acqeng_has_gps_l5_prn_gen_from_info(uint32_t info) {
 }
 
 //-------
-// GPS_L2
+// GPS_L2C
 //-------
-/*! \brief Tests if the Acquisition Engine has a GPS L2 PRN generator.
+/*! \brief Tests if the Acquisition Engine has a GPS L2C PRN generator.
  *
  * \param acqeng Base address of the Acquisition Engine instance.
  *
- * \return Value of the GPS_L2 bit.
- *   \retval true  GPS L2 PRN generator is present.
- *   \retval false GPS L2 PRN generator is not present.
+ * \return Value of the GPS_L2C bit.
+ *   \retval true  GPS L2C PRN generator is present.
+ *   \retval false GPS L2C PRN generator is not present.
  */
-static inline bool acqeng_has_gps_l2_prn_gen(volatile amba_acqeng_t *acqeng) {
-    return acqeng->INFO & AEC_INFO_GPS_L2;
+static inline bool acqeng_has_gps_l2c_prn_gen(volatile amba_acqeng_t *acqeng) {
+    return acqeng->INFO & AEC_INFO_GPS_L2C;
 }
 
-/*! \brief Tests if info indicates that the Acquisition Engine has a GPS L2 PRN generator.
+/*! \brief Tests if info indicates that the Acquisition Engine has a GPS L2C PRN generator.
  *
  * \param info Content of the info register.
  *
- * \return Value of the GPS_L2 bit.
- *   \retval true  GPS L2 PRN generator is present.
- *   \retval false GPS L2 PRN generator is not present.
+ * \return Value of the GPS_L2C bit.
+ *   \retval true  GPS L2C PRN generator is present.
+ *   \retval false GPS L2C PRN generator is not present.
  */
-static inline bool acqeng_has_gps_l2_prn_gen_from_info(uint32_t info) {
-    return info & AEC_INFO_GPS_L2;
+static inline bool acqeng_has_gps_l2c_prn_gen_from_info(uint32_t info) {
+    return info & AEC_INFO_GPS_L2C;
 }
 
 //-------
-// GPS_L1
+// GPS_L1CA
 //-------
-/*! \brief Tests if the Acquisition Engine has a GPS L1 PRN generator.
+/*! \brief Tests if the Acquisition Engine has a GPS L1CA PRN generator.
  *
  * \param acqeng Base address of the Acquisition Engine instance.
  *
- * \return Value of the GPS_L1 bit.
- *   \retval true  GPS L1 PRN generator is present.
- *   \retval false GPS L1 PRN generator is not present.
+ * \return Value of the GPS_L1CA bit.
+ *   \retval true  GPS L1CA PRN generator is present.
+ *   \retval false GPS L1CA PRN generator is not present.
  */
-static inline bool acqeng_has_gps_l1_prn_gen(volatile amba_acqeng_t *acqeng) {
-    return acqeng->INFO & AEC_INFO_GPS_L1;
+static inline bool acqeng_has_gps_l1ca_prn_gen(volatile amba_acqeng_t *acqeng) {
+    return acqeng->INFO & AEC_INFO_GPS_L1CA;
 }
 
-/*! \brief Tests if info indicates that the Acquisition Engine has a GPS L1 PRN generator.
+/*! \brief Tests if info indicates that the Acquisition Engine has a GPS L1CA PRN generator.
  *
  * \param info Content of the info register.
  *
- * \return Value of the GPS_L1 bit.
- *   \retval true  GPS L1 PRN generator is present.
- *   \retval false GPS L1 PRN generator is not present.
+ * \return Value of the GPS_L1CA bit.
+ *   \retval true  GPS L1CA PRN generator is present.
+ *   \retval false GPS L1CA PRN generator is not present.
  */
-static inline bool acqeng_has_gps_l1_prn_gen_from_info(uint32_t info) {
-    return info & AEC_INFO_GPS_L1;
+static inline bool acqeng_has_gps_l1ca_prn_gen_from_info(uint32_t info) {
+    return info & AEC_INFO_GPS_L1CA;
 }
 
 //------------------------------------------------------------------------------

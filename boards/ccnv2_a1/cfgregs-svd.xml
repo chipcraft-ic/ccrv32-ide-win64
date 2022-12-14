@@ -2,7 +2,7 @@
 <peripheral>
   <name>CFGREGS</name>
   <description>Configuration Registers</description>
-  <baseAddress>0x80007000</baseAddress>
+  <baseAddress>0xE0007000</baseAddress>
   <addressBlock>
     <offset>0</offset>
     <size>0x114</size>
@@ -1151,7 +1151,7 @@
         </field>
         <field>
           <name>DEC_SAMPLES_SHIFT</name>
-          <description>Number of samples to decimate, where num_of_samples = 2 ** DEC_SAMPLES_SHIFT.</description>
+          <description>Number of samples to decimate.</description>
           <bitRange>[9:7]</bitRange>
           <access>read-write</access>
         </field>
@@ -1169,7 +1169,7 @@
         </field>
         <field>
           <name>LPF_K_PARAM</name>
-          <description>K parameter of a low pass filter in the AGC channel., alpha = 2 ** (-k), y[n] = (1-alpha) * y[n-1] + alpha * x[n] </description>
+          <description>K parameter of a low pass filter in the AGC channel.</description>
           <bitRange>[3:1]</bitRange>
           <access>read-write</access>
         </field>
@@ -1189,7 +1189,7 @@
       <fields>
         <field>
           <name>STEP</name>
-          <description>Frequency step for the carrier removal block., freq_step = (f_carr / f_sampl) * (2 ** 32), precision = f_sampl / (2 ** 32)</description>
+          <description>Frequency step for the carrier removal block.</description>
           <bitRange>[31:0]</bitRange>
           <access>read-write</access>
         </field>
@@ -1377,7 +1377,7 @@
         </field>
         <field>
           <name>DEC_SAMPLES_SHIFT</name>
-          <description>Number of samples to decimate, where num_of_samples = 2 ** DEC_SAMPLES_SHIFT.</description>
+          <description>Number of samples to decimate.</description>
           <bitRange>[9:7]</bitRange>
           <access>read-write</access>
         </field>
@@ -1395,7 +1395,7 @@
         </field>
         <field>
           <name>LPF_K_PARAM</name>
-          <description>K parameter of a low pass filter in the AGC channel., alpha = 2 ** (-k), y[n] = (1-alpha) * y[n-1] + alpha * x[n] </description>
+          <description>K parameter of a low pass filter in the AGC channel.</description>
           <bitRange>[3:1]</bitRange>
           <access>read-write</access>
         </field>
@@ -1415,7 +1415,7 @@
       <fields>
         <field>
           <name>STEP</name>
-          <description>Frequency step for the carrier removal block., freq_step = (f_carr / f_sampl) * (2 ** 32), precision = f_sampl / (2 ** 32)</description>
+          <description>Frequency step for the carrier removal block.</description>
           <bitRange>[31:0]</bitRange>
           <access>read-write</access>
         </field>
@@ -1515,7 +1515,7 @@
         </field>
         <field>
           <name>DEC_SAMPLES_SHIFT</name>
-          <description>Number of samples to decimate, where num_of_samples = 2 ** DEC_SAMPLES_SHIFT.</description>
+          <description>Number of samples to decimate.</description>
           <bitRange>[9:7]</bitRange>
           <access>read-write</access>
         </field>
@@ -1533,7 +1533,7 @@
         </field>
         <field>
           <name>LPF_K_PARAM</name>
-          <description>K parameter of a low pass filter in the AGC channel., alpha = 2 ** (-k), y[n] = (1-alpha) * y[n-1] + alpha * x[n] </description>
+          <description>K parameter of a low pass filter in the AGC channel.</description>
           <bitRange>[3:1]</bitRange>
           <access>read-write</access>
         </field>
@@ -1553,7 +1553,7 @@
       <fields>
         <field>
           <name>STEP</name>
-          <description>Frequency step for the carrier removal block., freq_step = (f_carr / f_sampl) * (2 ** 32), precision = f_sampl / (2 ** 32)</description>
+          <description>Frequency step for the carrier removal block.</description>
           <bitRange>[31:0]</bitRange>
           <access>read-write</access>
         </field>
@@ -1653,7 +1653,7 @@
         </field>
         <field>
           <name>DEC_SAMPLES_SHIFT</name>
-          <description>Number of samples to decimate, where num_of_samples = 2 ** DEC_SAMPLES_SHIFT.</description>
+          <description>Number of samples to decimate.</description>
           <bitRange>[9:7]</bitRange>
           <access>read-write</access>
         </field>
@@ -1671,7 +1671,7 @@
         </field>
         <field>
           <name>LPF_K_PARAM</name>
-          <description>K parameter of a low pass filter in the AGC channel., alpha = 2 ** (-k), y[n] = (1-alpha) * y[n-1] + alpha * x[n] </description>
+          <description>K parameter of a low pass filter in the AGC channel.</description>
           <bitRange>[3:1]</bitRange>
           <access>read-write</access>
         </field>
@@ -1691,7 +1691,7 @@
       <fields>
         <field>
           <name>STEP</name>
-          <description>Frequency step for the carrier removal block., freq_step = (f_carr / f_sampl) * (2 ** 32), precision = f_sampl / (2 ** 32)</description>
+          <description>Frequency step for the carrier removal block.</description>
           <bitRange>[31:0]</bitRange>
           <access>read-write</access>
         </field>
@@ -1791,7 +1791,7 @@
         </field>
         <field>
           <name>DEC_SAMPLES_SHIFT</name>
-          <description>Number of samples to decimate, where num_of_samples = 2 ** DEC_SAMPLES_SHIFT.</description>
+          <description>Number of samples to decimate.</description>
           <bitRange>[9:7]</bitRange>
           <access>read-write</access>
         </field>
@@ -1809,7 +1809,7 @@
         </field>
         <field>
           <name>LPF_K_PARAM</name>
-          <description>K parameter of a low pass filter in the AGC channel., alpha = 2 ** (-k), y[n] = (1-alpha) * y[n-1] + alpha * x[n] </description>
+          <description>K parameter of a low pass filter in the AGC channel.</description>
           <bitRange>[3:1]</bitRange>
           <access>read-write</access>
         </field>
@@ -1829,7 +1829,7 @@
       <fields>
         <field>
           <name>STEP</name>
-          <description>Frequency step for the carrier removal block., freq_step = (f_carr / f_sampl) * (2 ** 32), precision = f_sampl / (2 ** 32)</description>
+          <description>Frequency step for the carrier removal block.</description>
           <bitRange>[31:0]</bitRange>
           <access>read-write</access>
         </field>
@@ -2328,36 +2328,43 @@
         </field>
         <field>
           <name>PLLTEST_ATT</name>
+          <description>TBD</description>
           <bitRange>[11:8]</bitRange>
           <access>read-write</access>
         </field>
         <field>
           <name>PLL25TEST_MOD_EN</name>
+          <description>TBD</description>
           <bitRange>[7:7]</bitRange>
           <access>read-write</access>
         </field>
         <field>
           <name>PLL25TEST_MOD_DIR</name>
+          <description>TBD</description>
           <bitRange>[6:6]</bitRange>
           <access>read-write</access>
         </field>
         <field>
           <name>PLL25TEST_MOD_PRESC</name>
+          <description>TBD</description>
           <bitRange>[5:4]</bitRange>
           <access>read-write</access>
         </field>
         <field>
           <name>PLL1TEST_MOD_EN</name>
+          <description>TBD</description>
           <bitRange>[3:3]</bitRange>
           <access>read-write</access>
         </field>
         <field>
           <name>PLL1TEST_MOD_DIR</name>
+          <description>TBD</description>
           <bitRange>[2:2]</bitRange>
           <access>read-write</access>
         </field>
         <field>
           <name>PLL1TEST_MOD_PRESC</name>
+          <description>TBD</description>
           <bitRange>[1:0]</bitRange>
           <access>read-write</access>
         </field>
