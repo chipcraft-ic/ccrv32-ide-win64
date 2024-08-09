@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2021 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2022-08-29 21:44:22 +0200 (pon, 29 sie 2022) $
-* $Revision: 887 $
+* $Date: 2024-08-09 17:41:43 +0200 (pią, 09 sie 2024) $
+* $Revision: 1097 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -33,14 +33,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
  * -------------------------------------------------------------------- */
 
+#include <math.h>
+
 #include <ccrv32.h>
 #include <ccrv32-csr.h>
+#include <ccrv32-pwd.h>
 #include <ccrv32-amba.h>
 #include <ccrv32-amba-cfgregs.h>
 #include <ccrv32-amba-gpio.h>
 #include <ccrv32-amba-edac.h>
 #include <ccrv32-amba-memctrl.h>
+#include <ccrv32-amba-flash.h>
 
+#include <board.h>
+#include <flash.h>
 #include <ccnv2.h>
 
 /**
@@ -66,6 +72,15 @@ void configure_gpio(void)
     AMBA_GPIO_PTR->PULL_LO |= GPIO_CONFIG_MASK(4,GPIO_PULL_UP);
     AMBA_GPIO_PTR->PULL_LO |= GPIO_CONFIG_MASK(5,GPIO_PULL_UP);
 
+    /* Set UART3 to GPIO 12, 13, 14, 15 */
+    AMBA_GPIO_PTR->ALTER_LO |= GPIO_CONFIG_MASK(12,GPIO_ALTER_0);
+    AMBA_GPIO_PTR->ALTER_LO |= GPIO_CONFIG_MASK(13,GPIO_ALTER_0);
+    AMBA_GPIO_PTR->ALTER_LO |= GPIO_CONFIG_MASK(14,GPIO_ALTER_0);
+    AMBA_GPIO_PTR->ALTER_LO |= GPIO_CONFIG_MASK(15,GPIO_ALTER_0);
+
+    /* Enable PPS output */
+    AMBA_GPIO_PTR->ALTER_HI |= GPIO_CONFIG_MASK(30,GPIO_ALTER_2);
+
     /* Disable GPIO controller */
     AMBA_GPIO_PTR->CTRL &= ~GPIO_CTRL_EN;
 
@@ -80,7 +95,9 @@ void configure_edac(void)
     for (int i=0; i<RAM_PARTITIONS; i++)
     {
         AMBA_EDAC_PTR(i)->SCR_PERIOD = 10000;
-        AMBA_EDAC_PTR(i)->CTRL = EDAC_CTRL_SLP_EN | EDAC_CTRL_ECC_EN | EDAC_CTRL_ERR_EN | EDAC_CTRL_SBR_EN | EDAC_CTRL_INJ_EN;
+        //AMBA_EDAC_PTR(i)->CTRL = EDAC_CTRL_SLP_EN | EDAC_CTRL_ECC_EN | EDAC_CTRL_ERR_EN | EDAC_CTRL_SBR_EN | EDAC_CTRL_INJ_EN;
+        // light sleep can have timing issues, do not use it
+        AMBA_EDAC_PTR(i)->CTRL = EDAC_CTRL_ECC_EN | EDAC_CTRL_ERR_EN | EDAC_CTRL_SBR_EN | EDAC_CTRL_INJ_EN;
     }
     AMBA_APB0_CFG_PTR->APB1_CFG &= ~AMBA_APB1_EN;
 }
@@ -92,11 +109,30 @@ void configure_pll(void)
 {
     /* Configure PLL */
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
-    CFG_REGS_PTR->CFGREG_COREFREQ_PLL = CFGREG_COREFREQ_PLL_EN_MASK | (16 << CFGREG_COREFREQ_PLL_N_SHIFT) | CFGREG_COREFREQ_PLL_REF_SEL_MASK;
-    while ((CFG_REGS_PTR->CFGREG_COREFREQ_STAT & CFGREG_COREFREQ_STAT_PLL_LOCK_MASK) == 0);
+    CFG_REGS_PTR->CFGREG_COREFREQ_PLL = CFGREG_COREFREQ_PLL_EN_MASK | (MCU_PLL_N << CFGREG_COREFREQ_PLL_N_SHIFT) | CFGREG_COREFREQ_PLL_REF_SEL_MASK;
+    //while ((CFG_REGS_PTR->CFGREG_COREFREQ_STAT & CFGREG_COREFREQ_STAT_PLL_LOCK_MASK) == 0);
+    for (int i=0; i<5000; i++)
+        __asm__ __volatile__("nop");
+    CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
+    CFG_REGS_PTR->CFGREG_COREFREQ_PLL |= 1 << CFGREG_COREFREQ_PLL_PLL_VFB_EN_SHIFT;
+    uint32_t dco_ctrl_pvt = (CFG_REGS_PTR->CFGREG_COREFREQ_STAT & CFGREG_COREFREQ_STAT_CTRL_PVT_MASK) << CFGREG_COREFREQ_STAT_CTRL_PVT_SHIFT;
+    uint32_t dco_ctrl_fine = (CFG_REGS_PTR->CFGREG_COREFREQ_STAT & CFGREG_COREFREQ_STAT_CTRL_FINE_MASK) << CFGREG_COREFREQ_STAT_CTRL_FINE_SHIFT;
+    dco_ctrl_fine &= ~0xFFFFFF00;
+    uint32_t corefreq_pll = CFG_REGS_PTR->CFGREG_COREFREQ_PLL & ~CFGREG_COREFREQ_STAT_CTRL_FINE_MASK & ~CFGREG_COREFREQ_STAT_CTRL_PVT_MASK;
+    corefreq_pll |= CFGREG_COREFREQ_PLL_CTRL_FINE_LOAD_MASK | (dco_ctrl_pvt << CFGREG_COREFREQ_PLL_CTRL_PVT_LOAD_SHIFT) | (dco_ctrl_fine << CFGREG_COREFREQ_PLL_CTRL_FINE_LOAD_SHIFT);
+    CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
+    CFG_REGS_PTR->CFGREG_COREFREQ_PLL &= ~CFGREG_COREFREQ_PLL_EN_MASK;
+    for (int i=0; i<5000; i++)
+        __asm__ __volatile__("nop");
+    CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
+    CFG_REGS_PTR->CFGREG_COREFREQ_PLL =  corefreq_pll;
+    for (int i=0; i<5000; i++)
+        __asm__ __volatile__("nop");
     /* Switch to PLL */
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
     CFG_REGS_PTR->CFGREG_COREFREQ_CLK = 2 << CFGREG_COREFREQ_CLK_CORE_SEL_SHIFT;
+    /* switch debugger to new baud rate */
+    csr_write(mdbgbaud,DBG_UART_PRES((CORE_FREQ / DBG_BAUDRATE) / 16, (CORE_FREQ / DBG_BAUDRATE) % 16));
 }
 
 /**
@@ -107,28 +143,34 @@ void board_init(void)
     configure_gpio();
 }
 
-/**
- * @brief Initialize the CCNV2 FMC
- */
-void configure_flash(void)
-{
-    volatile uint32_t* addr;
-    AMBA_APB0_CFG_PTR->APB1_CFG = AMBA_APB1_EN;
-    addr = (uint32_t*)0xE1000008;
-    *addr = 0x1F632519;
-    addr = (uint32_t*)0xE1000004;
-    *addr = 0x00000848;
-    AMBA_APB0_CFG_PTR->APB1_CFG &= ~AMBA_APB1_EN;
-}
+// helper function
+static inline uint32_t int_log2(const uint32_t x){return (31 - __builtin_clzl(x));}
 
 /**
  * @brief Initialize the CCNV2 hardware
  */
 void hardware_init(void)
 {
-    configure_flash();
+
+    /* Enable APB1 Bridge */
+    AMBA_APB0_CFG_PTR->APB1_CFG = AMBA_APB1_EN;
+
+    flash_configure_default( CORE_FREQ );
+    flash_sequential_prefetch_enable();
+    flash_ECC_enable();
+
+    /* Select read margin, should not be used in final revision */
+    //CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
+    //CFG_REGS_PTR->CFGREG_MEM_CONF = 0x13;
+
+    /* Scale processor and ACQENG frequency, should not be used in final revision */
+    PWD_PTR->CTRL |= (int_log2(CORE_FREQ_DIV)<<PWD_CTRL_COREINT_SHIFT) |
+                     (int_log2(APB2_FREQ_DIV)<<PWD_CTRL_PER2INT_SHIFT) |
+                     (int_log2(APB0_FREQ_DIV)<<PWD_CTRL_PER0INT_SHIFT) | PWD_CTRL_KEY;
+
     configure_pll();
     configure_edac();
+
 }
 
 /**
@@ -152,17 +194,16 @@ void gnss_splitter_init(void)
     CFG_REGS_PTR->CFGREG_SPLIT1_L1E1_CFG_THRESHOLD_Q = (0x1000 << CFGREG_SPLIT1_L1E1_CFG_THRESHOLD_Q_MAX_SHIFT) |
                                                        (0x0C00 << CFGREG_SPLIT1_L1E1_CFG_THRESHOLD_Q_MIN_SHIFT) ;
 
-    // Set carrier frequency to remove 0 when sample freq is 192*1.023MHz -> (0MHz / 64*1.023MHz) * 2^32 = 0
+    // Set carrier frequency to remove 0 when sample freq is 64*1.023MHz -> (0MHz / 64*1.023MHz) * 2^32 = 0
     // Signal present at 4*1.023MHz - remaining IF equal to 4*1.023MHz
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
-    CFG_REGS_PTR->CFGREG_SPLIT1_L1E1_CFG_CARR_FREQ = 0 << CFGREG_SPLIT1_L1E1_CFG_CARR_FREQ_STEP_SHIFT;
+    CFG_REGS_PTR->CFGREG_SPLIT1_L1E1_CFG_CARR_FREQ = (1 <<28) << CFGREG_SPLIT1_L1E1_CFG_CARR_FREQ_STEP_SHIFT;
 
-    // Set smooth filter alpha, enable carrier removal and set carrier mode, set decimation to 3
+    // Set smooth filter alpha, enable carrier removal and set carrier mode, set decimation to 2
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
-    CFG_REGS_PTR->CFGREG_SPLIT1_L1E1_CFG = CFGREG_SPLIT1_L1E1_CFG_DEC_BY_THREE_EN_MASK           | // decimation by 3
-//                                         (4 << CFGREG_SPLIT1_L1E1_CFG_DEC_SAMPLES_SHIFT_SHIFT) | // 2^4 = 16 dec samples
-                                           (1 << CFGREG_SPLIT1_L1E1_CFG_CARR_MODE_SHIFT)         | // carr mode 1
-                                           CFGREG_SPLIT1_L1E1_CFG_CARR_ENABLE_MASK               | // enable carrier removal
+    CFG_REGS_PTR->CFGREG_SPLIT1_L1E1_CFG = (0 << CFGREG_SPLIT1_L1E1_CFG_DEC_SAMPLES_SHIFT_SHIFT) | // 2^3 = 2 dec samples
+                                           (0 << CFGREG_SPLIT1_L1E1_CFG_CARR_MODE_SHIFT)         | // carr mode 0
+                                           (0 << CFGREG_SPLIT1_L1E1_CFG_CARR_ENABLE_SHIFT)       | // carr enable
                                            (7 << CFGREG_SPLIT1_L1E1_CFG_LPF_K_PARAM_SHIFT)       ; // alpha = (1 / 1024)
 
     /* General */
@@ -234,10 +275,10 @@ void gnss_splitter_init(void)
 
     // Set smooth filter alpha, enable carrier removal and set carrier mode, set decimation to 3
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
-    CFG_REGS_PTR->CFGREG_SPLIT25_E6_CFG = CFGREG_SPLIT25_E6_CFG_DEC_BY_THREE_EN_MASK           | // decimation by 3
-//                                        (4 << CFGREG_SPLIT25_E6_CFG_DEC_SAMPLES_SHIFT_SHIFT) | // 2^4 = 16 dec samples
+    //CFG_REGS_PTR->CFGREG_SPLIT25_E6_CFG = CFGREG_SPLIT25_E6_CFG_DEC_BY_THREE_EN_MASK           | // decimation by 3
+    CFG_REGS_PTR->CFGREG_SPLIT25_E6_CFG = (1 << CFGREG_SPLIT25_E6_CFG_DEC_SAMPLES_SHIFT_SHIFT) | // 2^4 = 16 dec samples
                                           (1 << CFGREG_SPLIT25_E6_CFG_CARR_MODE_SHIFT)         | // carr mode 1
-                                          CFGREG_SPLIT25_E6_CFG_CARR_ENABLE_MASK               | // enable carrier removal
+                                          (0 << CFGREG_SPLIT25_E6_CFG_CARR_ENABLE_SHIFT)        | // enable carrier removal
                                           (7 << CFGREG_SPLIT25_E6_CFG_LPF_K_PARAM_SHIFT)       ; // alpha = (1 / 1024)
 
     /* L5E5A */
@@ -255,15 +296,15 @@ void gnss_splitter_init(void)
     // Set carrier frequency to remove -27*1.023MHz when sample freq is 192*1.023MHz -> 2^32 - (27*1.023MHz / 192*1.023MHz) * 2^32 = 3690987520
     // Signal present at -41*1.023MHz - remaining IF equal to -14*1.023MHz
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
-    CFG_REGS_PTR->CFGREG_SPLIT25_L5E5A_CFG_CARR_FREQ = 3690987520 << CFGREG_SPLIT25_L5E5A_CFG_CARR_FREQ_STEP_SHIFT;
+    CFG_REGS_PTR->CFGREG_SPLIT25_L5E5A_CFG_CARR_FREQ = 0 << CFGREG_SPLIT25_L5E5A_CFG_CARR_FREQ_STEP_SHIFT;
 
     // Set smooth filter alpha, enable carrier removal and set carrier mode, set decimation to 3
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
-    CFG_REGS_PTR->CFGREG_SPLIT25_L5E5A_CFG = CFGREG_SPLIT25_L5E5A_CFG_DEC_BY_THREE_EN_MASK           | // decimation by 3
-//                                           (4 << CFGREG_SPLIT25_L5E5A_CFG_DEC_SAMPLES_SHIFT_SHIFT) | // 2^4 = 16 dec samples
-                                             (1 << CFGREG_SPLIT25_L5E5A_CFG_CARR_MODE_SHIFT)         | // carr mode 1
-                                             CFGREG_SPLIT25_L5E5A_CFG_CARR_ENABLE_MASK               | // enable carrier removal
-                                             (7 << CFGREG_SPLIT25_L5E5A_CFG_LPF_K_PARAM_SHIFT)       ; // alpha = (1 / 1024)
+    //CFG_REGS_PTR->CFGREG_SPLIT25_L5E5A_CFG = CFGREG_SPLIT25_L5E5A_CFG_DEC_BY_THREE_EN_MASK           | // decimation by 3
+    CFG_REGS_PTR->CFGREG_SPLIT25_L5E5A_CFG = (0 << CFGREG_SPLIT25_L5E5A_CFG_DEC_SAMPLES_SHIFT_SHIFT) | // 2^3 = 2 dec samples
+                                           (0 << CFGREG_SPLIT25_L5E5A_CFG_CARR_MODE_SHIFT)         | // carr mode 0
+                                           (0 << CFGREG_SPLIT25_L5E5A_CFG_CARR_ENABLE_SHIFT)       | // carr enable
+                                           (7 << CFGREG_SPLIT25_L5E5A_CFG_LPF_K_PARAM_SHIFT)       ; // alpha = (1 / 1024)
 
     /* E5B */
 
@@ -320,53 +361,122 @@ void gnss_afe_regs(void)
 {
 
     /* Configure AFE PM */
-    CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;    
-    CFG_REGS_PTR->PM_CONF = CFGREG_PM_CONF_DEF  | CFGREG_PM_CONF_BGVR_EN_MASK  | CFGREG_PM_CONF_IREF_EN_MASK | CFGREG_PM_CONF_VREF_EN_MASK |
-                            CFGREG_PM_CONF_LDO_ADC_EN_MASK | CFGREG_PM_CONF_LDO_IF_EN_MASK | CFGREG_PM_CONF_LDO_DPLL_EN_MASK | CFGREG_PM_CONF_LDO_APLL_EN_MASK |
-                            CFGREG_PM_CONF_LDO_RF_EN_MASK;
-    while( ~(CFG_REGS_PTR->PM_STAT & CFGREG_PM_STAT_PWR_UP_P_MASK) ) ;
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
-    CFG_REGS_PTR->PM_CONF |= CFGREG_PM_CONF_RC_FILTER_MASK | CFGREG_PM_CONF_NRST_MASK;
-
+    CFG_REGS_PTR->CFGREG_PM_CONF = CFGREG_PM_CONF_DEF  | CFGREG_PM_CONF_BGVR_EN_MASK  | CFGREG_PM_CONF_IREF_EN_MASK | CFGREG_PM_CONF_VREF_EN_MASK |
+    CFGREG_PM_CONF_LDO_ADC_EXT_DECAP_MASK | CFGREG_PM_CONF_LDO_IF_EXT_DECAP_MASK | CFGREG_PM_CONF_LDO_DPLL_EXT_DECAP_MASK |
+                            CFGREG_PM_CONF_LDO_APLL_EXT_DECAP_MASK | CFGREG_PM_CONF_LDO_RF_EXT_DECAP_MASK |
+                            CFGREG_PM_CONF_LDO_ADC_EN_MASK | CFGREG_PM_CONF_LDO_IF_EN_MASK | CFGREG_PM_CONF_LDO_DPLL_EN_MASK | CFGREG_PM_CONF_LDO_APLL_EN_MASK |
+                            CFGREG_PM_CONF_LDO_RF_EN_MASK |
+                            CFGREG_PM_CONF_IREF_TRIM_SRC_MASK | (15 << CFGREG_PM_CONF_IREF_TRIM_SHIFT) | CFGREG_PM_CONF_BGVR_TRIM_SRC_MASK | (15 << CFGREG_PM_CONF_BGVR_TRIM_SHIFT) | CFGREG_PM_CONF_CAL_EN_MASK*0 ;
 
     /* Configure GNSSAFE1 */
 
+    /* Configure PLL1 */
+    CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
+    CFG_REGS_PTR->CFGREG_PLL1_CONF  = CFGREG_PLL1_CONF_EN_MASK | (0x600000 << CFGREG_PLL1_CONF_FCW_SHIFT) | 0*CFGREG_PLL1_CONF_ADC_CLK_DIV_MASK | 0*CFGREG_PLL1_CONF_TEST_EN_MASK;
+    CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
+    CFG_REGS_PTR->CFGREG_PLL1DCO_CONF  = CFGREG_PLL1DCO_CONF_DEF | CFGREG_PLL1DCO_CONF_AMP_LOAD_MASK;// | CFGREG_PLL1DCO_CONF_CTRL_LOAD_MASK | CFGREG_PLL1DCO_CONF_CTRL_FINE_MASK | CFGREG_PLL1DCO_CONF_CTRL_PVT_MASK;
+
+    /* Configure PLL25 */
+    CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
+    CFG_REGS_PTR->CFGREG_PLL25_CONF  = CFGREG_PLL25_CONF_EN_MASK | (0x480000 << CFGREG_PLL25_CONF_FCW_SHIFT) | CFGREG_PLL25_CONF_ADC_CLK_DIV_MASK;
+    CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
+    CFG_REGS_PTR->CFGREG_PLL25DCO_CONF  = CFGREG_PLL25DCO_CONF_DEF | CFGREG_PLL25DCO_CONF_AMP_LOAD_MASK;
+
+
+
+    /* Configure LNA125*/
+    /*CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
+    CFG_REGS_PTR->CFGREG_LNA125_TUNE_CONF = (0 << CFGREG_LNA125_TUNE_CONF_L1_SHIFT) |  (0 << CFGREG_LNA125_TUNE_CONF_L25_SHIFT);
+    CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
+    CFG_REGS_PTR->CFGREG_LNA125_CONF = CFGREG_LNA125_CONF_DEF | CFGREG_LNA125_CONF_EN_L1_MASK | CFGREG_LNA125_CONF_L1_TUNE_SRC_MASK |
+                                        CFGREG_LNA125_CONF_L25_TUNE_SRC_MASK;*/
 
     /* Configure BALUN_MIXER1*/
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
-    CFG_REGS_PTR->CFGREG_BALUN_MIXER1_CONF = CFGREG_BALUN_MIXER1_DEF | CFGREG_BALUN_MIXER1_MIXER_EN | CFGREG_BALUN_MIXER1_BALUN_EN;
+    CFG_REGS_PTR->CFGREG_BALUN_MIXER1_CONF = CFGREG_BALUN_MIXER1_CONF_DEF | CFGREG_BALUN_MIXER1_CONF_MIXER_EN_MASK | CFGREG_BALUN_MIXER1_CONF_BALUN_EN_MASK |
+                                        CFGREG_BALUN_MIXER1_CONF_BALUN_TUNE_SRC_MASK | (0x00FF << CFGREG_BALUN_MIXER1_CONF_BALUN_TUNE_SHIFT);
 
-    /* Configure PLL1 */
-    CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
-    CFG_REGS_PTR->CFGREG_PLL1_CONF  = CFGREG_PLL1_CONF_EN_MASK | (0x600000 << CFGREG_PLL1_CONF_FCW_SHIFT) | CFGREG_PLL1_CONF_ADC_CLK_DIV_MASK;
     /* Configure IF1 */
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
     CFG_REGS_PTR->CFGREG_IF1_CONF  = CFGREG_IF1_CONF_DEF | CFGREG_IF1_CONF_EN_MASK | CFGREG_IF1_CONF_PREAMP_EN_MASK |
-                                     CFGREG_IF1_CONF_PGA1_EN_MASK | CFGREG_IF1_CONF_PGA2_EN_MASK                    ;
+                                     CFGREG_IF1_CONF_PGA1_EN_MASK | CFGREG_IF1_CONF_PGA2_EN_MASK | (0 << CFGREG_IF1_CONF_IF_BANDCUT_SHIFT);
+
+    CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
+    CFG_REGS_PTR->CFGREG_IF1_CONF  = (CFG_REGS_PTR->CFGREG_IF1_CONF & ~CFGREG_IF1_CONF_OFFSET_CAL_I_MASK) | (0 << CFGREG_IF1_CONF_OFFSET_CAL_I_SHIFT);
+    CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
+    CFG_REGS_PTR->CFGREG_IF1_CONF  = (CFG_REGS_PTR->CFGREG_IF1_CONF & ~CFGREG_IF1_CONF_OFFSET_CAL_Q_MASK) | (4 << CFGREG_IF1_CONF_OFFSET_CAL_Q_SHIFT)|
+                                        0*CFGREG_IF1_CONF_OFFSET_CAL_DIRECTION_Q_MASK;
     /* Configure ADC1 */
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
-    CFG_REGS_PTR->CFGREG_ADC1_CONF = CFGREG_ADC1_CONF_DEF | CFGREG_ADC1_CONF_ADC_EN_MASK | CFGREG_ADC1_CONF_SAH_EN_MASK;
+    CFG_REGS_PTR->CFGREG_ADC1_CONF = CFGREG_ADC1_CONF_DEF | CFGREG_ADC1_CONF_ADC_EN_MASK | CFGREG_ADC1_CONF_SAH_EN_MASK | (0 << CFGREG_ADC1_CONF_CLK_SEL_SHIFT) | (2 << CFGREG_ADC1_CONF_CLK_CONF_SHIFT) | CFGREG_ADC1_CONF_CAL_EN_MASK;
 
     /* Configure GNSSAFE25 */
 
     /* Configure BALUN_MIXER25*/
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
-    CFG_REGS_PTR->CFGREG_BALUN_MIXER25_CONF = CFGREG_BALUN_MIXER25_DEF | CFGREG_BALUN_MIXER25_MIXER_EN | CFGREG_BALUN_MIXER25_BALUN_EN;
+    CFG_REGS_PTR->CFGREG_BALUN_MIXER25_CONF = CFGREG_BALUN_MIXER25_CONF_DEF | CFGREG_BALUN_MIXER25_CONF_MIXER_EN_MASK | CFGREG_BALUN_MIXER25_CONF_BALUN_EN_MASK;// |
+    //                                    CFGREG_BALUN_MIXER25_CONF_BALUN_TUNE_SRC_MASK | (0x00FF << CFGREG_BALUN_MIXER25_CONF_BALUN_TUNE_SHIFT);
 
-    /* Configure PLL25 */
-    CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
-    CFG_REGS_PTR->CFGREG_PLL25_CONF  = CFGREG_PLL25_CONF_EN_MASK | (0x498000 << CFGREG_PLL25_CONF_FCW_SHIFT);
     /* Configure IF25 */
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
     CFG_REGS_PTR->CFGREG_IF25_CONF  = CFGREG_IF25_CONF_DEF | CFGREG_IF25_CONF_EN_MASK | CFGREG_IF25_CONF_PREAMP_EN_MASK |
                                       CFGREG_IF25_CONF_PGA1_EN_MASK | CFGREG_IF25_CONF_PGA2_EN_MASK                     ;
     /* Configure ADC25 */
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
-    CFG_REGS_PTR->CFGREG_ADC25_CONF = CFGREG_ADC25_CONF_DEF | CFGREG_ADC25_CONF_ADC_EN_MASK | CFGREG_ADC25_CONF_SAH_EN_MASK;
+    CFG_REGS_PTR->CFGREG_ADC25_CONF = CFGREG_ADC25_CONF_DEF | CFGREG_ADC25_CONF_ADC_EN_MASK | CFGREG_ADC25_CONF_SAH_EN_MASK | (0 << CFGREG_ADC25_CONF_CLK_SEL_SHIFT) | (2 << CFGREG_ADC25_CONF_CLK_CONF_SHIFT) | CFGREG_ADC25_CONF_CAL_EN_MASK;
 
     /* Configure LNA125 */
+    //CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
+    //CFG_REGS_PTR->CFGREG_LNA125_CONF = CFGREG_PM_CONF_DEF | CFGREG_LNA125_CONF_EN_L1_MASK |  CFGREG_LNA125_CONF_EN_L25_MASK;
+
+    /* Enable AUX AFE */
+    //CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
+    //CFG_REGS_PTR->CFGREG_GNSSAFE_CONF = CFGREG_GNSSAFE_CONF_GNSS_AUX0_EN_MASK | CFGREG_GNSSAFE_CONF_GNSS_AUX1_EN_MASK;
+
+    while( (CFG_REGS_PTR->CFGREG_PM_STAT & CFGREG_PM_STAT_PWR_UP_P_MASK) == 0) ;
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
-    CFG_REGS_PTR->CFGREG_LNA125_CONF = CFGREG_PM_CONF_DEF | CFGREG_LNA125_CONF_EN_L1_MASK |  CFGREG_LNA125_CONF_EN_L25_MASK;
+    //CFG_REGS_PTR->CFGREG_PM_CONF |= CFGREG_PM_CONF_RC_FILTER_MASK | CFGREG_PM_CONF_NRST_MASK;
+
+    CFG_REGS_PTR->CFGREG_PM_CONF |= CFGREG_PM_CONF_NRST_MASK;
+
+
+    while( (CFG_REGS_PTR->CFGREG_PLL1_STAT & CFGREG_PLL1_STAT_LOCK_MASK) == 0) ;
+    uint32_t counter_pll25 = 0;
+    while( (CFG_REGS_PTR->CFGREG_PLL25_STAT & CFGREG_PLL25_STAT_LOCK_MASK) == 0)
+    {
+        counter_pll25 += 1;
+        if(counter_pll25 > (1<<24))
+        {
+            CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
+            CFG_REGS_PTR->CFGREG_PM_CONF &= ~CFGREG_PM_CONF_NRST_MASK;
+            CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
+            CFG_REGS_PTR->CFGREG_PLL25_CONF  &= ~CFGREG_PLL25_CONF_EN_MASK;
+            for (int i=0; i<100; i++)
+                __asm__ __volatile__("nop");
+            CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
+            CFG_REGS_PTR->CFGREG_PLL25_CONF  |= CFGREG_PLL25_CONF_EN_MASK;
+            for (int i=0; i<100; i++)
+                __asm__ __volatile__("nop");
+            CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
+            CFG_REGS_PTR->CFGREG_PM_CONF |= CFGREG_PM_CONF_NRST_MASK;
+            counter_pll25 = 0;
+        }
+    } ;
+
+
+    //CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
+    //CFG_REGS_PTR->CFGREG_COREFREQ_CLK |= 1 << CFGREG_COREFREQ_CLK_TEST_OUT_EN_SHIFT;
+
+
+
+    /*CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
+    CFG_REGS_PTR->CFGREG_PM_CONF = CFGREG_PM_CONF_DEF  | CFGREG_PM_CONF_BGVR_EN_MASK  | CFGREG_PM_CONF_IREF_EN_MASK | CFGREG_PM_CONF_VREF_EN_MASK |
+    CFGREG_PM_CONF_LDO_ADC_EXT_DECAP_MASK | CFGREG_PM_CONF_LDO_IF_EXT_DECAP_MASK | CFGREG_PM_CONF_LDO_DPLL_EXT_DECAP_MASK |
+                            CFGREG_PM_CONF_LDO_APLL_EXT_DECAP_MASK | CFGREG_PM_CONF_LDO_RF_EXT_DECAP_MASK |
+                            CFGREG_PM_CONF_LDO_ADC_EN_MASK | CFGREG_PM_CONF_LDO_IF_EN_MASK | CFGREG_PM_CONF_LDO_DPLL_EN_MASK | CFGREG_PM_CONF_LDO_APLL_EN_MASK |
+                            CFGREG_PM_CONF_LDO_RF_EN_MASK |
+                            CFGREG_PM_CONF_IREF_TRIM_SRC_MASK | (15 << CFGREG_PM_CONF_IREF_TRIM_SHIFT) | CFGREG_PM_CONF_BGVR_TRIM_SRC_MASK | (15 << CFGREG_PM_CONF_BGVR_TRIM_SHIFT) | CFGREG_PM_CONF_CAL_EN_MASK*0 ;*/
 
 }
 

@@ -32,8 +32,8 @@
 # File Name : core.S
 # Author    : Krzysztof Marcinek
 # ******************************************************************************
-# $Date: 2019-05-12 22:08:11 +0200 (nie, 12 maj 2019) $
-# $Revision: 418 $
+# $Date: 2023-06-12 13:23:03 +0200 (pon, 12 cze 2023) $
+# $Revision: 974 $
 #H******************************************************************************
 
 #include <specialreg.h>
@@ -48,6 +48,9 @@ core_entrypoint:
   nop
   nop
   nop
+
+  la t0,   trap_handler               # set trap vector
+  csrw mtvec, t0
 
   jal common_start                    # common core init (startup.S)
   jal __libc_impure_init              # initialize impure data

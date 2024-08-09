@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2017 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2022-01-19 09:38:48 +0100 (śro, 19 sty 2022) $
-* $Revision: 814 $
+* $Date: 2024-01-14 21:55:43 +0100 (nie, 14 sty 2024) $
+* $Revision: 1038 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -302,7 +302,7 @@ ee_u8 core_start_parallel(core_results *res)
         /* Start core */
         core_starting = 1;
         // flush write buffer
-        while (((DCACHE_PTR->STATUS)&DCACHE_STAT_BUSY)>0);
+        while (((DCACHE_PTR->STCR)&DCACHE_STCR_BUSY)>0);
         MCORE_PTR->CORE_ADDR[core_index] = (uint32_t)core_entrypoint;
         MCORE_PTR->CORE_RUN[core_index] = MCORE_RUN_KEY;
 

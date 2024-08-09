@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2018 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2021-06-07 17:56:02 +0200 (pon, 07 cze 2021) $
-* $Revision: 704 $
+* $Date: 2024-07-30 10:10:27 +0200 (wto, 30 lip 2024) $
+* $Revision: 1079 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -104,16 +104,14 @@ enum
     AMBA_DMA_BASE        = AMBA_BASE + 0x00008000,          /*!< DMA base address                           */
     AMBA_CAN0_BASE       = AMBA_BASE + 0x00009000,          /*!< CAN 0 base address                         */
     AMBA_CAN1_BASE       = AMBA_BASE + 0x0000A000,          /*!< CAN 1 base address                         */
-    AMBA_BLE0_BASE       = AMBA_BASE + 0x0000B000,          /*!< BLE 0 base address                         */
-    AMBA_BLE1_BASE       = AMBA_BASE + 0x0000C000,          /*!< BLE 1 base address                         */
     AMBA_BKPRAM_BASE     = AMBA_BASE + 0x0000F000,          /*!< RTC Backup RAM base address                */
     AMBA_APB1_BASE       = AMBA_BASE + 0x01000000,          /*!< APB 1 Bridge base address                  */
     AMBA_APB2_BASE       = AMBA_BASE + 0x02000000,          /*!< APB 2 Bridge base address                  */
     AMBA_FLASH_BASE      = AMBA_APB1_BASE + 0x00000000,     /*!< Embedded Flash base address                */
     AMBA_MEMCTRL_BASE    = AMBA_APB1_BASE + 0x00001000,     /*!< External Memory Controller base address    */
-    AMBA_ETH0_BASE       = AMBA_APB2_BASE + 0x00001000,     /*!< ETH0 base address                          */
-    AMBA_ETH1_BASE       = AMBA_APB2_BASE + 0x00002000,     /*!< ETH1 base address                          */
-    AMBA_ACQENG_BASE     = AMBA_APB2_BASE + 0x00100000,     /*!< ETH1 base address                          */
+    AMBA_ACQENG0_BASE    = AMBA_APB2_BASE + 0x00100000,     /*!< ACQENG0 base address                       */
+    AMBA_ACQENG1_BASE    = AMBA_APB2_BASE + 0x00200000,     /*!< ACQENG1 base address                       */
+    AMBA_ACQENG2_BASE    = AMBA_APB2_BASE + 0x00300000,     /*!< ACQENG2 base address                       */
 };
 
 /** APB0 Configuration Registers */
@@ -133,11 +131,6 @@ typedef struct
 {
     uint32_t INFO_0;    /*!< APB2 Info Register 0            */
     uint32_t INFO_1;    /*!< APB2 Info Register 1            */
-    uint32_t _reserved[2];
-    uint32_t CLOCK_0;   /*!< Clock Configuration Register 0  */
-    uint32_t CLOCK_1;   /*!< Clock Configuration Register 1  */
-    uint32_t ETHMAP_0;  /*!< ETH0 Interrupt Mapping Register */
-    uint32_t ETHMAP_1;  /*!< ETH1 Interrupt Mapping Register */
 } amba_apb2_cfg_t;
 
 #ifdef CCRV32_SDK
@@ -158,17 +151,10 @@ enum
     AMBA_CAN_COUNT_SHIFT      = 30,  /*!< Number of CAN Controllers bitfield offset         */
 };
 
-/** AMBA0 Info 1 bitfield offsets */
-enum
-{
-    AMBA_BLE_COUNT_SHIFT      = 0,   /*!< Number of BLE Controllers bitfield offset     */
-    AMBA_AIDCODE_SHIFT        = 16,  /*!< Analog IDCODE bitfield offset                 */
-};
-
 /** AMBA2 Info 0 bitfield offsets */
 enum
 {
-    AMBA_ETH_COUNT_SHIFT      = 0,   /*!< Number of ETH Controllers bitfield offset     */
+    AMBA_ACQENG_COUNT_SHIFT   = 2,   /*!< Number of ACQENG Controllers bitfield offset  */
 };
 
 /**
@@ -185,9 +171,7 @@ enum
 #define MAX_NUM_OF_TIMER16  0x03  /*!< Maximal number of 16-Bit Timers          */
 #define MAX_NUM_OF_I2C_MST  0x03  /*!< Maximal number of I2C Master Controllers */
 #define MAX_NUM_OF_CAN      0x03  /*!< Maximal number of CAN Controllers        */
-#define MAX_NUM_OF_BLE      0x03  /*!< Maximal number of BLE Controllers        */
-#define MAX_NUM_OF_ETH      0x03  /*!< Maximal number of ETH Controllers        */
-#define MAX_AIDCODE         0xFF  /*!< Maximal value of Analog IDCODE           */
+#define MAX_NUM_OF_ACQENG   0x03  /*!< Maximal number of ACQENG Controllers     */
 
 /** @} */
 
@@ -206,10 +190,7 @@ enum
 #define AMBA_I2C_MST_COUNT()  ((AMBA_APB0_CFG_PTR->INFO_0 >> AMBA_I2C_MST_COUNT_SHIFT) & MAX_NUM_OF_I2C_MST) /*!< Number of I2C Master Controllers  */
 #define AMBA_CAN_COUNT()      ((AMBA_APB0_CFG_PTR->INFO_0 >> AMBA_CAN_COUNT_SHIFT)     & MAX_NUM_OF_CAN)     /*!< Number of CAN Controllers         */
 
-#define AMBA_BLE_COUNT()      ((AMBA_APB0_CFG_PTR->INFO_1 >> AMBA_BLE_COUNT_SHIFT)     & MAX_NUM_OF_BLE)     /*!< Number of BLE Controllers         */
-#define AMBA_ETH_COUNT()      ((AMBA_APB2_CFG_PTR->INFO_0 >> AMBA_ETH_COUNT_SHIFT)     & MAX_NUM_OF_ETH)     /*!< Number of ETH Controllers         */
-
-#define AMBA_AIDCODE()        ((AMBA_APB0_CFG_PTR->INFO_1 >> AMBA_AIDCODE_SHIFT)       & MAX_AIDCODE)        /*!< Get Analog IDCODE                 */
+#define AMBA_ACQENG_COUNT()   ((AMBA_APB2_CFG_PTR->INFO_0 >> AMBA_ACQENG_COUNT_SHIFT)  & MAX_NUM_OF_ACQENG)  /*!< Number of ACQENG Controllers      */
 
 #define AMBA_APB1_EXIST()     (AMBA_APB0_CFG_PTR->INFO_0 & AMBA_APB1)                                        /*!< Check if APB1 bridge exists       */
 #define AMBA_APB2_EXIST()     (AMBA_APB0_CFG_PTR->INFO_1 & AMBA_APB2)                                        /*!< Check if APB2 bridge exists       */
@@ -239,19 +220,6 @@ enum
 enum
 {
     AMBA_APB1_EN    = 1 << 0,  /*!< APB1 Bridge Enable      */
-};
-
-/** AMBA2 Clock 0 Register Masks */
-enum
-{
-    AMBA_ETH0_CLK   = 1 << 0,  /*!< ETH 0 Clock   */
-    AMBA_ETH1_CLK   = 1 << 1,  /*!< ETH 1 Clock   */
-};
-
-/** AMBA2 Info 0 Register Flags */
-enum
-{
-    AMBA_ACQENG     = 1 << 2,  /*!< Acqusition Engine Controller    */
 };
 
 #endif /* __CCRV32_AMBA_H */

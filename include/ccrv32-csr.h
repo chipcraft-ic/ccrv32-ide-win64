@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2019 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2022-11-24 15:32:16 +0100 (czw, 24 lis 2022) $
-* $Revision: 916 $
+* $Date: 2024-06-08 11:42:29 +0200 (sob, 08 cze 2024) $
+* $Revision: 1062 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -54,24 +54,6 @@
  * @{
  *//************************/
 
-/*
- * Originally the CSR register offsets were calculated similarly to:
- * typedef struct
- * {
- *     uint32_t _reserved[1995];
- *     uint32_t DBG_BAUD;
- *     uint32_t MEM_REMAP;
- * } csr_regs_t;
- *
- * Thus:
- * offset of DBG_BAUD = 1996 * sizeof( uint32_t )
- * offset of MEM_REMAP = 1997 * sizeof( uint32_t )
- */
-
-#define CSR_CTRL_BASE ( CSR_BASE )
-#define CSR_DBG_BAUD_OFFSET ( 1996 * sizeof( uint32_t ) )
-#define CSR_MEM_REMAP_OFFSET ( 1997 * sizeof( uint32_t ) )
-
 /**
  * @name Custom CSR Registers
  * @{
@@ -82,6 +64,9 @@
 #define mcontrol    0x07C8   /* Processor Control Register                       */
 #define mstackmin   0x07C9   /* Stack Pointer Protection Min. Register           */
 #define mstackmax   0x07CA   /* Stack Pointer Protection Max. Register           */
+#define mdbgbaud    0x07CB   /* On-chip Debugger Baud Rate Register              */
+#define mremap      0x07CC   /* Memory remap                                     */
+#define mromunlock  0x07CD   /* ROM unlock                                     */
 /** @} */
 
 /** CSR MSTATUS Register bits */
@@ -112,21 +97,21 @@ enum
 /** CSR Config 0 Register bit offsets */
 enum
 {
-    CPU_IMSIZE_SHIFT  = 0,   /*!< Instruction Memory Size Offset */
-    CPU_DMSIZE_SHIFT  = 5,   /*!< Data Memory Size Offset        */
-    CPU_ICSIZE_SHIFT  = 11,  /*!< Instruction Cache Size Offset  */
-    CPU_SPRSIZE_SHIFT = 18,  /*!< Scratch-Pad RAM Size Offset    */
-    CPU_ICWAY_SHIFT   = 29,  /*!< Instruction Cache Ways Offset  */
+    CPU_IMSIZE_SHIFT  = 0,   /*!< Instruction Memory Bus Address Size Offset    */
+    CPU_DMSIZE_SHIFT  = 5,   /*!< Data Memory Bus Address Size Offset           */
+    CPU_ICSIZE_SHIFT  = 11,  /*!< Instruction Cache Size Offset                 */
+    CPU_SPRSIZE_SHIFT = 18,  /*!< Scratch-Pad RAM Size Offset                   */
+    CPU_ICWAY_SHIFT   = 29,  /*!< Instruction Cache Ways Offset                 */
 };
 
 /** CSR Config 0 Register masks */
 enum
 {
-    CPU_IMSIZE_MASK  = 0x1F << CPU_IMSIZE_SHIFT,   /*!< Instruction Memory Size Mask */
-    CPU_DMSIZE_MASK  = 0x1F << CPU_DMSIZE_SHIFT,   /*!< Data Memory Size Mask        */
-    CPU_ICSIZE_MASK  = 0x1F << CPU_ICSIZE_SHIFT,   /*!< Instruction Cache Size Mask  */
-    CPU_SPRSIZE_MASK = 0x1F << CPU_SPRSIZE_SHIFT,  /*!< Scratch-Pad RAM Size Mask    */
-    CPU_ICWAY_MASK   = 0x07 << CPU_ICWAY_SHIFT,    /*!< Instruction Cache Ways Mask  */
+    CPU_IMSIZE_MASK  = 0x1F << CPU_IMSIZE_SHIFT,   /*!< Instruction Memory Bus Address Size Mask    */
+    CPU_DMSIZE_MASK  = 0x1F << CPU_DMSIZE_SHIFT,   /*!< Data Memory Bus Address Size Mask           */
+    CPU_ICSIZE_MASK  = 0x1F << CPU_ICSIZE_SHIFT,   /*!< Instruction Cache Size Mask                 */
+    CPU_SPRSIZE_MASK = 0x1F << CPU_SPRSIZE_SHIFT,  /*!< Scratch-Pad RAM Size Mask                   */
+    CPU_ICWAY_MASK   = 0x07 << CPU_ICWAY_SHIFT,    /*!< Instruction Cache Ways Mask                 */
 };
 
 /** CSR Config 0 Register bits */
@@ -216,13 +201,17 @@ enum
 {
     CPU_ARCH_SHIFT        = 0,    /*!< CPU Architecture Offset   */
     CPU_GNSS_BANKS_SHIFT  = 4,    /*!< GNSS Banks Number Offset  */
+    CPU_SYSBUS_SHIFT      = 10,   /*!< System Bus Width Offset   */
+    CPU_BTB_SHIFT         = 12,   /*!< BTB Size Offset           */
 };
 
 /** CSR Config 2 Register bit masks */
 enum
 {
     CPU_ARCH_MASK         = 0x7 << CPU_ARCH_SHIFT,        /*!< GNSS Architecture Mask    */
-    CPU_GNSS_BANKS_MASK   = 0xF << CPU_GNSS_BANKS_SHIFT,  /*!< GNSS Banks Number Offset  */
+    CPU_GNSS_BANKS_MASK   = 0xF << CPU_GNSS_BANKS_SHIFT,  /*!< GNSS Banks Number Mask    */
+    CPU_SYSBUS_MASK       = 0x3 << CPU_SYSBUS_SHIFT,      /*!< System Bus Width Mask     */
+    CPU_BTB_MASK          = 0x7 << CPU_BTB_SHIFT,         /*!< BTB Size Mask             */
 };
 
 /** CSR Config 2 Register bits */
@@ -230,6 +219,9 @@ enum
 {
     CPU_DCLS = 1 << 3,  /*!< Dual-core Lockstep Controller       */
 };
+
+/** Debug prescaler helper macro */
+#define DBG_UART_PRES(mantisa, fraction) ((mantisa) | ((fraction) << 16))  /*!< Debug prescaler from mantisa and fraction */
 
 /**
  * @name CSR helper macros

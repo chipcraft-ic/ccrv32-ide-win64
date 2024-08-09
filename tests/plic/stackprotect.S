@@ -32,8 +32,8 @@
 # File Name : stackprotect.S
 # Author    : Rafal Harabien
 # ******************************************************************************
-# $Date: 2019-09-11 09:01:01 +0200 (śro, 11 wrz 2019) $
-# $Revision: 464 $
+# $Date: 2023-06-12 13:23:03 +0200 (pon, 12 cze 2023) $
+# $Revision: 974 $
 #H******************************************************************************
 
 #include <specialreg.h>
@@ -91,7 +91,11 @@ safe_printf_buffer:
 test_val:
   .word 0xFFFFFFFF
 
+#ifdef _XPRAM_USE
+.section .xpram_text, "ax", @progbits
+#else
 .text
+#endif
 
 safe_printf:
   la t5, safe_printf_buffer
@@ -101,7 +105,8 @@ safe_printf:
   sw t6, 0(t5)                           # save control register in buffer
   csrrci t1, mcontrol, SPROT_EN_MASK     # disable stack protection
   la sp, safe_printf_stack_end
-  jal printf                             # do the printing job
+  la t6, printf
+  jalr t6                                # do the printing job
   la t5, safe_printf_buffer
   lw t6, 0(t5)                           # read old control register value
   lw sp, 4(t5)                           # restore Stack Pointer

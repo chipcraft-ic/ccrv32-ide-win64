@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2021 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2022-01-19 09:38:48 +0100 (śro, 19 sty 2022) $
-* $Revision: 814 $
+* $Date: 2023-09-13 11:58:46 +0200 (śro, 13 wrz 2023) $
+* $Revision: 996 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -83,22 +83,29 @@ typedef struct
 /** Device Configuration Flags */
 enum
 {
-    MEMCTRL_DEVICE_CONF_EN        = 1 << 9,  /*!< Device Enable                */
+    MEMCTRL_DEVICE_CONF_CS_HOLD   = 1 << 8,     /*!< Device Chip Select Hold      */
+    MEMCTRL_DEVICE_CONF_EN        = 1 << 9,     /*!< Device Enable                */
+    MEMCTRL_DEVICE_CONF_ZD_WRITE  = 1 << 10,    /*!< Device Zero-delay Write      */
+    MEMCTRL_DEVICE_CONF_SPI_DEV   = 1 << 16,    /*!< Device Spi Enable            */
+    MEMCTRL_DEVICE_CONF_SPI_EXT   = 1 << 17,    /*!< Device Spi Extended          */
 };
 
 /** Device Configuration Register bit offsets */
 enum
 {
     MEMCTRL_DEVICE_CONF_LATENCY_SHIFT  = 0,  /*!< Device Latency Shift         */
+    MEMCTRL_DEVICE_CONF_RWDS_DEL_SHIFT = 6,  /*!< Device RWDS Delay Shift      */
 };
 
 /** Device Configuration Register masks */
 enum
 {
-    MEMCTRL_DEVICE_CONF_LATENCY_MASK   = 0x23F << MEMCTRL_DEVICE_CONF_LATENCY_SHIFT,  /*!< Device Latency Mask       */
+    MEMCTRL_DEVICE_CONF_LATENCY_MASK   = 0x3F << MEMCTRL_DEVICE_CONF_LATENCY_SHIFT,  /*!< Device Latency Mask       */
+    MEMCTRL_DEVICE_CONF_RWDS_DEL_MASK  = 0x03 << MEMCTRL_DEVICE_CONF_RWDS_DEL_SHIFT, /*!< Device RWDS Delay Mask    */
 };
 
-#define MEMCTRL_BUILD_LATENCY(latency) ((latency << MEMCTRL_DEVICE_CONF_LATENCY_SHIFT) & MEMCTRL_DEVICE_CONF_LATENCY_MASK)  /*!< Device Latency Build Macro */
+#define MEMCTRL_BUILD_LATENCY(latency) ((latency << MEMCTRL_DEVICE_CONF_LATENCY_SHIFT) & MEMCTRL_DEVICE_CONF_LATENCY_MASK)  /*!< Device Latency Build Macro     */
+#define MEMCTRL_BUILD_RWDS_DEL(delay)  ((delay << MEMCTRL_DEVICE_CONF_RWDS_DEL_SHIFT) & MEMCTRL_DEVICE_CONF_RWDS_DEL_MASK)  /*!< Device RWDS Delay Build Macro  */
 
 /** External Memory Controller Configuration Flags */
 enum

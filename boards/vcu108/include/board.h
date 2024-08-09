@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2020 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2022-01-19 09:38:48 +0100 (śro, 19 sty 2022) $
-* $Revision: 814 $
+* $Date: 2024-01-14 21:55:43 +0100 (nie, 14 sty 2024) $
+* $Revision: 1038 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -36,30 +36,7 @@
 #ifndef _BOARD_H
 #define _BOARD_H
 
-/* DO NOT MODIFY */
-#define IDCODE_PART_NUM         0
-#define IDCODE_PART_VER         0
-
-/* EXTERNAL W25Q32 MEMORY */
-#define FLASH_SIZE              (-1)//(1024*1024*4)
-#define FLASH_PAGE_SIZE         256
-
-#define PERIPH0_FREQ            40000000UL
-#define PERIPH2_FREQ            40000000UL
-#define CORE_FREQ               80000000UL
-
-#define STDIO_UART              0
-#define STDIO_BAUDRATE          921600
-#define STDIO_RTSCTS            0
-
-#define TIME_SOURCE             TIMER32
-#define TIME_SOURCE_TIMER_ID    0
-#define TIME_SOURCE_PRSC        ((PERIPH0_FREQ/1000000)-1)
-
-#define MAX2771_SPI_NUM         0
-#define MAX2771_L1E1_CS         2
-#define MAX2771_L5E5_CS         1
-#define MAX2771_L2E6_CS         0
+#include "defines.h"
 
 /* Initialize GNSS AFE */
 int gnss_afe_init(void);

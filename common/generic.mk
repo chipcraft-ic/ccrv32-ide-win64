@@ -32,8 +32,8 @@
 # File Name : generic.mk
 # Author    : Rafal Harabien
 # ******************************************************************************
-# $Date: 2022-12-09 14:30:40 +0100 (pią, 09 gru 2022) $
-# $Revision: 935 $
+# $Date: 2024-06-18 12:14:03 +0200 (wto, 18 cze 2024) $
+# $Revision: 1067 $
 #H******************************************************************************
 
 ifeq ($(OS),Windows_NT)
@@ -143,6 +143,7 @@ OBJDUMP       := "$(PREFIX)objdump"
 SIZE          := "$(PREFIX)size"
 DEBUGGER      := "$(PREFIX)gdb"
 CCPROG        := "$(CHIPCRAFT_SDK_TOOLS_PATH)/ccprog$(EXEEXT)"
+CCBTERM       := "$(CHIPCRAFT_SDK_TOOLS_PATH)/ccbterm$(EXEEXT)"
 CCTERM        := "$(CHIPCRAFT_SDK_TOOLS_PATH)/ccterm$(EXEEXT)"
 DBGSERVER_RS  := $(PYTHON) "$(CHIPCRAFT_SDK_TOOLS_PATH)/dbgserver.py"
 CCSIM         := "$(CHIPCRAFT_SDK_TOOLS_PATH)/ccsim$(EXEEXT)"
@@ -392,6 +393,9 @@ disasm: $(PROGBIN)
 
 term:
 	$(Q)$(CCTERM) $(CHIPCRAFT_SDK_UART_PORT) $(CHIPCRAFT_SDK_UART_BAUDRATE)
+
+bterm:
+	$(Q)$(CCBTERM) $(CHIPCRAFT_SDK_UART_PORT) $(CHIPCRAFT_SDK_UART_BAUDRATE) $(PROGSREC)
 
 miniterm:
 	$(Q)$(MINITERM) $(CHIPCRAFT_SDK_UART_PORT) $(CHIPCRAFT_SDK_UART_BAUDRATE)

@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2021 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2022-12-12 15:09:34 +0100 (pon, 12 gru 2022) $
-* $Revision: 936 $
+* $Date: 2023-05-31 15:16:05 +0200 (śro, 31 maj 2023) $
+* $Revision: 971 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -87,21 +87,22 @@ typedef struct
 } amba_acqeng_t;
 
 #ifdef CCRV32_SDK
- static volatile amba_acqeng_t   * const AMBA_ACQENG_PTR      = (amba_acqeng_t*)AMBA_ACQENG_BASE;              /*!< GNSS Acquisition Engine Controller pointer      */
- static volatile amba_streamer_t * const AMBA_ACQENG_DS_I_PTR = (amba_streamer_t*)&AMBA_ACQENG_PTR->DS_I_BASE; /*!< GNSS Acquisition Engine Data Streamer I pointer */
- static volatile amba_streamer_t * const AMBA_ACQENG_DS_Q_PTR = (amba_streamer_t*)&AMBA_ACQENG_PTR->DS_Q_BASE; /*!< GNSS Acquisition Engine Data Streamer Q pointer */
+ #define AMBA_ACQENG_BASE(index)        (AMBA_ACQENG0_BASE+(index)*0x100000)                    /*!< Acquisition Engine base address                    */
+ #define AMBA_ACQENG_PTR(index)         ((volatile amba_acqeng_t*)AMBA_ACQENG_BASE(index))      /*!< Acquisition Engine pointer                         */
+ #define AMBA_ACQENG_DS_I_PTR(index)    (amba_streamer_t*)&AMBA_ACQENG_PTR(index)->DS_I_BASE    /*!< GNSS Acquisition Engine Data Streamer I pointer    */
+ #define AMBA_ACQENG_DS_Q_PTR(index)    (amba_streamer_t*)&AMBA_ACQENG_PTR(index)->DS_Q_BASE    /*!< GNSS Acquisition Engine Data Streamer Q pointer    */
 #endif
 
-#define DS_FIFO_SIZE (256*4)                                               /*!< Data Streamer FIFO Size                                                        */
-#define AEC_ACCU_SIZE (4096*4)                                             /*!< Acquisition Engine Core Accumulator Size                                       */
-#define AEC_PRN_SIZE (8192*4)                                              /*!< Acquisition Engine Core PRN Generator Size                                     */
-#define DIAG_ACQENG_BASE (0xC0000)                                         /*!< Diagnostic Access Base Address                                                 */
-#define DIAG_AEC_PRN_BASE (AMBA_ACQENG_BASE+DIAG_ACQENG_BASE+AEC_PRN_SIZE) /*!< Diagnostic Access Acquisition Engine Core PRN Generator Base Address           */
-#define DIAG_AEC_COH_ACCU_I_BASE (DIAG_AEC_PRN_BASE+AEC_PRN_SIZE)          /*!< Diagnostic Access Acquisition Engine Core Coherent Accumulator I Base Address  */
-#define DIAG_AEC_COH_ACCU_Q_BASE (DIAG_AEC_COH_ACCU_I_BASE+AEC_ACCU_SIZE)  /*!< Diagnostic Access Acquisition Engine Core Coherent Accumulator Q Base Address  */
-#define DIAG_AEC_NCOH_ACCU_BASE (DIAG_AEC_COH_ACCU_Q_BASE+AEC_ACCU_SIZE)   /*!< Diagnostic Access Acquisition Engine Core Noncoherent Accumulator Base Address */
-#define DIAG_DS_I_FIFO_BASE (DIAG_AEC_PRN_BASE-(DS_FIFO_SIZE*2))           /*!< Diagnostic Access Data Streamer I FIFO Base Address                            */
-#define DIAG_DS_Q_FIFO_BASE (DIAG_DS_I_FIFO_BASE+DS_FIFO_SIZE)             /*!< Diagnostic Access Data Streamer Q FIFO Base Address                            */
+#define DS_FIFO_SIZE (256*4)                                                                /*!< Data Streamer FIFO Size                                                        */
+#define AEC_ACCU_SIZE (4096*4)                                                              /*!< Acquisition Engine Core Accumulator Size                                       */
+#define AEC_PRN_SIZE (8192*4)                                                               /*!< Acquisition Engine Core PRN Generator Size                                     */
+#define DIAG_ACQENG_BASE (0xC0000)                                                          /*!< Diagnostic Access Base Address                                                 */
+#define DIAG_AEC_PRN_BASE(index) (AMBA_ACQENG_BASE(index)+DIAG_ACQENG_BASE+AEC_PRN_SIZE)    /*!< Diagnostic Access Acquisition Engine Core PRN Generator Base Address           */
+#define DIAG_AEC_COH_ACCU_I_BASE(index) (DIAG_AEC_PRN_BASE(index)+AEC_PRN_SIZE)             /*!< Diagnostic Access Acquisition Engine Core Coherent Accumulator I Base Address  */
+#define DIAG_AEC_COH_ACCU_Q_BASE(index) (DIAG_AEC_COH_ACCU_I_BASE(index)+AEC_ACCU_SIZE)     /*!< Diagnostic Access Acquisition Engine Core Coherent Accumulator Q Base Address  */
+#define DIAG_AEC_NCOH_ACCU_BASE(index) (DIAG_AEC_COH_ACCU_Q_BASE(index)+AEC_ACCU_SIZE)      /*!< Diagnostic Access Acquisition Engine Core Noncoherent Accumulator Base Address */
+#define DIAG_DS_I_FIFO_BASE(index) (DIAG_AEC_PRN_BASE(index)-(DS_FIFO_SIZE*2))              /*!< Diagnostic Access Data Streamer I FIFO Base Address                            */
+#define DIAG_DS_Q_FIFO_BASE(index) (DIAG_DS_I_FIFO_BASE(index)+DS_FIFO_SIZE)                /*!< Diagnostic Access Data Streamer Q FIFO Base Address                            */
 
 /** ACQENG Acquisition Engine Core Status Register Flags */
 enum

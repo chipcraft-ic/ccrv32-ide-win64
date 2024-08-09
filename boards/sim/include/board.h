@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2018 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2021-11-03 11:41:26 +0100 (śro, 03 lis 2021) $
-* $Revision: 782 $
+* $Date: 2024-01-14 21:55:43 +0100 (nie, 14 sty 2024) $
+* $Revision: 1038 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -36,24 +36,7 @@
 #ifndef _BOARD_H
 #define _BOARD_H
 
-/* DO NOT MODIFY */
-#define IDCODE_PART_NUM         0
-#define IDCODE_PART_VER         0
-
-/* SIM DOES NOT HAVE FLASH */
-#define FLASH_SIZE              (-1)
-#define FLASH_PAGE_SIZE         512
-
-#define PERIPH0_FREQ            100000000UL
-#define CORE_FREQ               100000000UL
-
-#define STDIO_UART              0
-#define STDIO_BAUDRATE          1843200
-#define STDIO_RTSCTS            0
-
-#define TIME_SOURCE             TIMER32
-#define TIME_SOURCE_TIMER_ID    0
-#define TIME_SOURCE_PRSC        ((PERIPH0_FREQ/1000000)-1)
+#include "defines.h"
 
 /* Initialize GNSS AFE */
 int gnss_afe_init(void);

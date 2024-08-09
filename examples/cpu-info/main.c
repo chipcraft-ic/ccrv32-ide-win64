@@ -32,8 +32,8 @@
 * File Name : main.c
 * Author    : Krzysztof Marcinek
 * ******************************************************************************
-* $Date: 2022-01-19 09:38:48 +0100 (śro, 19 sty 2022) $
-* $Revision: 814 $
+* $Date: 2024-04-08 13:38:29 +0200 (pon, 08 kwi 2024) $
+* $Revision: 1047 $
 *H*****************************************************************************/
 
 #include "board.h"
@@ -115,16 +115,25 @@ int main(void)
     if ((cpu_info_2 & CPU_ARCH_MASK) >> CPU_ARCH_SHIFT == 0) {
         printf("unknown\n");
     }
+    else  {
+        printf("RV32%s\n",arch_str);
+    }
+
+    printf("INFO: Core microarchitecture    ");
+
+    if ((cpu_info_2 & CPU_ARCH_MASK) >> CPU_ARCH_SHIFT == 0) {
+        printf("unknown\n");
+    }
     else if ((cpu_info_2 & CPU_ARCH_MASK) >> CPU_ARCH_SHIFT == 1) {
-        printf("CCRV32LP%s\n",arch_str);
+        printf("RV32LP\n");
         low_power = 1;
     }
     else if ((cpu_info_2 & CPU_ARCH_MASK) >> CPU_ARCH_SHIFT == 2) {
         if (cpu_info_2 & CPU_DCLS) {
-            printf("CCRV32HR%s\n",arch_str);
+            printf("RV32HR\n");
         }
         else {
-            printf("CCRV32ST%s\n",arch_str);
+            printf("RV32ST\n");
         }
     }
 

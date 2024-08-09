@@ -32,8 +32,8 @@
 # File Name : startup.S
 # Author    : Rafal Harabien, Krzysztof Marcinek
 # ******************************************************************************
-# $Date: 2022-12-05 17:07:41 +0100 (pon, 05 gru 2022) $
-# $Revision: 928 $
+# $Date: 2024-07-19 09:26:19 +0200 (pią, 19 lip 2024) $
+# $Revision: 1074 $
 #H******************************************************************************
 
 # Useful defines:
@@ -49,6 +49,7 @@
 #
 
 #include <specialreg.h>
+#include <defines.h>
 
 #ifdef _NO_SPRAM_MEMORY
   #define _STARTUP_STACK_IN_RAM
@@ -81,10 +82,7 @@ __start:
 #endif
 
   j start                               # start code
-
-.align 2
-trap_vector:
-  j trap_handler
+  j trap_default                        # default dummy trap handler, do not move
 
 .global end_loop
 end_loop:
@@ -107,8 +105,11 @@ start:
 .global common_start
 common_start:
 
-  la t0,   trap_vector                  # set trap vector
-  csrw mtval, t0
+  la t0,   trap_handler                 # set trap vector
+  csrw mtvec, t0
+
+  li t0, NMI_DIS_MASK
+  csrc mcontrol, t0                     # clear nmi disable
 
   or sp,   zero, zero                   # clear register file
   or gp,   zero, zero
@@ -189,15 +190,15 @@ cache_init:
   li t0, ICACHE_CTRL_BASE               # Instruction Cache Controller address
   li t2, DCACHE_CTRL_BASE               # Data Cache Controller address
   or t1, zero, CACHE_SC_MASK            # cache scrambling enable mask
-  sw t1, CACHE_STAT_OFFSET(t0)          # enable instruction cache scrambling
-  sw t1, CACHE_STAT_OFFSET(t2)          # enable data cache scrambling
+  sw t1, CACHE_STCR_OFFSET(t0)          # enable instruction cache scrambling
+  sw t1, CACHE_STCR_OFFSET(t2)          # enable data cache scrambling
   sw zero, CACHE_FLUSH_OFFSET(t0)       # flush instruction cache
   sw zero, CACHE_FLUSH_OFFSET(t2)       # flush data cache
   or t1, zero, CACHE_EN_MASK            # cache enable mask
   or t1, t1, CACHE_FT_MASK              # cache parity/ecc enable mask
   or t1, t1, CACHE_HE_MASK              # cache hard error enable mask
-  sw t1, CACHE_STAT_OFFSET(t0)          # enable instruction cache
-  sw t1, CACHE_STAT_OFFSET(t2)          # enable data cache
+  sw t1, CACHE_STCR_OFFSET(t0)          # enable instruction cache
+  sw t1, CACHE_STCR_OFFSET(t2)          # enable data cache
   .option push
   .option norelax
   la gp, __global_pointer$              # init global pointer
@@ -219,15 +220,7 @@ cache_init:
   addi t1, sp, -4                       # decrement t1
   csrw mstackmax, t1                    # set stack pointer min. value
 
-  csrw mscratch, ra                     # save ra
-  jal hardware_init                     # hardware specific initialization
-  csrr ra, mscratch                     # restore ra
-
   csrrsi t1, mcontrol, SPROT_EN_MASK    # enable stack protection
-  csrrsi t1, mstatus, IRQ_EN_MASK       # enable interrupts
-  addi t1, zero, 1
-  slli t1, t1, IRQ_EXT_EN_SHIFT
-  csrw mie, t1                          # enable external interrupts
 
 check_spram_size:
   csrr s1, mconfig0                     # get CPU features register
@@ -266,10 +259,13 @@ zero_spram_bss:
   sw zero, 0(t0)                        # zero word in SPRAM BSS
   sub t4, t1, t0                        # last ptr - cur ptr
   bgt t4, zero, zero_spram_bss          # loop
-common_done:
-  jr ra                                 # return
 
-program:
+common_done:
+
+  csrrsi t1, mstatus, IRQ_EN_MASK       # enable interrupts
+  addi t1, zero, 1
+  slli t1, t1, IRQ_EXT_EN_SHIFT
+  csrw mie, t1                          # enable external interrupts
 
 #ifdef __riscv_float_abi_double
 check_hardfloat:
@@ -282,11 +278,23 @@ check_hardfloat:
   li s1, FPU_INIT_MASK                  # load FPU initial state mask
   csrs mstatus, s1                      # enable FPU if present
 
+  jr ra                                 # return
+
+program:
+
+  csrw mscratch, ra                     # save ra
+  jal hardware_init                     # hardware specific initialization
+  csrr ra, mscratch                     # restore ra
+
   csrr s1, mconfig0                     # get CPU features register
   srl t0, s1, RAM_SIZE_SHIFT
   and t0, t0, RAM_SIZE_MASK             # t0 = log2(RAM size)
+#ifndef RAM_SIZE
   li s2, 1
   sll s2, s2, t0                        # s2 = RAM size
+#else
+  li s2, RAM_SIZE
+#endif
   lui s3, RAM_BASE                      # RAM memory base address
   add s3, s3, s2                        # s3 = RAM memory end
 
@@ -372,7 +380,7 @@ wdt_period:
   lw t4, WDT_PERIOD_OFFSET(t0)          # load period
   bne t2, t4, wdt_period                # check if period stored
 wdt_enable:
-  sw t1, WDT_UNLOCK_OFFSET(t0)          # unlok registers
+  sw t1, WDT_UNLOCK_OFFSET(t0)          # unlock registers
   sw t3, WDT_CTRL_OFFSET(t0)            # enable watchdog
   lw t4, WDT_CTRL_OFFSET(t0)            # load control
   bne t3, t4, wdt_enable                # check if watchdog enabled
@@ -411,6 +419,17 @@ no_mem:                                 # no mem loop
   j no_mem
 #endif
 
+.align 4
+.weak trap_default
+trap_default:
+  csrw mscratch, t0                     # save t0
+  csrr t0, mcause
+  ebreak
+
+#ifdef _XPRAM_USE
+.section .xpram_text, "ax", @progbits
+#endif
+
 .weak mtvec_handler
 mtvec_handler:
   j trap_handler
@@ -419,6 +438,7 @@ mtvec_handler:
 stvec_handler:
   j trap_handler
 
+.align 4
 .weak trap_handler
 trap_handler:
   csrw mscratch, t0                     # save t0
@@ -437,7 +457,7 @@ interrupt_handler:
   bne t0, zero, nmi_handler
 
 int_enter:
-  addi sp, sp, -128-256-8-36-4            # alloc stack
+  addi sp, sp, -128-256-8-36-4          # alloc stack
   csrr t0, mscratch                     # restore t0 from scratch
   sw t0, 36+20(sp)                      # save t0 on stack
   sw t1, 36+24(sp)                      # save t1 on stack
@@ -502,30 +522,30 @@ int_enter_stack:
 int_isr_check:
   lw t0, 28(sp)                         # read mcause from stack
   ori t1, zero, IRQ_CAUSE_MSOFT
-  beq t0, t1, int_soft                  # jump to software handler
+  beq t0, t1, int_isr_soft              # jump to software handler
   ori t1, zero, IRQ_CAUSE_MTIMER
-  beq t0, t1, int_timer                 # jump to timer handler
+  beq t0, t1, int_isr_timer             # jump to timer handler
 
-int_enter_rest:
+int_isr_plic:
   lw t0, 32(sp)                         # read claim from stack
   slli t0, t0, 2                        # claim * 4
   la t1, int_vectors                    # address of IRQ vector table
   add t0, t1, t0                        # address of IRQ handler
   lw t0, (t0)                           # load IRQ handler address
-  la ra, int_ret                        # set return address for IRQ handler
+  la ra, int_ret_plic                   # set return address for IRQ handler
   jr t0                                 # jump to IRQ handler
 
-int_soft:
+int_isr_soft:
   la t0, isr_soft                       # load software isr address
   la ra, int_ret_stack                  # set return address for IRQ handler
   jr t0                                 # jump to IRQ handler
 
-int_timer:
+int_isr_timer:
   la t0, isr_timer                      # load timer isr address
   la ra, int_ret_stack                  # set return address for IRQ handler
   jr t0                                 # jump to IRQ handler
 
-int_ret:
+int_ret_plic:
   lw t0, 24(sp)                         # read mstatus from stack
   csrw mstatus, t0                      # write mstatus (interrupt disabled again)
   lw t0, 32(sp)                         # read claim from stack
@@ -582,7 +602,7 @@ int_ret_rest:
 exception_handler:
 #ifndef _DONT_BREAK_ON_BREAK
   ebreak
-  j end_jump
+  j isr_end_jump
 #else
   csrw mscratch, t0                     # save t0
   csrr t0, mepc
@@ -597,7 +617,20 @@ incr_two:
 incr_four:
   csrr t0, mepc
   add t0, t0, 4
+
 incr_common:
+
+  nop                                   # dummy insctructions for lockstep operation
+  nop                                   # in corner case where exception occures
+  nop                                   # immediately after previous one
+  nop                                   # because of presence of signature buffer
+  nop                                   # slave core can still be acknowledging
+  nop                                   # previous exception while master core
+  nop                                   # the current one
+  nop                                   # because of that the number of instructions
+  nop                                   # in exception handler should be greater
+  nop                                   # than the signature buffer
+
   csrw mepc, t0                         # write mepc
   csrr t0, mscratch                     # restore t0
   mret
@@ -665,6 +698,10 @@ isr_timer:
 dummy_isr:
   # Dummy ISR
   jr ra
+
+isr_end_jump:
+  j isr_end_jump
+  nop
 
 # Dummy board_init
 .weak board_init

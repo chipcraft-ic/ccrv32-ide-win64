@@ -32,8 +32,8 @@
 * File Name : syscalls.c
 * Author    : Rafal Harabien
 * ******************************************************************************
-* $Date: 2019-12-27 16:05:17 +0100 (pią, 27 gru 2019) $
-* $Revision: 494 $
+* $Date: 2024-02-02 20:23:10 +0100 (pią, 02 lut 2024) $
+* $Revision: 1041 $
 *H*****************************************************************************/
 
 #include <errno.h>
@@ -107,6 +107,7 @@ int uart_read_blocking(int uart, char *data);
  * @brief heap top address
  */
 extern void *_sheap[]; /* make it array to solve small-data section problem */
+extern void *_sheap_end[]; /* make it array to solve small-data section problem */
 static char *heap_begin, *heap_end, *heap_top;
 
 static void clock_init(void)
@@ -178,14 +179,22 @@ static uint32_t clock_read(void)
 void _ccrv32_init(void)
 {
     /* Setup heap */
+    heap_begin = (char*)&_sheap;
+#ifndef RAM_SIZE /* !RAM_SIZE, the default */
     volatile uint32_t cpu_info;
     cpu_info = csr_read(mconfig0);
-    heap_begin = (char*)&_sheap;
     if (CPU_INFO_GET_DMSIZE_LOG(cpu_info) == 0)
         // in case of no on-chip RAM memory
         heap_end = (char*)(RAM_BASE + 0x0FFFFFFF);
     else
         heap_end = (char*)(RAM_BASE + CPU_INFO_GET_DMSIZE(cpu_info));
+#else /* RAM_SIZE */
+    /*
+     * Some boards, may have non-standard amount of RAM.
+     * As an alternative, set up from define.
+     */
+    heap_end = (char*)(RAM_BASE + RAM_SIZE);
+#endif /* RAM_SIZE */
     heap_top = heap_begin;
 
     uart_init_blocking(STDIO_UART, STDIO_BAUDRATE, STDIO_RTSCTS);

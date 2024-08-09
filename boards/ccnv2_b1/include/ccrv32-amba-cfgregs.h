@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2017 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date$
-* $Revision$
+* $Date: 2023-10-05 13:15:19 +0200 (czw, 05 paź 2023) $
+* $Revision: 1019 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -67,11 +67,13 @@ typedef struct
     uint32_t CFGREG_COREFREQ_STAT;
     uint32_t CFGREG_GNSSAFE_CONF;
     uint32_t CFGREG_PLL1_CONF;
+    uint32_t CFGREG_PLL1TDC_CONF;
     uint32_t CFGREG_PLL1DCO_CONF;
     uint32_t CFGREG_PLL1_STAT;
     uint32_t CFGREG_PLL1_STAT2;
     uint32_t CFGREG_PLL1DCO_STAT;
     uint32_t CFGREG_PLL25_CONF;
+    uint32_t CFGREG_PLL25TDC_CONF;
     uint32_t CFGREG_PLL25DCO_CONF;
     uint32_t CFGREG_PLL25_STAT;
     uint32_t CFGREG_PLL25_STAT2;
@@ -120,9 +122,15 @@ typedef struct
     uint32_t CFGREG_BALUN_MIXER25_CONF;
     uint32_t CFGREG_PMU_CONF;
     uint32_t CFGREG_PMU_STAT;
+    uint32_t CFGREG_PMU_BOD_CONF;
+    uint32_t CFGREG_PMU_BOD_STAT;
     uint32_t CFGREG_PM_STAT;
     uint32_t CFGREG_PM_CONF;
     uint32_t CFGREG_GNSSAFE_TEST_CONF;
+    uint32_t CFGREG_GPADC_CONF;
+    uint32_t CFGREG_GPADC_STAT;
+    uint32_t CFGREG_ANT_DET_CONF;
+    uint32_t CFGREG_ANT_DET_STAT;
     uint32_t CFGREG_SPARE_CONF;
     uint32_t CFGREG_SPARE_STAT;
 } cfg_regs_t;
@@ -135,20 +143,22 @@ enum
 {
      CFGREG_IRQMAP_DEF                                            = 0x00000000,  /*!<  Interrupt Mapping Register Default Value */
      CFGREG_UNLOCK_DEF                                            = 0x0000A55A,  /*!<  Unlock Register Default Value */
-     CFGREG_IRQFLAGS_DEF                                          = 0x00000000,  /*!<  32kHz RTC Clock Interrupt Flags Default Value */
+     CFGREG_IRQFLAGS_DEF                                          = 0x00000000,  /*!<  Clock Interrupt Flags Default Value */
      CFGREG_MEM_CONF_DEF                                          = 0x00000000,  /*!<  Memory Configuration Register Default Value */
      CFGREG_RTCSTAT_DEF                                           = 0x00000000,  /*!<  32kHz RTC Clock Status Default Value */
      CFGREG_RTCCONF_DEF                                           = 0x00000000,  /*!<  32kHz RTC Clock Configuration Default Value */
-     CFGREG_COREFREQ_CLK_DEF                                      = 0x00000002,  /*!<  External XTAL Configuration Register Default Value */
+     CFGREG_COREFREQ_CLK_DEF                                      = 0x001A2002,  /*!<  External XTAL Configuration Register Default Value */
      CFGREG_COREFREQ_PLL_DEF                                      = 0x00000020,  /*!<  PLL Configuration Register Default Value */
      CFGREG_COREFREQ_STAT_DEF                                     = 0x00000000,  /*!<  Core Clock Status Register Default Value */
      CFGREG_GNSSAFE_CONF_DEF                                      = 0x00000000,  /*!<  GNSS-AFE Configuration Register Default Value */
      CFGREG_PLL1_CONF_DEF                                         = 0x00C46A7E,  /*!<  PLL1 Configuration Register Default Value */
+     CFGREG_PLL1TDC_CONF_DEF                                      = 0x00000000,  /*!<  PLL1 TDC Configuration Register Default Value */
      CFGREG_PLL1DCO_CONF_DEF                                      = 0x00104000,  /*!<  PLL1 DCO Configuration Register Default Value */
      CFGREG_PLL1_STAT_DEF                                         = 0x00000000,  /*!<  PLL1 Status Register Default Value */
      CFGREG_PLL1_STAT2_DEF                                        = 0x00001000,  /*!<  PLL1 Status Register Default Value */
      CFGREG_PLL1DCO_STAT_DEF                                      = 0x00000000,  /*!<  PLL1 TDC Status Register Default Value */
      CFGREG_PLL25_CONF_DEF                                        = 0x00C46A7E,  /*!<  PLL25 Configuration Register Default Value */
+     CFGREG_PLL25TDC_CONF_DEF                                     = 0x00000000,  /*!<  PLL25 TDC Configuration Register Default Value */
      CFGREG_PLL25DCO_CONF_DEF                                     = 0x00104000,  /*!<  PLL25 DCO Configuration Register Default Value */
      CFGREG_PLL25_STAT_DEF                                        = 0x00000000,  /*!<  PLL25 Status Register Default Value */
      CFGREG_PLL25_STAT2_DEF                                       = 0x00001000,  /*!<  PLL25 Status Register Default Value */
@@ -195,11 +205,17 @@ enum
      CFGREG_LNA125_TUNE_CONF_DEF                                  = 0x10001000,  /*!<  LNA125 Configuration Register Default Value */
      CFGREG_BALUN_MIXER1_CONF_DEF                                 = 0x00000018,  /*!<  BALUN and MIXER 1 Configuration Register Default Value */
      CFGREG_BALUN_MIXER25_CONF_DEF                                = 0x00000018,  /*!<  BALUN and MIXER 25 Configuration Register Default Value */
-     CFGREG_PMU_CONF_DEF                                          = 0x0000301E,  /*!<  PMU Configuration register Default Value */
+     CFGREG_PMU_CONF_DEF                                          = 0x0000F01E,  /*!<  PMU Configuration register Default Value */
      CFGREG_PMU_STAT_DEF                                          = 0x00000000,  /*!<  Power Management Unit Status Default Value */
+     CFGREG_PMU_BOD_CONF_DEF                                      = 0x00000000,  /*!<  GNSS-AFE PM Status Register Default Value */
+     CFGREG_PMU_BOD_STAT_DEF                                      = 0x00000000,  /*!<  GNSS-AFE PM Status Register Default Value */
      CFGREG_PM_STAT_DEF                                           = 0x00000001,  /*!<  GNSS-AFE PM Status Register Default Value */
      CFGREG_PM_CONF_DEF                                           = 0x00000820,  /*!<  GNSS-AFE PM Configuration Register Default Value */
      CFGREG_GNSSAFE_TEST_CONF_DEF                                 = 0x00000000,  /*!<  GNSS-AFE PM Configuration Register Default Value */
+     CFGREG_GPADC_CONF_DEF                                        = 0x00000000,  /*!<  GPADC Configuration Register Default Value */
+     CFGREG_GPADC_STAT_DEF                                        = 0x00000000,  /*!<  GPADC Status Register Default Value */
+     CFGREG_ANT_DET_CONF_DEF                                      = 0x00000000,  /*!<  Antenna Detection Configuration Register Default Value */
+     CFGREG_ANT_DET_STAT_DEF                                      = 0x00000000,  /*!<  Antenna Detection Status Register Default Value */
      CFGREG_SPARE_CONF_DEF                                        = 0x00000000,  /*!<  SPARE Configuration Register Default Value */
      CFGREG_SPARE_STAT_DEF                                        = 0x00000000,  /*!<  SPARE Configuration Register Default Value */
 };
@@ -212,9 +228,9 @@ enum
 
      CFGREG_UNLOCK_UNLOCK_KEY_MASK                                = 0x0000FFFF,  /*!<  Unlock Register Mask Value */
 
-     CFGREG_IRQFLAGS_PLL_FAIL_MASK                                = 0x00000004,  /*!<  32kHz RTC Clock Interrupt Flags Mask Value */
-     CFGREG_IRQFLAGS_XTAL_CORE_FAIL_MASK                          = 0x00000002,  /*!<  32kHz RTC Clock Interrupt Flags Mask Value */
-     CFGREG_IRQFLAGS_XTAL_RTC_FAIL_MASK                           = 0x00000001,  /*!<  32kHz RTC Clock Interrupt Flags Mask Value */
+     CFGREG_IRQFLAGS_PLL_FAIL_MASK                                = 0x00000004,  /*!<  Clock Interrupt Flags Mask Value */
+     CFGREG_IRQFLAGS_XTAL_CORE_FAIL_MASK                          = 0x00000002,  /*!<  Clock Interrupt Flags Mask Value */
+     CFGREG_IRQFLAGS_XTAL_RTC_FAIL_MASK                           = 0x00000001,  /*!<  Clock Interrupt Flags Mask Value */
 
      CFGREG_MEM_CONF_TEST1_MASK                                   = 0x00000020,  /*!<  Memory Configuration Register Mask Value */
      CFGREG_MEM_CONF_RME_MASK                                     = 0x00000010,  /*!<  Memory Configuration Register Mask Value */
@@ -224,13 +240,19 @@ enum
      CFGREG_RTCSTAT_RC_RTC_RDY_MASK                               = 0x00000002,  /*!<  32kHz RTC Clock Status Mask Value */
      CFGREG_RTCSTAT_CLK_RTC_SEL_MASK                              = 0x00000001,  /*!<  32kHz RTC Clock Status Mask Value */
 
-     CFGREG_RTCCONF_RC_RTC_VAL_SRC_MASK                           = 0x00000400,  /*!<  32kHz RTC Clock Configuration Mask Value */
-     CFGREG_RTCCONF_RC_RTC_VAL_MASK                               = 0x000003F8,  /*!<  32kHz RTC Clock Configuration Mask Value */
-     CFGREG_RTCCONF_RC_RTC_CAL_MASK                               = 0x00000004,  /*!<  32kHz RTC Clock Configuration Mask Value */
+     CFGREG_RTCCONF_RC_RTC_VAL_SRC_MASK                           = 0x00000800,  /*!<  32kHz RTC Clock Configuration Mask Value */
+     CFGREG_RTCCONF_RC_RTC_VAL_MASK                               = 0x000007F0,  /*!<  32kHz RTC Clock Configuration Mask Value */
+     CFGREG_RTCCONF_RC_RTC_CAL_MASK                               = 0x00000008,  /*!<  32kHz RTC Clock Configuration Mask Value */
+     CFGREG_RTCCONF_LOCK_OV_MASK                                  = 0x00000004,  /*!<  32kHz RTC Clock Configuration Mask Value */
      CFGREG_RTCCONF_XTAL_RTC_SEL_MASK                             = 0x00000002,  /*!<  32kHz RTC Clock Configuration Mask Value */
      CFGREG_RTCCONF_XTAL_RTC_TEST_MASK                            = 0x00000001,  /*!<  32kHz RTC Clock Configuration Mask Value */
 
-     CFGREG_COREFREQ_CLK_TEST_OUT_EN_MASK                         = 0x00000800,  /*!<  External XTAL Configuration Register Mask Value */
+     CFGREG_COREFREQ_CLK_XTAL_LOCK_OV_MASK                        = 0x00800000,  /*!<  External XTAL Configuration Register Mask Value */
+     CFGREG_COREFREQ_CLK_CORE_XTAL_SCALE_MASK                     = 0x00780000,  /*!<  External XTAL Configuration Register Mask Value */
+     CFGREG_COREFREQ_CLK_GNSSAFE_XTAL_SCALE_MASK                  = 0x00078000,  /*!<  External XTAL Configuration Register Mask Value */
+     CFGREG_COREFREQ_CLK_XTAL_SEL_MASK                            = 0x00004000,  /*!<  External XTAL Configuration Register Mask Value */
+     CFGREG_COREFREQ_CLK_XTAL_EN_MASK                             = 0x00002000,  /*!<  External XTAL Configuration Register Mask Value */
+     CFGREG_COREFREQ_CLK_TEST_OUT_EN_MASK                         = 0x00001800,  /*!<  External XTAL Configuration Register Mask Value */
      CFGREG_COREFREQ_CLK_RC_CORE_VAL_SRC_MASK                     = 0x00000400,  /*!<  External XTAL Configuration Register Mask Value */
      CFGREG_COREFREQ_CLK_RC_CORE_VAL_MASK                         = 0x000003F0,  /*!<  External XTAL Configuration Register Mask Value */
      CFGREG_COREFREQ_CLK_RC_CORE_CAL_MASK                         = 0x00000008,  /*!<  External XTAL Configuration Register Mask Value */
@@ -240,7 +262,7 @@ enum
      CFGREG_COREFREQ_PLL_CTRL_FINE_LOAD_MASK                      = 0x7FFE0000,  /*!<  PLL Configuration Register Mask Value */
      CFGREG_COREFREQ_PLL_CTRL_LOAD_MASK                           = 0x00010000,  /*!<  PLL Configuration Register Mask Value */
      CFGREG_COREFREQ_PLL_CTRL_PVT_LOAD_MASK                       = 0x0000FC00,  /*!<  PLL Configuration Register Mask Value */
-     CFGREG_COREFREQ_PLL_PLL_VFB_EN_MASK                          = 0x00000200,  /*!<  PLL Configuration Register Mask Value */
+     CFGREG_COREFREQ_PLL_LOCK_OV_MASK                             = 0x00000200,  /*!<  PLL Configuration Register Mask Value */
      CFGREG_COREFREQ_PLL_TEST_MASK                                = 0x00000100,  /*!<  PLL Configuration Register Mask Value */
      CFGREG_COREFREQ_PLL_N_MASK                                   = 0x000000FC,  /*!<  PLL Configuration Register Mask Value */
      CFGREG_COREFREQ_PLL_REF_SEL_MASK                             = 0x00000002,  /*!<  PLL Configuration Register Mask Value */
@@ -254,16 +276,18 @@ enum
      CFGREG_COREFREQ_STAT_XTAL_CORE_LOCK_MASK                     = 0x00000004,  /*!<  Core Clock Status Register Mask Value */
      CFGREG_COREFREQ_STAT_CLK_CORE_SEL_MASK                       = 0x00000003,  /*!<  Core Clock Status Register Mask Value */
 
-     CFGREG_GNSSAFE_CONF_GNSS_OUT_BAND_MASK                       = 0x00000004,  /*!<  GNSS-AFE Configuration Register Mask Value */
-     CFGREG_GNSSAFE_CONF_GNSS_AUX1_EN_MASK                        = 0x00000002,  /*!<  GNSS-AFE Configuration Register Mask Value */
-     CFGREG_GNSSAFE_CONF_GNSS_AUX0_EN_MASK                        = 0x00000001,  /*!<  GNSS-AFE Configuration Register Mask Value */
+     CFGREG_GNSSAFE_CONF_GNSS_OUT_BAND_MASK                       = 0x00000002,  /*!<  GNSS-AFE Configuration Register Mask Value */
+     CFGREG_GNSSAFE_CONF_GNSS_AUX_EN_MASK                         = 0x00000001,  /*!<  GNSS-AFE Configuration Register Mask Value */
 
+     CFGREG_PLL1_CONF_PRESC_MASK                                  = 0x30000000,  /*!<  PLL1 Configuration Register Mask Value */
      CFGREG_PLL1_CONF_EN_BOOST_MASK                               = 0x08000000,  /*!<  PLL1 Configuration Register Mask Value */
      CFGREG_PLL1_CONF_ADC_CLK_DIV_MASK                            = 0x04000000,  /*!<  PLL1 Configuration Register Mask Value */
      CFGREG_PLL1_CONF_LOPCB_EN_MASK                               = 0x02000000,  /*!<  PLL1 Configuration Register Mask Value */
      CFGREG_PLL1_CONF_TEST_EN_MASK                                = 0x01000000,  /*!<  PLL1 Configuration Register Mask Value */
      CFGREG_PLL1_CONF_FCW_MASK                                    = 0x00FFFFFE,  /*!<  PLL1 Configuration Register Mask Value */
      CFGREG_PLL1_CONF_EN_MASK                                     = 0x00000001,  /*!<  PLL1 Configuration Register Mask Value */
+
+     CFGREG_PLL1TDC_CONF_GATING_MASK                              = 0x0000000F,  /*!<  PLL1 TDC Configuration Register Mask Value */
 
      CFGREG_PLL1DCO_CONF_AMP_MASK                                 = 0x03C00000,  /*!<  PLL1 DCO Configuration Register Mask Value */
      CFGREG_PLL1DCO_CONF_AMP_LOAD_MASK                            = 0x00200000,  /*!<  PLL1 DCO Configuration Register Mask Value */
@@ -282,12 +306,15 @@ enum
      CFGREG_PLL1DCO_STAT_CTRL_PVT_MASK                            = 0x0007C000,  /*!<  PLL1 TDC Status Register Mask Value */
      CFGREG_PLL1DCO_STAT_CTRL_FINE_MASK                           = 0x00003FFF,  /*!<  PLL1 TDC Status Register Mask Value */
 
+     CFGREG_PLL25_CONF_PRESC_MASK                                 = 0x30000000,  /*!<  PLL25 Configuration Register Mask Value */
      CFGREG_PLL25_CONF_EN_BOOST_MASK                              = 0x08000000,  /*!<  PLL25 Configuration Register Mask Value */
      CFGREG_PLL25_CONF_ADC_CLK_DIV_MASK                           = 0x04000000,  /*!<  PLL25 Configuration Register Mask Value */
      CFGREG_PLL25_CONF_LOPCB_EN_MASK                              = 0x02000000,  /*!<  PLL25 Configuration Register Mask Value */
      CFGREG_PLL25_CONF_TEST_EN_MASK                               = 0x01000000,  /*!<  PLL25 Configuration Register Mask Value */
      CFGREG_PLL25_CONF_FCW_MASK                                   = 0x00FFFFFE,  /*!<  PLL25 Configuration Register Mask Value */
      CFGREG_PLL25_CONF_EN_MASK                                    = 0x00000001,  /*!<  PLL25 Configuration Register Mask Value */
+
+     CFGREG_PLL25TDC_CONF_GATING_MASK                             = 0x0000000F,  /*!<  PLL25 TDC Configuration Register Mask Value */
 
      CFGREG_PLL25DCO_CONF_AMP_MASK                                = 0x07800000,  /*!<  PLL25 DCO Configuration Register Mask Value */
      CFGREG_PLL25DCO_CONF_AMP_LOAD_MASK                           = 0x00400000,  /*!<  PLL25 DCO Configuration Register Mask Value */
@@ -459,6 +486,8 @@ enum
      CFGREG_SPLIT25_E5B_CFG_MANUAL_MODE_DIG_GAIN_Q_MASK           = 0x00000FC0,  /*!<  Splitter AFE25 E5B Manual Mode Digital Gain Configuration Register Mask Value */
      CFGREG_SPLIT25_E5B_CFG_MANUAL_MODE_DIG_GAIN_I_MASK           = 0x0000003F,  /*!<  Splitter AFE25 E5B Manual Mode Digital Gain Configuration Register Mask Value */
 
+     CFGREG_LNA125_CONF_L25_BYPASS_MASK                           = 0x00000020,  /*!<  LNA125 Configuration Register Mask Value */
+     CFGREG_LNA125_CONF_L1_BYPASS_MASK                            = 0x00000010,  /*!<  LNA125 Configuration Register Mask Value */
      CFGREG_LNA125_CONF_L25_TUNE_SRC_MASK                         = 0x00000008,  /*!<  LNA125 Configuration Register Mask Value */
      CFGREG_LNA125_CONF_L1_TUNE_SRC_MASK                          = 0x00000004,  /*!<  LNA125 Configuration Register Mask Value */
      CFGREG_LNA125_CONF_EN_L25_MASK                               = 0x00000002,  /*!<  LNA125 Configuration Register Mask Value */
@@ -477,19 +506,32 @@ enum
      CFGREG_BALUN_MIXER25_CONF_BALUN_EN_MASK                      = 0x00000002,  /*!<  BALUN and MIXER 25 Configuration Register Mask Value */
      CFGREG_BALUN_MIXER25_CONF_MIXER_EN_MASK                      = 0x00000001,  /*!<  BALUN and MIXER 25 Configuration Register Mask Value */
 
-     CFGREG_PMU_CONF_FLASH_POR_EN_MASK                            = 0x00040000,  /*!<  PMU Configuration register Mask Value */
-     CFGREG_PMU_CONF_FLASH_BOD_EN_MASK                            = 0x00020000,  /*!<  PMU Configuration register Mask Value */
-     CFGREG_PMU_CONF_DCDC_MODE_MASK                               = 0x00010000,  /*!<  PMU Configuration register Mask Value */
-     CFGREG_PMU_CONF_DCDC_GENTRIM_SRC_MASK                        = 0x00008000,  /*!<  PMU Configuration register Mask Value */
-     CFGREG_PMU_CONF_DCDC_GENTRIM_MASK                            = 0x00007000,  /*!<  PMU Configuration register Mask Value */
-     CFGREG_PMU_CONF_DCDC_TRIM_RESET_MASK                         = 0x00000800,  /*!<  PMU Configuration register Mask Value */
+     CFGREG_PMU_CONF_FLASH_POR_EN_MASK                            = 0x20000000,  /*!<  PMU Configuration register Mask Value */
+     CFGREG_PMU_CONF_FLASH_BOD_EN_MASK                            = 0x10000000,  /*!<  PMU Configuration register Mask Value */
+     CFGREG_PMU_CONF_DCDC_MODE_MASK                               = 0x08000000,  /*!<  PMU Configuration register Mask Value */
+     CFGREG_PMU_CONF_DCDC_GENTRIM_SRC_MASK                        = 0x04000000,  /*!<  PMU Configuration register Mask Value */
+     CFGREG_PMU_CONF_DCDC_GENTRIM_MASK                            = 0x03800000,  /*!<  PMU Configuration register Mask Value */
+     CFGREG_PMU_CONF_DCDC_TRIM_RESET_MASK                         = 0x00400000,  /*!<  PMU Configuration register Mask Value */
+     CFGREG_PMU_CONF_VREF_CAL_EN_MASK                             = 0x00200000,  /*!<  PMU Configuration register Mask Value */
+     CFGREG_PMU_CONF_VREF_TRIM_VAL_SRC_MASK                       = 0x00100000,  /*!<  PMU Configuration register Mask Value */
+     CFGREG_PMU_CONF_VREF_TRIM_VAL_MASK                           = 0x000FF000,  /*!<  PMU Configuration register Mask Value */
+     CFGREG_PMU_CONF_VREF_TRIM_EN_MASK                            = 0x00000800,  /*!<  PMU Configuration register Mask Value */
      CFGREG_PMU_CONF_IREF_CAL_EN_MASK                             = 0x00000400,  /*!<  PMU Configuration register Mask Value */
      CFGREG_PMU_CONF_IREF_TRIM_VAL_SRC_MASK                       = 0x00000200,  /*!<  PMU Configuration register Mask Value */
      CFGREG_PMU_CONF_IREF_TRIM_VAL_MASK                           = 0x000001FE,  /*!<  PMU Configuration register Mask Value */
      CFGREG_PMU_CONF_IREF_TRIM_EN_MASK                            = 0x00000001,  /*!<  PMU Configuration register Mask Value */
 
+     CFGREG_PMU_STAT_VREF_COMP_OUT_MASK                           = 0x00000200,  /*!<  Power Management Unit Status Mask Value */
      CFGREG_PMU_STAT_IREF_TRIM_VAL_MASK                           = 0x000001FE,  /*!<  Power Management Unit Status Mask Value */
      CFGREG_PMU_STAT_IREF_CAL_RDY_MASK                            = 0x00000001,  /*!<  Power Management Unit Status Mask Value */
+
+     CFGREG_PMU_BOD_CONF_VDD_MCU_ERR_CTR_MASK                     = 0x0003FC00,  /*!<  GNSS-AFE PM Status Register Mask Value */
+     CFGREG_PMU_BOD_CONF_VDD_MCU_ERR_EN_MASK                      = 0x00000200,  /*!<  GNSS-AFE PM Status Register Mask Value */
+     CFGREG_PMU_BOD_CONF_VDD_MCU_WRN_CTR_MASK                     = 0x000001FE,  /*!<  GNSS-AFE PM Status Register Mask Value */
+     CFGREG_PMU_BOD_CONF_VDD_MCU_WRN_EN_MASK                      = 0x00000001,  /*!<  GNSS-AFE PM Status Register Mask Value */
+
+     CFGREG_PMU_BOD_STAT_VDD_MCU_ERR_MASK                         = 0x00000002,  /*!<  GNSS-AFE PM Status Register Mask Value */
+     CFGREG_PMU_BOD_STAT_VDD_MCU_WRN_MASK                         = 0x00000001,  /*!<  GNSS-AFE PM Status Register Mask Value */
 
      CFGREG_PM_STAT_IREF_COMP_MASK                                = 0x00000008,  /*!<  GNSS-AFE PM Status Register Mask Value */
      CFGREG_PM_STAT_VREF_COMP_MASK                                = 0x00000004,  /*!<  GNSS-AFE PM Status Register Mask Value */
@@ -526,6 +568,22 @@ enum
      CFGREG_GNSSAFE_TEST_CONF_PLL1TEST_MOD_DIR_MASK               = 0x00000004,  /*!<  GNSS-AFE PM Configuration Register Mask Value */
      CFGREG_GNSSAFE_TEST_CONF_PLL1TEST_MOD_PRESC_MASK             = 0x00000003,  /*!<  GNSS-AFE PM Configuration Register Mask Value */
 
+     CFGREG_GPADC_CONF_CLK_PRESC_MASK                             = 0x00000F00,  /*!<  GPADC Configuration Register Mask Value */
+     CFGREG_GPADC_CONF_CLK_SEL_MASK                               = 0x000000C0,  /*!<  GPADC Configuration Register Mask Value */
+     CFGREG_GPADC_CONF_SEL_MASK                                   = 0x00000030,  /*!<  GPADC Configuration Register Mask Value */
+     CFGREG_GPADC_CONF_SINGLE_SAMPLE_MASK                         = 0x00000008,  /*!<  GPADC Configuration Register Mask Value */
+     CFGREG_GPADC_CONF_EN_PROC_MASK                               = 0x00000004,  /*!<  GPADC Configuration Register Mask Value */
+     CFGREG_GPADC_CONF_EN_8BIT_MASK                               = 0x00000002,  /*!<  GPADC Configuration Register Mask Value */
+     CFGREG_GPADC_CONF_EN_MASK                                    = 0x00000001,  /*!<  GPADC Configuration Register Mask Value */
+
+     CFGREG_GPADC_STAT_DATA_RDY_MASK                              = 0x00001000,  /*!<  GPADC Status Register Mask Value */
+     CFGREG_GPADC_STAT_DATA_OUT_MASK                              = 0x00000FFF,  /*!<  GPADC Status Register Mask Value */
+
+     CFGREG_ANT_DET_CONF_EN_MASK                                  = 0x00000001,  /*!<  Antenna Detection Configuration Register Mask Value */
+
+     CFGREG_ANT_DET_STAT_SENSE_MASK                               = 0x00000006,  /*!<  Antenna Detection Status Register Mask Value */
+     CFGREG_ANT_DET_STAT_SHORT_MASK                               = 0x00000001,  /*!<  Antenna Detection Status Register Mask Value */
+
      CFGREG_SPARE_CONF_SIG_MASK                                   = 0xFFFFFFFF,  /*!<  SPARE Configuration Register Mask Value */
 
      CFGREG_SPARE_STAT_SIG_MASK                                   = 0xFFFFFFFF,  /*!<  SPARE Configuration Register Mask Value */
@@ -540,9 +598,9 @@ enum
 
      CFGREG_UNLOCK_UNLOCK_KEY_SHIFT                               =  0,  /*!<  Unlock Register Shift Value */
 
-     CFGREG_IRQFLAGS_PLL_FAIL_SHIFT                               =  2,  /*!<  32kHz RTC Clock Interrupt Flags Shift Value */
-     CFGREG_IRQFLAGS_XTAL_CORE_FAIL_SHIFT                         =  1,  /*!<  32kHz RTC Clock Interrupt Flags Shift Value */
-     CFGREG_IRQFLAGS_XTAL_RTC_FAIL_SHIFT                          =  0,  /*!<  32kHz RTC Clock Interrupt Flags Shift Value */
+     CFGREG_IRQFLAGS_PLL_FAIL_SHIFT                               =  2,  /*!<  Clock Interrupt Flags Shift Value */
+     CFGREG_IRQFLAGS_XTAL_CORE_FAIL_SHIFT                         =  1,  /*!<  Clock Interrupt Flags Shift Value */
+     CFGREG_IRQFLAGS_XTAL_RTC_FAIL_SHIFT                          =  0,  /*!<  Clock Interrupt Flags Shift Value */
 
      CFGREG_MEM_CONF_TEST1_SHIFT                                  =  5,  /*!<  Memory Configuration Register Shift Value */
      CFGREG_MEM_CONF_RME_SHIFT                                    =  4,  /*!<  Memory Configuration Register Shift Value */
@@ -552,12 +610,18 @@ enum
      CFGREG_RTCSTAT_RC_RTC_RDY_SHIFT                              =  1,  /*!<  32kHz RTC Clock Status Shift Value */
      CFGREG_RTCSTAT_CLK_RTC_SEL_SHIFT                             =  0,  /*!<  32kHz RTC Clock Status Shift Value */
 
-     CFGREG_RTCCONF_RC_RTC_VAL_SRC_SHIFT                          = 10,  /*!<  32kHz RTC Clock Configuration Shift Value */
-     CFGREG_RTCCONF_RC_RTC_VAL_SHIFT                              =  3,  /*!<  32kHz RTC Clock Configuration Shift Value */
-     CFGREG_RTCCONF_RC_RTC_CAL_SHIFT                              =  2,  /*!<  32kHz RTC Clock Configuration Shift Value */
+     CFGREG_RTCCONF_RC_RTC_VAL_SRC_SHIFT                          = 11,  /*!<  32kHz RTC Clock Configuration Shift Value */
+     CFGREG_RTCCONF_RC_RTC_VAL_SHIFT                              =  4,  /*!<  32kHz RTC Clock Configuration Shift Value */
+     CFGREG_RTCCONF_RC_RTC_CAL_SHIFT                              =  3,  /*!<  32kHz RTC Clock Configuration Shift Value */
+     CFGREG_RTCCONF_LOCK_OV_SHIFT                                 =  2,  /*!<  32kHz RTC Clock Configuration Shift Value */
      CFGREG_RTCCONF_XTAL_RTC_SEL_SHIFT                            =  1,  /*!<  32kHz RTC Clock Configuration Shift Value */
      CFGREG_RTCCONF_XTAL_RTC_TEST_SHIFT                           =  0,  /*!<  32kHz RTC Clock Configuration Shift Value */
 
+     CFGREG_COREFREQ_CLK_XTAL_LOCK_OV_SHIFT                       = 23,  /*!<  External XTAL Configuration Register Shift Value */
+     CFGREG_COREFREQ_CLK_CORE_XTAL_SCALE_SHIFT                    = 19,  /*!<  External XTAL Configuration Register Shift Value */
+     CFGREG_COREFREQ_CLK_GNSSAFE_XTAL_SCALE_SHIFT                 = 15,  /*!<  External XTAL Configuration Register Shift Value */
+     CFGREG_COREFREQ_CLK_XTAL_SEL_SHIFT                           = 14,  /*!<  External XTAL Configuration Register Shift Value */
+     CFGREG_COREFREQ_CLK_XTAL_EN_SHIFT                            = 13,  /*!<  External XTAL Configuration Register Shift Value */
      CFGREG_COREFREQ_CLK_TEST_OUT_EN_SHIFT                        = 11,  /*!<  External XTAL Configuration Register Shift Value */
      CFGREG_COREFREQ_CLK_RC_CORE_VAL_SRC_SHIFT                    = 10,  /*!<  External XTAL Configuration Register Shift Value */
      CFGREG_COREFREQ_CLK_RC_CORE_VAL_SHIFT                        =  4,  /*!<  External XTAL Configuration Register Shift Value */
@@ -568,7 +632,7 @@ enum
      CFGREG_COREFREQ_PLL_CTRL_FINE_LOAD_SHIFT                     = 17,  /*!<  PLL Configuration Register Shift Value */
      CFGREG_COREFREQ_PLL_CTRL_LOAD_SHIFT                          = 16,  /*!<  PLL Configuration Register Shift Value */
      CFGREG_COREFREQ_PLL_CTRL_PVT_LOAD_SHIFT                      = 10,  /*!<  PLL Configuration Register Shift Value */
-     CFGREG_COREFREQ_PLL_PLL_VFB_EN_SHIFT                         =  9,  /*!<  PLL Configuration Register Shift Value */
+     CFGREG_COREFREQ_PLL_LOCK_OV_SHIFT                            =  9,  /*!<  PLL Configuration Register Shift Value */
      CFGREG_COREFREQ_PLL_TEST_SHIFT                               =  8,  /*!<  PLL Configuration Register Shift Value */
      CFGREG_COREFREQ_PLL_N_SHIFT                                  =  2,  /*!<  PLL Configuration Register Shift Value */
      CFGREG_COREFREQ_PLL_REF_SEL_SHIFT                            =  1,  /*!<  PLL Configuration Register Shift Value */
@@ -582,16 +646,18 @@ enum
      CFGREG_COREFREQ_STAT_XTAL_CORE_LOCK_SHIFT                    =  2,  /*!<  Core Clock Status Register Shift Value */
      CFGREG_COREFREQ_STAT_CLK_CORE_SEL_SHIFT                      =  0,  /*!<  Core Clock Status Register Shift Value */
 
-     CFGREG_GNSSAFE_CONF_GNSS_OUT_BAND_SHIFT                      =  2,  /*!<  GNSS-AFE Configuration Register Shift Value */
-     CFGREG_GNSSAFE_CONF_GNSS_AUX1_EN_SHIFT                       =  1,  /*!<  GNSS-AFE Configuration Register Shift Value */
-     CFGREG_GNSSAFE_CONF_GNSS_AUX0_EN_SHIFT                       =  0,  /*!<  GNSS-AFE Configuration Register Shift Value */
+     CFGREG_GNSSAFE_CONF_GNSS_OUT_BAND_SHIFT                      =  1,  /*!<  GNSS-AFE Configuration Register Shift Value */
+     CFGREG_GNSSAFE_CONF_GNSS_AUX_EN_SHIFT                        =  0,  /*!<  GNSS-AFE Configuration Register Shift Value */
 
+     CFGREG_PLL1_CONF_PRESC_SHIFT                                 = 28,  /*!<  PLL1 Configuration Register Shift Value */
      CFGREG_PLL1_CONF_EN_BOOST_SHIFT                              = 27,  /*!<  PLL1 Configuration Register Shift Value */
      CFGREG_PLL1_CONF_ADC_CLK_DIV_SHIFT                           = 26,  /*!<  PLL1 Configuration Register Shift Value */
      CFGREG_PLL1_CONF_LOPCB_EN_SHIFT                              = 25,  /*!<  PLL1 Configuration Register Shift Value */
      CFGREG_PLL1_CONF_TEST_EN_SHIFT                               = 24,  /*!<  PLL1 Configuration Register Shift Value */
      CFGREG_PLL1_CONF_FCW_SHIFT                                   =  1,  /*!<  PLL1 Configuration Register Shift Value */
      CFGREG_PLL1_CONF_EN_SHIFT                                    =  0,  /*!<  PLL1 Configuration Register Shift Value */
+
+     CFGREG_PLL1TDC_CONF_GATING_SHIFT                             =  0,  /*!<  PLL1 TDC Configuration Register Shift Value */
 
      CFGREG_PLL1DCO_CONF_AMP_SHIFT                                = 22,  /*!<  PLL1 DCO Configuration Register Shift Value */
      CFGREG_PLL1DCO_CONF_AMP_LOAD_SHIFT                           = 21,  /*!<  PLL1 DCO Configuration Register Shift Value */
@@ -610,12 +676,15 @@ enum
      CFGREG_PLL1DCO_STAT_CTRL_PVT_SHIFT                           = 14,  /*!<  PLL1 TDC Status Register Shift Value */
      CFGREG_PLL1DCO_STAT_CTRL_FINE_SHIFT                          =  0,  /*!<  PLL1 TDC Status Register Shift Value */
 
+     CFGREG_PLL25_CONF_PRESC_SHIFT                                = 28,  /*!<  PLL25 Configuration Register Shift Value */
      CFGREG_PLL25_CONF_EN_BOOST_SHIFT                             = 27,  /*!<  PLL25 Configuration Register Shift Value */
      CFGREG_PLL25_CONF_ADC_CLK_DIV_SHIFT                          = 26,  /*!<  PLL25 Configuration Register Shift Value */
      CFGREG_PLL25_CONF_LOPCB_EN_SHIFT                             = 25,  /*!<  PLL25 Configuration Register Shift Value */
      CFGREG_PLL25_CONF_TEST_EN_SHIFT                              = 24,  /*!<  PLL25 Configuration Register Shift Value */
      CFGREG_PLL25_CONF_FCW_SHIFT                                  =  1,  /*!<  PLL25 Configuration Register Shift Value */
      CFGREG_PLL25_CONF_EN_SHIFT                                   =  0,  /*!<  PLL25 Configuration Register Shift Value */
+
+     CFGREG_PLL25TDC_CONF_GATING_SHIFT                            =  0,  /*!<  PLL25 TDC Configuration Register Shift Value */
 
      CFGREG_PLL25DCO_CONF_AMP_SHIFT                               = 23,  /*!<  PLL25 DCO Configuration Register Shift Value */
      CFGREG_PLL25DCO_CONF_AMP_LOAD_SHIFT                          = 22,  /*!<  PLL25 DCO Configuration Register Shift Value */
@@ -787,6 +856,8 @@ enum
      CFGREG_SPLIT25_E5B_CFG_MANUAL_MODE_DIG_GAIN_Q_SHIFT          =  6,  /*!<  Splitter AFE25 E5B Manual Mode Digital Gain Configuration Register Shift Value */
      CFGREG_SPLIT25_E5B_CFG_MANUAL_MODE_DIG_GAIN_I_SHIFT          =  0,  /*!<  Splitter AFE25 E5B Manual Mode Digital Gain Configuration Register Shift Value */
 
+     CFGREG_LNA125_CONF_L25_BYPASS_SHIFT                          =  5,  /*!<  LNA125 Configuration Register Shift Value */
+     CFGREG_LNA125_CONF_L1_BYPASS_SHIFT                           =  4,  /*!<  LNA125 Configuration Register Shift Value */
      CFGREG_LNA125_CONF_L25_TUNE_SRC_SHIFT                        =  3,  /*!<  LNA125 Configuration Register Shift Value */
      CFGREG_LNA125_CONF_L1_TUNE_SRC_SHIFT                         =  2,  /*!<  LNA125 Configuration Register Shift Value */
      CFGREG_LNA125_CONF_EN_L25_SHIFT                              =  1,  /*!<  LNA125 Configuration Register Shift Value */
@@ -805,19 +876,32 @@ enum
      CFGREG_BALUN_MIXER25_CONF_BALUN_EN_SHIFT                     =  1,  /*!<  BALUN and MIXER 25 Configuration Register Shift Value */
      CFGREG_BALUN_MIXER25_CONF_MIXER_EN_SHIFT                     =  0,  /*!<  BALUN and MIXER 25 Configuration Register Shift Value */
 
-     CFGREG_PMU_CONF_FLASH_POR_EN_SHIFT                           = 18,  /*!<  PMU Configuration register Shift Value */
-     CFGREG_PMU_CONF_FLASH_BOD_EN_SHIFT                           = 17,  /*!<  PMU Configuration register Shift Value */
-     CFGREG_PMU_CONF_DCDC_MODE_SHIFT                              = 16,  /*!<  PMU Configuration register Shift Value */
-     CFGREG_PMU_CONF_DCDC_GENTRIM_SRC_SHIFT                       = 15,  /*!<  PMU Configuration register Shift Value */
-     CFGREG_PMU_CONF_DCDC_GENTRIM_SHIFT                           = 12,  /*!<  PMU Configuration register Shift Value */
-     CFGREG_PMU_CONF_DCDC_TRIM_RESET_SHIFT                        = 11,  /*!<  PMU Configuration register Shift Value */
+     CFGREG_PMU_CONF_FLASH_POR_EN_SHIFT                           = 29,  /*!<  PMU Configuration register Shift Value */
+     CFGREG_PMU_CONF_FLASH_BOD_EN_SHIFT                           = 28,  /*!<  PMU Configuration register Shift Value */
+     CFGREG_PMU_CONF_DCDC_MODE_SHIFT                              = 27,  /*!<  PMU Configuration register Shift Value */
+     CFGREG_PMU_CONF_DCDC_GENTRIM_SRC_SHIFT                       = 26,  /*!<  PMU Configuration register Shift Value */
+     CFGREG_PMU_CONF_DCDC_GENTRIM_SHIFT                           = 23,  /*!<  PMU Configuration register Shift Value */
+     CFGREG_PMU_CONF_DCDC_TRIM_RESET_SHIFT                        = 22,  /*!<  PMU Configuration register Shift Value */
+     CFGREG_PMU_CONF_VREF_CAL_EN_SHIFT                            = 21,  /*!<  PMU Configuration register Shift Value */
+     CFGREG_PMU_CONF_VREF_TRIM_VAL_SRC_SHIFT                      = 20,  /*!<  PMU Configuration register Shift Value */
+     CFGREG_PMU_CONF_VREF_TRIM_VAL_SHIFT                          = 12,  /*!<  PMU Configuration register Shift Value */
+     CFGREG_PMU_CONF_VREF_TRIM_EN_SHIFT                           = 11,  /*!<  PMU Configuration register Shift Value */
      CFGREG_PMU_CONF_IREF_CAL_EN_SHIFT                            = 10,  /*!<  PMU Configuration register Shift Value */
      CFGREG_PMU_CONF_IREF_TRIM_VAL_SRC_SHIFT                      =  9,  /*!<  PMU Configuration register Shift Value */
      CFGREG_PMU_CONF_IREF_TRIM_VAL_SHIFT                          =  1,  /*!<  PMU Configuration register Shift Value */
      CFGREG_PMU_CONF_IREF_TRIM_EN_SHIFT                           =  0,  /*!<  PMU Configuration register Shift Value */
 
+     CFGREG_PMU_STAT_VREF_COMP_OUT_SHIFT                          =  9,  /*!<  Power Management Unit Status Shift Value */
      CFGREG_PMU_STAT_IREF_TRIM_VAL_SHIFT                          =  1,  /*!<  Power Management Unit Status Shift Value */
      CFGREG_PMU_STAT_IREF_CAL_RDY_SHIFT                           =  0,  /*!<  Power Management Unit Status Shift Value */
+
+     CFGREG_PMU_BOD_CONF_VDD_MCU_ERR_CTR_SHIFT                    = 10,  /*!<  GNSS-AFE PM Status Register Shift Value */
+     CFGREG_PMU_BOD_CONF_VDD_MCU_ERR_EN_SHIFT                     =  9,  /*!<  GNSS-AFE PM Status Register Shift Value */
+     CFGREG_PMU_BOD_CONF_VDD_MCU_WRN_CTR_SHIFT                    =  1,  /*!<  GNSS-AFE PM Status Register Shift Value */
+     CFGREG_PMU_BOD_CONF_VDD_MCU_WRN_EN_SHIFT                     =  0,  /*!<  GNSS-AFE PM Status Register Shift Value */
+
+     CFGREG_PMU_BOD_STAT_VDD_MCU_ERR_SHIFT                        =  1,  /*!<  GNSS-AFE PM Status Register Shift Value */
+     CFGREG_PMU_BOD_STAT_VDD_MCU_WRN_SHIFT                        =  0,  /*!<  GNSS-AFE PM Status Register Shift Value */
 
      CFGREG_PM_STAT_IREF_COMP_SHIFT                               =  3,  /*!<  GNSS-AFE PM Status Register Shift Value */
      CFGREG_PM_STAT_VREF_COMP_SHIFT                               =  2,  /*!<  GNSS-AFE PM Status Register Shift Value */
@@ -854,6 +938,22 @@ enum
      CFGREG_GNSSAFE_TEST_CONF_PLL1TEST_MOD_DIR_SHIFT              =  2,  /*!<  GNSS-AFE PM Configuration Register Shift Value */
      CFGREG_GNSSAFE_TEST_CONF_PLL1TEST_MOD_PRESC_SHIFT            =  0,  /*!<  GNSS-AFE PM Configuration Register Shift Value */
 
+     CFGREG_GPADC_CONF_CLK_PRESC_SHIFT                            =  8,  /*!<  GPADC Configuration Register Shift Value */
+     CFGREG_GPADC_CONF_CLK_SEL_SHIFT                              =  6,  /*!<  GPADC Configuration Register Shift Value */
+     CFGREG_GPADC_CONF_SEL_SHIFT                                  =  4,  /*!<  GPADC Configuration Register Shift Value */
+     CFGREG_GPADC_CONF_SINGLE_SAMPLE_SHIFT                        =  3,  /*!<  GPADC Configuration Register Shift Value */
+     CFGREG_GPADC_CONF_EN_PROC_SHIFT                              =  2,  /*!<  GPADC Configuration Register Shift Value */
+     CFGREG_GPADC_CONF_EN_8BIT_SHIFT                              =  1,  /*!<  GPADC Configuration Register Shift Value */
+     CFGREG_GPADC_CONF_EN_SHIFT                                   =  0,  /*!<  GPADC Configuration Register Shift Value */
+
+     CFGREG_GPADC_STAT_DATA_RDY_SHIFT                             = 12,  /*!<  GPADC Status Register Shift Value */
+     CFGREG_GPADC_STAT_DATA_OUT_SHIFT                             =  0,  /*!<  GPADC Status Register Shift Value */
+
+     CFGREG_ANT_DET_CONF_EN_SHIFT                                 =  0,  /*!<  Antenna Detection Configuration Register Shift Value */
+
+     CFGREG_ANT_DET_STAT_SENSE_SHIFT                              =  1,  /*!<  Antenna Detection Status Register Shift Value */
+     CFGREG_ANT_DET_STAT_SHORT_SHIFT                              =  0,  /*!<  Antenna Detection Status Register Shift Value */
+
      CFGREG_SPARE_CONF_SIG_SHIFT                                  =  0,  /*!<  SPARE Configuration Register Shift Value */
 
      CFGREG_SPARE_STAT_SIG_SHIFT                                  =  0,  /*!<  SPARE Configuration Register Shift Value */
@@ -866,9 +966,9 @@ enum
 
 #define CFGREG_UNLOCK_UNLOCK_KEY_BITS_SET(x)                                   ((x << CFGREG_UNLOCK_UNLOCK_KEY_SHIFT) & CFGREG_UNLOCK_UNLOCK_KEY_MASK)                                                  /*!<  Unlock Register Bits Set */
 
-#define CFGREG_IRQFLAGS_PLL_FAIL_BITS_SET(x)                                   ((x << CFGREG_IRQFLAGS_PLL_FAIL_SHIFT) & CFGREG_IRQFLAGS_PLL_FAIL_MASK)                                                  /*!<  32kHz RTC Clock Interrupt Flags Bits Set */
-#define CFGREG_IRQFLAGS_XTAL_CORE_FAIL_BITS_SET(x)                             ((x << CFGREG_IRQFLAGS_XTAL_CORE_FAIL_SHIFT) & CFGREG_IRQFLAGS_XTAL_CORE_FAIL_MASK)                                      /*!<  32kHz RTC Clock Interrupt Flags Bits Set */
-#define CFGREG_IRQFLAGS_XTAL_RTC_FAIL_BITS_SET(x)                              ((x << CFGREG_IRQFLAGS_XTAL_RTC_FAIL_SHIFT) & CFGREG_IRQFLAGS_XTAL_RTC_FAIL_MASK)                                        /*!<  32kHz RTC Clock Interrupt Flags Bits Set */
+#define CFGREG_IRQFLAGS_PLL_FAIL_BITS_SET(x)                                   ((x << CFGREG_IRQFLAGS_PLL_FAIL_SHIFT) & CFGREG_IRQFLAGS_PLL_FAIL_MASK)                                                  /*!<  Clock Interrupt Flags Bits Set */
+#define CFGREG_IRQFLAGS_XTAL_CORE_FAIL_BITS_SET(x)                             ((x << CFGREG_IRQFLAGS_XTAL_CORE_FAIL_SHIFT) & CFGREG_IRQFLAGS_XTAL_CORE_FAIL_MASK)                                      /*!<  Clock Interrupt Flags Bits Set */
+#define CFGREG_IRQFLAGS_XTAL_RTC_FAIL_BITS_SET(x)                              ((x << CFGREG_IRQFLAGS_XTAL_RTC_FAIL_SHIFT) & CFGREG_IRQFLAGS_XTAL_RTC_FAIL_MASK)                                        /*!<  Clock Interrupt Flags Bits Set */
 
 #define CFGREG_MEM_CONF_TEST1_BITS_SET(x)                                      ((x << CFGREG_MEM_CONF_TEST1_SHIFT) & CFGREG_MEM_CONF_TEST1_MASK)                                                        /*!<  Memory Configuration Register Bits Set */
 #define CFGREG_MEM_CONF_RME_BITS_SET(x)                                        ((x << CFGREG_MEM_CONF_RME_SHIFT) & CFGREG_MEM_CONF_RME_MASK)                                                            /*!<  Memory Configuration Register Bits Set */
@@ -881,9 +981,15 @@ enum
 #define CFGREG_RTCCONF_RC_RTC_VAL_SRC_BITS_SET(x)                              ((x << CFGREG_RTCCONF_RC_RTC_VAL_SRC_SHIFT) & CFGREG_RTCCONF_RC_RTC_VAL_SRC_MASK)                                        /*!<  32kHz RTC Clock Configuration Bits Set */
 #define CFGREG_RTCCONF_RC_RTC_VAL_BITS_SET(x)                                  ((x << CFGREG_RTCCONF_RC_RTC_VAL_SHIFT) & CFGREG_RTCCONF_RC_RTC_VAL_MASK)                                                /*!<  32kHz RTC Clock Configuration Bits Set */
 #define CFGREG_RTCCONF_RC_RTC_CAL_BITS_SET(x)                                  ((x << CFGREG_RTCCONF_RC_RTC_CAL_SHIFT) & CFGREG_RTCCONF_RC_RTC_CAL_MASK)                                                /*!<  32kHz RTC Clock Configuration Bits Set */
+#define CFGREG_RTCCONF_LOCK_OV_BITS_SET(x)                                     ((x << CFGREG_RTCCONF_LOCK_OV_SHIFT) & CFGREG_RTCCONF_LOCK_OV_MASK)                                                      /*!<  32kHz RTC Clock Configuration Bits Set */
 #define CFGREG_RTCCONF_XTAL_RTC_SEL_BITS_SET(x)                                ((x << CFGREG_RTCCONF_XTAL_RTC_SEL_SHIFT) & CFGREG_RTCCONF_XTAL_RTC_SEL_MASK)                                            /*!<  32kHz RTC Clock Configuration Bits Set */
 #define CFGREG_RTCCONF_XTAL_RTC_TEST_BITS_SET(x)                               ((x << CFGREG_RTCCONF_XTAL_RTC_TEST_SHIFT) & CFGREG_RTCCONF_XTAL_RTC_TEST_MASK)                                          /*!<  32kHz RTC Clock Configuration Bits Set */
 
+#define CFGREG_COREFREQ_CLK_XTAL_LOCK_OV_BITS_SET(x)                           ((x << CFGREG_COREFREQ_CLK_XTAL_LOCK_OV_SHIFT) & CFGREG_COREFREQ_CLK_XTAL_LOCK_OV_MASK)                                  /*!<  External XTAL Configuration Register Bits Set */
+#define CFGREG_COREFREQ_CLK_CORE_XTAL_SCALE_BITS_SET(x)                        ((x << CFGREG_COREFREQ_CLK_CORE_XTAL_SCALE_SHIFT) & CFGREG_COREFREQ_CLK_CORE_XTAL_SCALE_MASK)                            /*!<  External XTAL Configuration Register Bits Set */
+#define CFGREG_COREFREQ_CLK_GNSSAFE_XTAL_SCALE_BITS_SET(x)                     ((x << CFGREG_COREFREQ_CLK_GNSSAFE_XTAL_SCALE_SHIFT) & CFGREG_COREFREQ_CLK_GNSSAFE_XTAL_SCALE_MASK)                      /*!<  External XTAL Configuration Register Bits Set */
+#define CFGREG_COREFREQ_CLK_XTAL_SEL_BITS_SET(x)                               ((x << CFGREG_COREFREQ_CLK_XTAL_SEL_SHIFT) & CFGREG_COREFREQ_CLK_XTAL_SEL_MASK)                                          /*!<  External XTAL Configuration Register Bits Set */
+#define CFGREG_COREFREQ_CLK_XTAL_EN_BITS_SET(x)                                ((x << CFGREG_COREFREQ_CLK_XTAL_EN_SHIFT) & CFGREG_COREFREQ_CLK_XTAL_EN_MASK)                                            /*!<  External XTAL Configuration Register Bits Set */
 #define CFGREG_COREFREQ_CLK_TEST_OUT_EN_BITS_SET(x)                            ((x << CFGREG_COREFREQ_CLK_TEST_OUT_EN_SHIFT) & CFGREG_COREFREQ_CLK_TEST_OUT_EN_MASK)                                    /*!<  External XTAL Configuration Register Bits Set */
 #define CFGREG_COREFREQ_CLK_RC_CORE_VAL_SRC_BITS_SET(x)                        ((x << CFGREG_COREFREQ_CLK_RC_CORE_VAL_SRC_SHIFT) & CFGREG_COREFREQ_CLK_RC_CORE_VAL_SRC_MASK)                            /*!<  External XTAL Configuration Register Bits Set */
 #define CFGREG_COREFREQ_CLK_RC_CORE_VAL_BITS_SET(x)                            ((x << CFGREG_COREFREQ_CLK_RC_CORE_VAL_SHIFT) & CFGREG_COREFREQ_CLK_RC_CORE_VAL_MASK)                                    /*!<  External XTAL Configuration Register Bits Set */
@@ -894,7 +1000,7 @@ enum
 #define CFGREG_COREFREQ_PLL_CTRL_FINE_LOAD_BITS_SET(x)                         ((x << CFGREG_COREFREQ_PLL_CTRL_FINE_LOAD_SHIFT) & CFGREG_COREFREQ_PLL_CTRL_FINE_LOAD_MASK)                              /*!<  PLL Configuration Register Bits Set */
 #define CFGREG_COREFREQ_PLL_CTRL_LOAD_BITS_SET(x)                              ((x << CFGREG_COREFREQ_PLL_CTRL_LOAD_SHIFT) & CFGREG_COREFREQ_PLL_CTRL_LOAD_MASK)                                        /*!<  PLL Configuration Register Bits Set */
 #define CFGREG_COREFREQ_PLL_CTRL_PVT_LOAD_BITS_SET(x)                          ((x << CFGREG_COREFREQ_PLL_CTRL_PVT_LOAD_SHIFT) & CFGREG_COREFREQ_PLL_CTRL_PVT_LOAD_MASK)                                /*!<  PLL Configuration Register Bits Set */
-#define CFGREG_COREFREQ_PLL_PLL_VFB_EN_BITS_SET(x)                             ((x << CFGREG_COREFREQ_PLL_PLL_VFB_EN_SHIFT) & CFGREG_COREFREQ_PLL_PLL_VFB_EN_MASK)                                      /*!<  PLL Configuration Register Bits Set */
+#define CFGREG_COREFREQ_PLL_LOCK_OV_BITS_SET(x)                                ((x << CFGREG_COREFREQ_PLL_LOCK_OV_SHIFT) & CFGREG_COREFREQ_PLL_LOCK_OV_MASK)                                            /*!<  PLL Configuration Register Bits Set */
 #define CFGREG_COREFREQ_PLL_TEST_BITS_SET(x)                                   ((x << CFGREG_COREFREQ_PLL_TEST_SHIFT) & CFGREG_COREFREQ_PLL_TEST_MASK)                                                  /*!<  PLL Configuration Register Bits Set */
 #define CFGREG_COREFREQ_PLL_N_BITS_SET(x)                                      ((x << CFGREG_COREFREQ_PLL_N_SHIFT) & CFGREG_COREFREQ_PLL_N_MASK)                                                        /*!<  PLL Configuration Register Bits Set */
 #define CFGREG_COREFREQ_PLL_REF_SEL_BITS_SET(x)                                ((x << CFGREG_COREFREQ_PLL_REF_SEL_SHIFT) & CFGREG_COREFREQ_PLL_REF_SEL_MASK)                                            /*!<  PLL Configuration Register Bits Set */
@@ -909,15 +1015,17 @@ enum
 #define CFGREG_COREFREQ_STAT_CLK_CORE_SEL_BITS_SET(x)                          ((x << CFGREG_COREFREQ_STAT_CLK_CORE_SEL_SHIFT) & CFGREG_COREFREQ_STAT_CLK_CORE_SEL_MASK)                                /*!<  Core Clock Status Register Bits Set */
 
 #define CFGREG_GNSSAFE_CONF_GNSS_OUT_BAND_BITS_SET(x)                          ((x << CFGREG_GNSSAFE_CONF_GNSS_OUT_BAND_SHIFT) & CFGREG_GNSSAFE_CONF_GNSS_OUT_BAND_MASK)                                /*!<  GNSS-AFE Configuration Register Bits Set */
-#define CFGREG_GNSSAFE_CONF_GNSS_AUX1_EN_BITS_SET(x)                           ((x << CFGREG_GNSSAFE_CONF_GNSS_AUX1_EN_SHIFT) & CFGREG_GNSSAFE_CONF_GNSS_AUX1_EN_MASK)                                  /*!<  GNSS-AFE Configuration Register Bits Set */
-#define CFGREG_GNSSAFE_CONF_GNSS_AUX0_EN_BITS_SET(x)                           ((x << CFGREG_GNSSAFE_CONF_GNSS_AUX0_EN_SHIFT) & CFGREG_GNSSAFE_CONF_GNSS_AUX0_EN_MASK)                                  /*!<  GNSS-AFE Configuration Register Bits Set */
+#define CFGREG_GNSSAFE_CONF_GNSS_AUX_EN_BITS_SET(x)                            ((x << CFGREG_GNSSAFE_CONF_GNSS_AUX_EN_SHIFT) & CFGREG_GNSSAFE_CONF_GNSS_AUX_EN_MASK)                                    /*!<  GNSS-AFE Configuration Register Bits Set */
 
+#define CFGREG_PLL1_CONF_PRESC_BITS_SET(x)                                     ((x << CFGREG_PLL1_CONF_PRESC_SHIFT) & CFGREG_PLL1_CONF_PRESC_MASK)                                                      /*!<  PLL1 Configuration Register Bits Set */
 #define CFGREG_PLL1_CONF_EN_BOOST_BITS_SET(x)                                  ((x << CFGREG_PLL1_CONF_EN_BOOST_SHIFT) & CFGREG_PLL1_CONF_EN_BOOST_MASK)                                                /*!<  PLL1 Configuration Register Bits Set */
 #define CFGREG_PLL1_CONF_ADC_CLK_DIV_BITS_SET(x)                               ((x << CFGREG_PLL1_CONF_ADC_CLK_DIV_SHIFT) & CFGREG_PLL1_CONF_ADC_CLK_DIV_MASK)                                          /*!<  PLL1 Configuration Register Bits Set */
 #define CFGREG_PLL1_CONF_LOPCB_EN_BITS_SET(x)                                  ((x << CFGREG_PLL1_CONF_LOPCB_EN_SHIFT) & CFGREG_PLL1_CONF_LOPCB_EN_MASK)                                                /*!<  PLL1 Configuration Register Bits Set */
 #define CFGREG_PLL1_CONF_TEST_EN_BITS_SET(x)                                   ((x << CFGREG_PLL1_CONF_TEST_EN_SHIFT) & CFGREG_PLL1_CONF_TEST_EN_MASK)                                                  /*!<  PLL1 Configuration Register Bits Set */
 #define CFGREG_PLL1_CONF_FCW_BITS_SET(x)                                       ((x << CFGREG_PLL1_CONF_FCW_SHIFT) & CFGREG_PLL1_CONF_FCW_MASK)                                                          /*!<  PLL1 Configuration Register Bits Set */
 #define CFGREG_PLL1_CONF_EN_BITS_SET(x)                                        ((x << CFGREG_PLL1_CONF_EN_SHIFT) & CFGREG_PLL1_CONF_EN_MASK)                                                            /*!<  PLL1 Configuration Register Bits Set */
+
+#define CFGREG_PLL1TDC_CONF_GATING_BITS_SET(x)                                 ((x << CFGREG_PLL1TDC_CONF_GATING_SHIFT) & CFGREG_PLL1TDC_CONF_GATING_MASK)                                              /*!<  PLL1 TDC Configuration Register Bits Set */
 
 #define CFGREG_PLL1DCO_CONF_AMP_BITS_SET(x)                                    ((x << CFGREG_PLL1DCO_CONF_AMP_SHIFT) & CFGREG_PLL1DCO_CONF_AMP_MASK)                                                    /*!<  PLL1 DCO Configuration Register Bits Set */
 #define CFGREG_PLL1DCO_CONF_AMP_LOAD_BITS_SET(x)                               ((x << CFGREG_PLL1DCO_CONF_AMP_LOAD_SHIFT) & CFGREG_PLL1DCO_CONF_AMP_LOAD_MASK)                                          /*!<  PLL1 DCO Configuration Register Bits Set */
@@ -936,12 +1044,15 @@ enum
 #define CFGREG_PLL1DCO_STAT_CTRL_PVT_BITS_SET(x)                               ((x << CFGREG_PLL1DCO_STAT_CTRL_PVT_SHIFT) & CFGREG_PLL1DCO_STAT_CTRL_PVT_MASK)                                          /*!<  PLL1 TDC Status Register Bits Set */
 #define CFGREG_PLL1DCO_STAT_CTRL_FINE_BITS_SET(x)                              ((x << CFGREG_PLL1DCO_STAT_CTRL_FINE_SHIFT) & CFGREG_PLL1DCO_STAT_CTRL_FINE_MASK)                                        /*!<  PLL1 TDC Status Register Bits Set */
 
+#define CFGREG_PLL25_CONF_PRESC_BITS_SET(x)                                    ((x << CFGREG_PLL25_CONF_PRESC_SHIFT) & CFGREG_PLL25_CONF_PRESC_MASK)                                                    /*!<  PLL25 Configuration Register Bits Set */
 #define CFGREG_PLL25_CONF_EN_BOOST_BITS_SET(x)                                 ((x << CFGREG_PLL25_CONF_EN_BOOST_SHIFT) & CFGREG_PLL25_CONF_EN_BOOST_MASK)                                              /*!<  PLL25 Configuration Register Bits Set */
 #define CFGREG_PLL25_CONF_ADC_CLK_DIV_BITS_SET(x)                              ((x << CFGREG_PLL25_CONF_ADC_CLK_DIV_SHIFT) & CFGREG_PLL25_CONF_ADC_CLK_DIV_MASK)                                        /*!<  PLL25 Configuration Register Bits Set */
 #define CFGREG_PLL25_CONF_LOPCB_EN_BITS_SET(x)                                 ((x << CFGREG_PLL25_CONF_LOPCB_EN_SHIFT) & CFGREG_PLL25_CONF_LOPCB_EN_MASK)                                              /*!<  PLL25 Configuration Register Bits Set */
 #define CFGREG_PLL25_CONF_TEST_EN_BITS_SET(x)                                  ((x << CFGREG_PLL25_CONF_TEST_EN_SHIFT) & CFGREG_PLL25_CONF_TEST_EN_MASK)                                                /*!<  PLL25 Configuration Register Bits Set */
 #define CFGREG_PLL25_CONF_FCW_BITS_SET(x)                                      ((x << CFGREG_PLL25_CONF_FCW_SHIFT) & CFGREG_PLL25_CONF_FCW_MASK)                                                        /*!<  PLL25 Configuration Register Bits Set */
 #define CFGREG_PLL25_CONF_EN_BITS_SET(x)                                       ((x << CFGREG_PLL25_CONF_EN_SHIFT) & CFGREG_PLL25_CONF_EN_MASK)                                                          /*!<  PLL25 Configuration Register Bits Set */
+
+#define CFGREG_PLL25TDC_CONF_GATING_BITS_SET(x)                                ((x << CFGREG_PLL25TDC_CONF_GATING_SHIFT) & CFGREG_PLL25TDC_CONF_GATING_MASK)                                            /*!<  PLL25 TDC Configuration Register Bits Set */
 
 #define CFGREG_PLL25DCO_CONF_AMP_BITS_SET(x)                                   ((x << CFGREG_PLL25DCO_CONF_AMP_SHIFT) & CFGREG_PLL25DCO_CONF_AMP_MASK)                                                  /*!<  PLL25 DCO Configuration Register Bits Set */
 #define CFGREG_PLL25DCO_CONF_AMP_LOAD_BITS_SET(x)                              ((x << CFGREG_PLL25DCO_CONF_AMP_LOAD_SHIFT) & CFGREG_PLL25DCO_CONF_AMP_LOAD_MASK)                                        /*!<  PLL25 DCO Configuration Register Bits Set */
@@ -1113,6 +1224,8 @@ enum
 #define CFGREG_SPLIT25_E5B_CFG_MANUAL_MODE_DIG_GAIN_Q_BITS_SET(x)              ((x << CFGREG_SPLIT25_E5B_CFG_MANUAL_MODE_DIG_GAIN_Q_SHIFT) & CFGREG_SPLIT25_E5B_CFG_MANUAL_MODE_DIG_GAIN_Q_MASK)        /*!<  Splitter AFE25 E5B Manual Mode Digital Gain Configuration Register Bits Set */
 #define CFGREG_SPLIT25_E5B_CFG_MANUAL_MODE_DIG_GAIN_I_BITS_SET(x)              ((x << CFGREG_SPLIT25_E5B_CFG_MANUAL_MODE_DIG_GAIN_I_SHIFT) & CFGREG_SPLIT25_E5B_CFG_MANUAL_MODE_DIG_GAIN_I_MASK)        /*!<  Splitter AFE25 E5B Manual Mode Digital Gain Configuration Register Bits Set */
 
+#define CFGREG_LNA125_CONF_L25_BYPASS_BITS_SET(x)                              ((x << CFGREG_LNA125_CONF_L25_BYPASS_SHIFT) & CFGREG_LNA125_CONF_L25_BYPASS_MASK)                                        /*!<  LNA125 Configuration Register Bits Set */
+#define CFGREG_LNA125_CONF_L1_BYPASS_BITS_SET(x)                               ((x << CFGREG_LNA125_CONF_L1_BYPASS_SHIFT) & CFGREG_LNA125_CONF_L1_BYPASS_MASK)                                          /*!<  LNA125 Configuration Register Bits Set */
 #define CFGREG_LNA125_CONF_L25_TUNE_SRC_BITS_SET(x)                            ((x << CFGREG_LNA125_CONF_L25_TUNE_SRC_SHIFT) & CFGREG_LNA125_CONF_L25_TUNE_SRC_MASK)                                    /*!<  LNA125 Configuration Register Bits Set */
 #define CFGREG_LNA125_CONF_L1_TUNE_SRC_BITS_SET(x)                             ((x << CFGREG_LNA125_CONF_L1_TUNE_SRC_SHIFT) & CFGREG_LNA125_CONF_L1_TUNE_SRC_MASK)                                      /*!<  LNA125 Configuration Register Bits Set */
 #define CFGREG_LNA125_CONF_EN_L25_BITS_SET(x)                                  ((x << CFGREG_LNA125_CONF_EN_L25_SHIFT) & CFGREG_LNA125_CONF_EN_L25_MASK)                                                /*!<  LNA125 Configuration Register Bits Set */
@@ -1137,13 +1250,26 @@ enum
 #define CFGREG_PMU_CONF_DCDC_GENTRIM_SRC_BITS_SET(x)                           ((x << CFGREG_PMU_CONF_DCDC_GENTRIM_SRC_SHIFT) & CFGREG_PMU_CONF_DCDC_GENTRIM_SRC_MASK)                                  /*!<  PMU Configuration register Bits Set */
 #define CFGREG_PMU_CONF_DCDC_GENTRIM_BITS_SET(x)                               ((x << CFGREG_PMU_CONF_DCDC_GENTRIM_SHIFT) & CFGREG_PMU_CONF_DCDC_GENTRIM_MASK)                                          /*!<  PMU Configuration register Bits Set */
 #define CFGREG_PMU_CONF_DCDC_TRIM_RESET_BITS_SET(x)                            ((x << CFGREG_PMU_CONF_DCDC_TRIM_RESET_SHIFT) & CFGREG_PMU_CONF_DCDC_TRIM_RESET_MASK)                                    /*!<  PMU Configuration register Bits Set */
+#define CFGREG_PMU_CONF_VREF_CAL_EN_BITS_SET(x)                                ((x << CFGREG_PMU_CONF_VREF_CAL_EN_SHIFT) & CFGREG_PMU_CONF_VREF_CAL_EN_MASK)                                            /*!<  PMU Configuration register Bits Set */
+#define CFGREG_PMU_CONF_VREF_TRIM_VAL_SRC_BITS_SET(x)                          ((x << CFGREG_PMU_CONF_VREF_TRIM_VAL_SRC_SHIFT) & CFGREG_PMU_CONF_VREF_TRIM_VAL_SRC_MASK)                                /*!<  PMU Configuration register Bits Set */
+#define CFGREG_PMU_CONF_VREF_TRIM_VAL_BITS_SET(x)                              ((x << CFGREG_PMU_CONF_VREF_TRIM_VAL_SHIFT) & CFGREG_PMU_CONF_VREF_TRIM_VAL_MASK)                                        /*!<  PMU Configuration register Bits Set */
+#define CFGREG_PMU_CONF_VREF_TRIM_EN_BITS_SET(x)                               ((x << CFGREG_PMU_CONF_VREF_TRIM_EN_SHIFT) & CFGREG_PMU_CONF_VREF_TRIM_EN_MASK)                                          /*!<  PMU Configuration register Bits Set */
 #define CFGREG_PMU_CONF_IREF_CAL_EN_BITS_SET(x)                                ((x << CFGREG_PMU_CONF_IREF_CAL_EN_SHIFT) & CFGREG_PMU_CONF_IREF_CAL_EN_MASK)                                            /*!<  PMU Configuration register Bits Set */
 #define CFGREG_PMU_CONF_IREF_TRIM_VAL_SRC_BITS_SET(x)                          ((x << CFGREG_PMU_CONF_IREF_TRIM_VAL_SRC_SHIFT) & CFGREG_PMU_CONF_IREF_TRIM_VAL_SRC_MASK)                                /*!<  PMU Configuration register Bits Set */
 #define CFGREG_PMU_CONF_IREF_TRIM_VAL_BITS_SET(x)                              ((x << CFGREG_PMU_CONF_IREF_TRIM_VAL_SHIFT) & CFGREG_PMU_CONF_IREF_TRIM_VAL_MASK)                                        /*!<  PMU Configuration register Bits Set */
 #define CFGREG_PMU_CONF_IREF_TRIM_EN_BITS_SET(x)                               ((x << CFGREG_PMU_CONF_IREF_TRIM_EN_SHIFT) & CFGREG_PMU_CONF_IREF_TRIM_EN_MASK)                                          /*!<  PMU Configuration register Bits Set */
 
+#define CFGREG_PMU_STAT_VREF_COMP_OUT_BITS_SET(x)                              ((x << CFGREG_PMU_STAT_VREF_COMP_OUT_SHIFT) & CFGREG_PMU_STAT_VREF_COMP_OUT_MASK)                                        /*!<  Power Management Unit Status Bits Set */
 #define CFGREG_PMU_STAT_IREF_TRIM_VAL_BITS_SET(x)                              ((x << CFGREG_PMU_STAT_IREF_TRIM_VAL_SHIFT) & CFGREG_PMU_STAT_IREF_TRIM_VAL_MASK)                                        /*!<  Power Management Unit Status Bits Set */
 #define CFGREG_PMU_STAT_IREF_CAL_RDY_BITS_SET(x)                               ((x << CFGREG_PMU_STAT_IREF_CAL_RDY_SHIFT) & CFGREG_PMU_STAT_IREF_CAL_RDY_MASK)                                          /*!<  Power Management Unit Status Bits Set */
+
+#define CFGREG_PMU_BOD_CONF_VDD_MCU_ERR_CTR_BITS_SET(x)                        ((x << CFGREG_PMU_BOD_CONF_VDD_MCU_ERR_CTR_SHIFT) & CFGREG_PMU_BOD_CONF_VDD_MCU_ERR_CTR_MASK)                            /*!<  GNSS-AFE PM Status Register Bits Set */
+#define CFGREG_PMU_BOD_CONF_VDD_MCU_ERR_EN_BITS_SET(x)                         ((x << CFGREG_PMU_BOD_CONF_VDD_MCU_ERR_EN_SHIFT) & CFGREG_PMU_BOD_CONF_VDD_MCU_ERR_EN_MASK)                              /*!<  GNSS-AFE PM Status Register Bits Set */
+#define CFGREG_PMU_BOD_CONF_VDD_MCU_WRN_CTR_BITS_SET(x)                        ((x << CFGREG_PMU_BOD_CONF_VDD_MCU_WRN_CTR_SHIFT) & CFGREG_PMU_BOD_CONF_VDD_MCU_WRN_CTR_MASK)                            /*!<  GNSS-AFE PM Status Register Bits Set */
+#define CFGREG_PMU_BOD_CONF_VDD_MCU_WRN_EN_BITS_SET(x)                         ((x << CFGREG_PMU_BOD_CONF_VDD_MCU_WRN_EN_SHIFT) & CFGREG_PMU_BOD_CONF_VDD_MCU_WRN_EN_MASK)                              /*!<  GNSS-AFE PM Status Register Bits Set */
+
+#define CFGREG_PMU_BOD_STAT_VDD_MCU_ERR_BITS_SET(x)                            ((x << CFGREG_PMU_BOD_STAT_VDD_MCU_ERR_SHIFT) & CFGREG_PMU_BOD_STAT_VDD_MCU_ERR_MASK)                                    /*!<  GNSS-AFE PM Status Register Bits Set */
+#define CFGREG_PMU_BOD_STAT_VDD_MCU_WRN_BITS_SET(x)                            ((x << CFGREG_PMU_BOD_STAT_VDD_MCU_WRN_SHIFT) & CFGREG_PMU_BOD_STAT_VDD_MCU_WRN_MASK)                                    /*!<  GNSS-AFE PM Status Register Bits Set */
 
 #define CFGREG_PM_STAT_IREF_COMP_BITS_SET(x)                                   ((x << CFGREG_PM_STAT_IREF_COMP_SHIFT) & CFGREG_PM_STAT_IREF_COMP_MASK)                                                  /*!<  GNSS-AFE PM Status Register Bits Set */
 #define CFGREG_PM_STAT_VREF_COMP_BITS_SET(x)                                   ((x << CFGREG_PM_STAT_VREF_COMP_SHIFT) & CFGREG_PM_STAT_VREF_COMP_MASK)                                                  /*!<  GNSS-AFE PM Status Register Bits Set */
@@ -1180,6 +1306,22 @@ enum
 #define CFGREG_GNSSAFE_TEST_CONF_PLL1TEST_MOD_DIR_BITS_SET(x)                  ((x << CFGREG_GNSSAFE_TEST_CONF_PLL1TEST_MOD_DIR_SHIFT) & CFGREG_GNSSAFE_TEST_CONF_PLL1TEST_MOD_DIR_MASK)                /*!<  GNSS-AFE PM Configuration Register Bits Set */
 #define CFGREG_GNSSAFE_TEST_CONF_PLL1TEST_MOD_PRESC_BITS_SET(x)                ((x << CFGREG_GNSSAFE_TEST_CONF_PLL1TEST_MOD_PRESC_SHIFT) & CFGREG_GNSSAFE_TEST_CONF_PLL1TEST_MOD_PRESC_MASK)            /*!<  GNSS-AFE PM Configuration Register Bits Set */
 
+#define CFGREG_GPADC_CONF_CLK_PRESC_BITS_SET(x)                                ((x << CFGREG_GPADC_CONF_CLK_PRESC_SHIFT) & CFGREG_GPADC_CONF_CLK_PRESC_MASK)                                            /*!<  GPADC Configuration Register Bits Set */
+#define CFGREG_GPADC_CONF_CLK_SEL_BITS_SET(x)                                  ((x << CFGREG_GPADC_CONF_CLK_SEL_SHIFT) & CFGREG_GPADC_CONF_CLK_SEL_MASK)                                                /*!<  GPADC Configuration Register Bits Set */
+#define CFGREG_GPADC_CONF_SEL_BITS_SET(x)                                      ((x << CFGREG_GPADC_CONF_SEL_SHIFT) & CFGREG_GPADC_CONF_SEL_MASK)                                                        /*!<  GPADC Configuration Register Bits Set */
+#define CFGREG_GPADC_CONF_SINGLE_SAMPLE_BITS_SET(x)                            ((x << CFGREG_GPADC_CONF_SINGLE_SAMPLE_SHIFT) & CFGREG_GPADC_CONF_SINGLE_SAMPLE_MASK)                                    /*!<  GPADC Configuration Register Bits Set */
+#define CFGREG_GPADC_CONF_EN_PROC_BITS_SET(x)                                  ((x << CFGREG_GPADC_CONF_EN_PROC_SHIFT) & CFGREG_GPADC_CONF_EN_PROC_MASK)                                                /*!<  GPADC Configuration Register Bits Set */
+#define CFGREG_GPADC_CONF_EN_8BIT_BITS_SET(x)                                  ((x << CFGREG_GPADC_CONF_EN_8BIT_SHIFT) & CFGREG_GPADC_CONF_EN_8BIT_MASK)                                                /*!<  GPADC Configuration Register Bits Set */
+#define CFGREG_GPADC_CONF_EN_BITS_SET(x)                                       ((x << CFGREG_GPADC_CONF_EN_SHIFT) & CFGREG_GPADC_CONF_EN_MASK)                                                          /*!<  GPADC Configuration Register Bits Set */
+
+#define CFGREG_GPADC_STAT_DATA_RDY_BITS_SET(x)                                 ((x << CFGREG_GPADC_STAT_DATA_RDY_SHIFT) & CFGREG_GPADC_STAT_DATA_RDY_MASK)                                              /*!<  GPADC Status Register Bits Set */
+#define CFGREG_GPADC_STAT_DATA_OUT_BITS_SET(x)                                 ((x << CFGREG_GPADC_STAT_DATA_OUT_SHIFT) & CFGREG_GPADC_STAT_DATA_OUT_MASK)                                              /*!<  GPADC Status Register Bits Set */
+
+#define CFGREG_ANT_DET_CONF_EN_BITS_SET(x)                                     ((x << CFGREG_ANT_DET_CONF_EN_SHIFT) & CFGREG_ANT_DET_CONF_EN_MASK)                                                      /*!<  Antenna Detection Configuration Register Bits Set */
+
+#define CFGREG_ANT_DET_STAT_SENSE_BITS_SET(x)                                  ((x << CFGREG_ANT_DET_STAT_SENSE_SHIFT) & CFGREG_ANT_DET_STAT_SENSE_MASK)                                                /*!<  Antenna Detection Status Register Bits Set */
+#define CFGREG_ANT_DET_STAT_SHORT_BITS_SET(x)                                  ((x << CFGREG_ANT_DET_STAT_SHORT_SHIFT) & CFGREG_ANT_DET_STAT_SHORT_MASK)                                                /*!<  Antenna Detection Status Register Bits Set */
+
 #define CFGREG_SPARE_CONF_SIG_BITS_SET(x)                                      ((x << CFGREG_SPARE_CONF_SIG_SHIFT) & CFGREG_SPARE_CONF_SIG_MASK)                                                        /*!<  SPARE Configuration Register Bits Set */
 
 #define CFGREG_SPARE_STAT_SIG_BITS_SET(x)                                      ((x << CFGREG_SPARE_STAT_SIG_SHIFT) & CFGREG_SPARE_STAT_SIG_MASK)                                                        /*!<  SPARE Configuration Register Bits Set */
@@ -1191,9 +1333,9 @@ enum
 
 #define CFGREG_UNLOCK_UNLOCK_KEY_BITS_GET(x)                                   ((x & CFGREG_UNLOCK_UNLOCK_KEY_MASK) >> CFGREG_UNLOCK_UNLOCK_KEY_SHIFT)                                                  /*!<  Unlock Register Bits Get */
 
-#define CFGREG_IRQFLAGS_PLL_FAIL_BITS_GET(x)                                   ((x & CFGREG_IRQFLAGS_PLL_FAIL_MASK) >> CFGREG_IRQFLAGS_PLL_FAIL_SHIFT)                                                  /*!<  32kHz RTC Clock Interrupt Flags Bits Get */
-#define CFGREG_IRQFLAGS_XTAL_CORE_FAIL_BITS_GET(x)                             ((x & CFGREG_IRQFLAGS_XTAL_CORE_FAIL_MASK) >> CFGREG_IRQFLAGS_XTAL_CORE_FAIL_SHIFT)                                      /*!<  32kHz RTC Clock Interrupt Flags Bits Get */
-#define CFGREG_IRQFLAGS_XTAL_RTC_FAIL_BITS_GET(x)                              ((x & CFGREG_IRQFLAGS_XTAL_RTC_FAIL_MASK) >> CFGREG_IRQFLAGS_XTAL_RTC_FAIL_SHIFT)                                        /*!<  32kHz RTC Clock Interrupt Flags Bits Get */
+#define CFGREG_IRQFLAGS_PLL_FAIL_BITS_GET(x)                                   ((x & CFGREG_IRQFLAGS_PLL_FAIL_MASK) >> CFGREG_IRQFLAGS_PLL_FAIL_SHIFT)                                                  /*!<  Clock Interrupt Flags Bits Get */
+#define CFGREG_IRQFLAGS_XTAL_CORE_FAIL_BITS_GET(x)                             ((x & CFGREG_IRQFLAGS_XTAL_CORE_FAIL_MASK) >> CFGREG_IRQFLAGS_XTAL_CORE_FAIL_SHIFT)                                      /*!<  Clock Interrupt Flags Bits Get */
+#define CFGREG_IRQFLAGS_XTAL_RTC_FAIL_BITS_GET(x)                              ((x & CFGREG_IRQFLAGS_XTAL_RTC_FAIL_MASK) >> CFGREG_IRQFLAGS_XTAL_RTC_FAIL_SHIFT)                                        /*!<  Clock Interrupt Flags Bits Get */
 
 #define CFGREG_MEM_CONF_TEST1_BITS_GET(x)                                      ((x & CFGREG_MEM_CONF_TEST1_MASK) >> CFGREG_MEM_CONF_TEST1_SHIFT)                                                        /*!<  Memory Configuration Register Bits Get */
 #define CFGREG_MEM_CONF_RME_BITS_GET(x)                                        ((x & CFGREG_MEM_CONF_RME_MASK) >> CFGREG_MEM_CONF_RME_SHIFT)                                                            /*!<  Memory Configuration Register Bits Get */
@@ -1206,9 +1348,15 @@ enum
 #define CFGREG_RTCCONF_RC_RTC_VAL_SRC_BITS_GET(x)                              ((x & CFGREG_RTCCONF_RC_RTC_VAL_SRC_MASK) >> CFGREG_RTCCONF_RC_RTC_VAL_SRC_SHIFT)                                        /*!<  32kHz RTC Clock Configuration Bits Get */
 #define CFGREG_RTCCONF_RC_RTC_VAL_BITS_GET(x)                                  ((x & CFGREG_RTCCONF_RC_RTC_VAL_MASK) >> CFGREG_RTCCONF_RC_RTC_VAL_SHIFT)                                                /*!<  32kHz RTC Clock Configuration Bits Get */
 #define CFGREG_RTCCONF_RC_RTC_CAL_BITS_GET(x)                                  ((x & CFGREG_RTCCONF_RC_RTC_CAL_MASK) >> CFGREG_RTCCONF_RC_RTC_CAL_SHIFT)                                                /*!<  32kHz RTC Clock Configuration Bits Get */
+#define CFGREG_RTCCONF_LOCK_OV_BITS_GET(x)                                     ((x & CFGREG_RTCCONF_LOCK_OV_MASK) >> CFGREG_RTCCONF_LOCK_OV_SHIFT)                                                      /*!<  32kHz RTC Clock Configuration Bits Get */
 #define CFGREG_RTCCONF_XTAL_RTC_SEL_BITS_GET(x)                                ((x & CFGREG_RTCCONF_XTAL_RTC_SEL_MASK) >> CFGREG_RTCCONF_XTAL_RTC_SEL_SHIFT)                                            /*!<  32kHz RTC Clock Configuration Bits Get */
 #define CFGREG_RTCCONF_XTAL_RTC_TEST_BITS_GET(x)                               ((x & CFGREG_RTCCONF_XTAL_RTC_TEST_MASK) >> CFGREG_RTCCONF_XTAL_RTC_TEST_SHIFT)                                          /*!<  32kHz RTC Clock Configuration Bits Get */
 
+#define CFGREG_COREFREQ_CLK_XTAL_LOCK_OV_BITS_GET(x)                           ((x & CFGREG_COREFREQ_CLK_XTAL_LOCK_OV_MASK) >> CFGREG_COREFREQ_CLK_XTAL_LOCK_OV_SHIFT)                                  /*!<  External XTAL Configuration Register Bits Get */
+#define CFGREG_COREFREQ_CLK_CORE_XTAL_SCALE_BITS_GET(x)                        ((x & CFGREG_COREFREQ_CLK_CORE_XTAL_SCALE_MASK) >> CFGREG_COREFREQ_CLK_CORE_XTAL_SCALE_SHIFT)                            /*!<  External XTAL Configuration Register Bits Get */
+#define CFGREG_COREFREQ_CLK_GNSSAFE_XTAL_SCALE_BITS_GET(x)                     ((x & CFGREG_COREFREQ_CLK_GNSSAFE_XTAL_SCALE_MASK) >> CFGREG_COREFREQ_CLK_GNSSAFE_XTAL_SCALE_SHIFT)                      /*!<  External XTAL Configuration Register Bits Get */
+#define CFGREG_COREFREQ_CLK_XTAL_SEL_BITS_GET(x)                               ((x & CFGREG_COREFREQ_CLK_XTAL_SEL_MASK) >> CFGREG_COREFREQ_CLK_XTAL_SEL_SHIFT)                                          /*!<  External XTAL Configuration Register Bits Get */
+#define CFGREG_COREFREQ_CLK_XTAL_EN_BITS_GET(x)                                ((x & CFGREG_COREFREQ_CLK_XTAL_EN_MASK) >> CFGREG_COREFREQ_CLK_XTAL_EN_SHIFT)                                            /*!<  External XTAL Configuration Register Bits Get */
 #define CFGREG_COREFREQ_CLK_TEST_OUT_EN_BITS_GET(x)                            ((x & CFGREG_COREFREQ_CLK_TEST_OUT_EN_MASK) >> CFGREG_COREFREQ_CLK_TEST_OUT_EN_SHIFT)                                    /*!<  External XTAL Configuration Register Bits Get */
 #define CFGREG_COREFREQ_CLK_RC_CORE_VAL_SRC_BITS_GET(x)                        ((x & CFGREG_COREFREQ_CLK_RC_CORE_VAL_SRC_MASK) >> CFGREG_COREFREQ_CLK_RC_CORE_VAL_SRC_SHIFT)                            /*!<  External XTAL Configuration Register Bits Get */
 #define CFGREG_COREFREQ_CLK_RC_CORE_VAL_BITS_GET(x)                            ((x & CFGREG_COREFREQ_CLK_RC_CORE_VAL_MASK) >> CFGREG_COREFREQ_CLK_RC_CORE_VAL_SHIFT)                                    /*!<  External XTAL Configuration Register Bits Get */
@@ -1219,7 +1367,7 @@ enum
 #define CFGREG_COREFREQ_PLL_CTRL_FINE_LOAD_BITS_GET(x)                         ((x & CFGREG_COREFREQ_PLL_CTRL_FINE_LOAD_MASK) >> CFGREG_COREFREQ_PLL_CTRL_FINE_LOAD_SHIFT)                              /*!<  PLL Configuration Register Bits Get */
 #define CFGREG_COREFREQ_PLL_CTRL_LOAD_BITS_GET(x)                              ((x & CFGREG_COREFREQ_PLL_CTRL_LOAD_MASK) >> CFGREG_COREFREQ_PLL_CTRL_LOAD_SHIFT)                                        /*!<  PLL Configuration Register Bits Get */
 #define CFGREG_COREFREQ_PLL_CTRL_PVT_LOAD_BITS_GET(x)                          ((x & CFGREG_COREFREQ_PLL_CTRL_PVT_LOAD_MASK) >> CFGREG_COREFREQ_PLL_CTRL_PVT_LOAD_SHIFT)                                /*!<  PLL Configuration Register Bits Get */
-#define CFGREG_COREFREQ_PLL_PLL_VFB_EN_BITS_GET(x)                             ((x & CFGREG_COREFREQ_PLL_PLL_VFB_EN_MASK) >> CFGREG_COREFREQ_PLL_PLL_VFB_EN_SHIFT)                                      /*!<  PLL Configuration Register Bits Get */
+#define CFGREG_COREFREQ_PLL_LOCK_OV_BITS_GET(x)                                ((x & CFGREG_COREFREQ_PLL_LOCK_OV_MASK) >> CFGREG_COREFREQ_PLL_LOCK_OV_SHIFT)                                            /*!<  PLL Configuration Register Bits Get */
 #define CFGREG_COREFREQ_PLL_TEST_BITS_GET(x)                                   ((x & CFGREG_COREFREQ_PLL_TEST_MASK) >> CFGREG_COREFREQ_PLL_TEST_SHIFT)                                                  /*!<  PLL Configuration Register Bits Get */
 #define CFGREG_COREFREQ_PLL_N_BITS_GET(x)                                      ((x & CFGREG_COREFREQ_PLL_N_MASK) >> CFGREG_COREFREQ_PLL_N_SHIFT)                                                        /*!<  PLL Configuration Register Bits Get */
 #define CFGREG_COREFREQ_PLL_REF_SEL_BITS_GET(x)                                ((x & CFGREG_COREFREQ_PLL_REF_SEL_MASK) >> CFGREG_COREFREQ_PLL_REF_SEL_SHIFT)                                            /*!<  PLL Configuration Register Bits Get */
@@ -1234,15 +1382,17 @@ enum
 #define CFGREG_COREFREQ_STAT_CLK_CORE_SEL_BITS_GET(x)                          ((x & CFGREG_COREFREQ_STAT_CLK_CORE_SEL_MASK) >> CFGREG_COREFREQ_STAT_CLK_CORE_SEL_SHIFT)                                /*!<  Core Clock Status Register Bits Get */
 
 #define CFGREG_GNSSAFE_CONF_GNSS_OUT_BAND_BITS_GET(x)                          ((x & CFGREG_GNSSAFE_CONF_GNSS_OUT_BAND_MASK) >> CFGREG_GNSSAFE_CONF_GNSS_OUT_BAND_SHIFT)                                /*!<  GNSS-AFE Configuration Register Bits Get */
-#define CFGREG_GNSSAFE_CONF_GNSS_AUX1_EN_BITS_GET(x)                           ((x & CFGREG_GNSSAFE_CONF_GNSS_AUX1_EN_MASK) >> CFGREG_GNSSAFE_CONF_GNSS_AUX1_EN_SHIFT)                                  /*!<  GNSS-AFE Configuration Register Bits Get */
-#define CFGREG_GNSSAFE_CONF_GNSS_AUX0_EN_BITS_GET(x)                           ((x & CFGREG_GNSSAFE_CONF_GNSS_AUX0_EN_MASK) >> CFGREG_GNSSAFE_CONF_GNSS_AUX0_EN_SHIFT)                                  /*!<  GNSS-AFE Configuration Register Bits Get */
+#define CFGREG_GNSSAFE_CONF_GNSS_AUX_EN_BITS_GET(x)                            ((x & CFGREG_GNSSAFE_CONF_GNSS_AUX_EN_MASK) >> CFGREG_GNSSAFE_CONF_GNSS_AUX_EN_SHIFT)                                    /*!<  GNSS-AFE Configuration Register Bits Get */
 
+#define CFGREG_PLL1_CONF_PRESC_BITS_GET(x)                                     ((x & CFGREG_PLL1_CONF_PRESC_MASK) >> CFGREG_PLL1_CONF_PRESC_SHIFT)                                                      /*!<  PLL1 Configuration Register Bits Get */
 #define CFGREG_PLL1_CONF_EN_BOOST_BITS_GET(x)                                  ((x & CFGREG_PLL1_CONF_EN_BOOST_MASK) >> CFGREG_PLL1_CONF_EN_BOOST_SHIFT)                                                /*!<  PLL1 Configuration Register Bits Get */
 #define CFGREG_PLL1_CONF_ADC_CLK_DIV_BITS_GET(x)                               ((x & CFGREG_PLL1_CONF_ADC_CLK_DIV_MASK) >> CFGREG_PLL1_CONF_ADC_CLK_DIV_SHIFT)                                          /*!<  PLL1 Configuration Register Bits Get */
 #define CFGREG_PLL1_CONF_LOPCB_EN_BITS_GET(x)                                  ((x & CFGREG_PLL1_CONF_LOPCB_EN_MASK) >> CFGREG_PLL1_CONF_LOPCB_EN_SHIFT)                                                /*!<  PLL1 Configuration Register Bits Get */
 #define CFGREG_PLL1_CONF_TEST_EN_BITS_GET(x)                                   ((x & CFGREG_PLL1_CONF_TEST_EN_MASK) >> CFGREG_PLL1_CONF_TEST_EN_SHIFT)                                                  /*!<  PLL1 Configuration Register Bits Get */
 #define CFGREG_PLL1_CONF_FCW_BITS_GET(x)                                       ((x & CFGREG_PLL1_CONF_FCW_MASK) >> CFGREG_PLL1_CONF_FCW_SHIFT)                                                          /*!<  PLL1 Configuration Register Bits Get */
 #define CFGREG_PLL1_CONF_EN_BITS_GET(x)                                        ((x & CFGREG_PLL1_CONF_EN_MASK) >> CFGREG_PLL1_CONF_EN_SHIFT)                                                            /*!<  PLL1 Configuration Register Bits Get */
+
+#define CFGREG_PLL1TDC_CONF_GATING_BITS_GET(x)                                 ((x & CFGREG_PLL1TDC_CONF_GATING_MASK) >> CFGREG_PLL1TDC_CONF_GATING_SHIFT)                                              /*!<  PLL1 TDC Configuration Register Bits Get */
 
 #define CFGREG_PLL1DCO_CONF_AMP_BITS_GET(x)                                    ((x & CFGREG_PLL1DCO_CONF_AMP_MASK) >> CFGREG_PLL1DCO_CONF_AMP_SHIFT)                                                    /*!<  PLL1 DCO Configuration Register Bits Get */
 #define CFGREG_PLL1DCO_CONF_AMP_LOAD_BITS_GET(x)                               ((x & CFGREG_PLL1DCO_CONF_AMP_LOAD_MASK) >> CFGREG_PLL1DCO_CONF_AMP_LOAD_SHIFT)                                          /*!<  PLL1 DCO Configuration Register Bits Get */
@@ -1261,12 +1411,15 @@ enum
 #define CFGREG_PLL1DCO_STAT_CTRL_PVT_BITS_GET(x)                               ((x & CFGREG_PLL1DCO_STAT_CTRL_PVT_MASK) >> CFGREG_PLL1DCO_STAT_CTRL_PVT_SHIFT)                                          /*!<  PLL1 TDC Status Register Bits Get */
 #define CFGREG_PLL1DCO_STAT_CTRL_FINE_BITS_GET(x)                              ((x & CFGREG_PLL1DCO_STAT_CTRL_FINE_MASK) >> CFGREG_PLL1DCO_STAT_CTRL_FINE_SHIFT)                                        /*!<  PLL1 TDC Status Register Bits Get */
 
+#define CFGREG_PLL25_CONF_PRESC_BITS_GET(x)                                    ((x & CFGREG_PLL25_CONF_PRESC_MASK) >> CFGREG_PLL25_CONF_PRESC_SHIFT)                                                    /*!<  PLL25 Configuration Register Bits Get */
 #define CFGREG_PLL25_CONF_EN_BOOST_BITS_GET(x)                                 ((x & CFGREG_PLL25_CONF_EN_BOOST_MASK) >> CFGREG_PLL25_CONF_EN_BOOST_SHIFT)                                              /*!<  PLL25 Configuration Register Bits Get */
 #define CFGREG_PLL25_CONF_ADC_CLK_DIV_BITS_GET(x)                              ((x & CFGREG_PLL25_CONF_ADC_CLK_DIV_MASK) >> CFGREG_PLL25_CONF_ADC_CLK_DIV_SHIFT)                                        /*!<  PLL25 Configuration Register Bits Get */
 #define CFGREG_PLL25_CONF_LOPCB_EN_BITS_GET(x)                                 ((x & CFGREG_PLL25_CONF_LOPCB_EN_MASK) >> CFGREG_PLL25_CONF_LOPCB_EN_SHIFT)                                              /*!<  PLL25 Configuration Register Bits Get */
 #define CFGREG_PLL25_CONF_TEST_EN_BITS_GET(x)                                  ((x & CFGREG_PLL25_CONF_TEST_EN_MASK) >> CFGREG_PLL25_CONF_TEST_EN_SHIFT)                                                /*!<  PLL25 Configuration Register Bits Get */
 #define CFGREG_PLL25_CONF_FCW_BITS_GET(x)                                      ((x & CFGREG_PLL25_CONF_FCW_MASK) >> CFGREG_PLL25_CONF_FCW_SHIFT)                                                        /*!<  PLL25 Configuration Register Bits Get */
 #define CFGREG_PLL25_CONF_EN_BITS_GET(x)                                       ((x & CFGREG_PLL25_CONF_EN_MASK) >> CFGREG_PLL25_CONF_EN_SHIFT)                                                          /*!<  PLL25 Configuration Register Bits Get */
+
+#define CFGREG_PLL25TDC_CONF_GATING_BITS_GET(x)                                ((x & CFGREG_PLL25TDC_CONF_GATING_MASK) >> CFGREG_PLL25TDC_CONF_GATING_SHIFT)                                            /*!<  PLL25 TDC Configuration Register Bits Get */
 
 #define CFGREG_PLL25DCO_CONF_AMP_BITS_GET(x)                                   ((x & CFGREG_PLL25DCO_CONF_AMP_MASK) >> CFGREG_PLL25DCO_CONF_AMP_SHIFT)                                                  /*!<  PLL25 DCO Configuration Register Bits Get */
 #define CFGREG_PLL25DCO_CONF_AMP_LOAD_BITS_GET(x)                              ((x & CFGREG_PLL25DCO_CONF_AMP_LOAD_MASK) >> CFGREG_PLL25DCO_CONF_AMP_LOAD_SHIFT)                                        /*!<  PLL25 DCO Configuration Register Bits Get */
@@ -1438,6 +1591,8 @@ enum
 #define CFGREG_SPLIT25_E5B_CFG_MANUAL_MODE_DIG_GAIN_Q_BITS_GET(x)              ((x & CFGREG_SPLIT25_E5B_CFG_MANUAL_MODE_DIG_GAIN_Q_MASK) >> CFGREG_SPLIT25_E5B_CFG_MANUAL_MODE_DIG_GAIN_Q_SHIFT)        /*!<  Splitter AFE25 E5B Manual Mode Digital Gain Configuration Register Bits Get */
 #define CFGREG_SPLIT25_E5B_CFG_MANUAL_MODE_DIG_GAIN_I_BITS_GET(x)              ((x & CFGREG_SPLIT25_E5B_CFG_MANUAL_MODE_DIG_GAIN_I_MASK) >> CFGREG_SPLIT25_E5B_CFG_MANUAL_MODE_DIG_GAIN_I_SHIFT)        /*!<  Splitter AFE25 E5B Manual Mode Digital Gain Configuration Register Bits Get */
 
+#define CFGREG_LNA125_CONF_L25_BYPASS_BITS_GET(x)                              ((x & CFGREG_LNA125_CONF_L25_BYPASS_MASK) >> CFGREG_LNA125_CONF_L25_BYPASS_SHIFT)                                        /*!<  LNA125 Configuration Register Bits Get */
+#define CFGREG_LNA125_CONF_L1_BYPASS_BITS_GET(x)                               ((x & CFGREG_LNA125_CONF_L1_BYPASS_MASK) >> CFGREG_LNA125_CONF_L1_BYPASS_SHIFT)                                          /*!<  LNA125 Configuration Register Bits Get */
 #define CFGREG_LNA125_CONF_L25_TUNE_SRC_BITS_GET(x)                            ((x & CFGREG_LNA125_CONF_L25_TUNE_SRC_MASK) >> CFGREG_LNA125_CONF_L25_TUNE_SRC_SHIFT)                                    /*!<  LNA125 Configuration Register Bits Get */
 #define CFGREG_LNA125_CONF_L1_TUNE_SRC_BITS_GET(x)                             ((x & CFGREG_LNA125_CONF_L1_TUNE_SRC_MASK) >> CFGREG_LNA125_CONF_L1_TUNE_SRC_SHIFT)                                      /*!<  LNA125 Configuration Register Bits Get */
 #define CFGREG_LNA125_CONF_EN_L25_BITS_GET(x)                                  ((x & CFGREG_LNA125_CONF_EN_L25_MASK) >> CFGREG_LNA125_CONF_EN_L25_SHIFT)                                                /*!<  LNA125 Configuration Register Bits Get */
@@ -1462,13 +1617,26 @@ enum
 #define CFGREG_PMU_CONF_DCDC_GENTRIM_SRC_BITS_GET(x)                           ((x & CFGREG_PMU_CONF_DCDC_GENTRIM_SRC_MASK) >> CFGREG_PMU_CONF_DCDC_GENTRIM_SRC_SHIFT)                                  /*!<  PMU Configuration register Bits Get */
 #define CFGREG_PMU_CONF_DCDC_GENTRIM_BITS_GET(x)                               ((x & CFGREG_PMU_CONF_DCDC_GENTRIM_MASK) >> CFGREG_PMU_CONF_DCDC_GENTRIM_SHIFT)                                          /*!<  PMU Configuration register Bits Get */
 #define CFGREG_PMU_CONF_DCDC_TRIM_RESET_BITS_GET(x)                            ((x & CFGREG_PMU_CONF_DCDC_TRIM_RESET_MASK) >> CFGREG_PMU_CONF_DCDC_TRIM_RESET_SHIFT)                                    /*!<  PMU Configuration register Bits Get */
+#define CFGREG_PMU_CONF_VREF_CAL_EN_BITS_GET(x)                                ((x & CFGREG_PMU_CONF_VREF_CAL_EN_MASK) >> CFGREG_PMU_CONF_VREF_CAL_EN_SHIFT)                                            /*!<  PMU Configuration register Bits Get */
+#define CFGREG_PMU_CONF_VREF_TRIM_VAL_SRC_BITS_GET(x)                          ((x & CFGREG_PMU_CONF_VREF_TRIM_VAL_SRC_MASK) >> CFGREG_PMU_CONF_VREF_TRIM_VAL_SRC_SHIFT)                                /*!<  PMU Configuration register Bits Get */
+#define CFGREG_PMU_CONF_VREF_TRIM_VAL_BITS_GET(x)                              ((x & CFGREG_PMU_CONF_VREF_TRIM_VAL_MASK) >> CFGREG_PMU_CONF_VREF_TRIM_VAL_SHIFT)                                        /*!<  PMU Configuration register Bits Get */
+#define CFGREG_PMU_CONF_VREF_TRIM_EN_BITS_GET(x)                               ((x & CFGREG_PMU_CONF_VREF_TRIM_EN_MASK) >> CFGREG_PMU_CONF_VREF_TRIM_EN_SHIFT)                                          /*!<  PMU Configuration register Bits Get */
 #define CFGREG_PMU_CONF_IREF_CAL_EN_BITS_GET(x)                                ((x & CFGREG_PMU_CONF_IREF_CAL_EN_MASK) >> CFGREG_PMU_CONF_IREF_CAL_EN_SHIFT)                                            /*!<  PMU Configuration register Bits Get */
 #define CFGREG_PMU_CONF_IREF_TRIM_VAL_SRC_BITS_GET(x)                          ((x & CFGREG_PMU_CONF_IREF_TRIM_VAL_SRC_MASK) >> CFGREG_PMU_CONF_IREF_TRIM_VAL_SRC_SHIFT)                                /*!<  PMU Configuration register Bits Get */
 #define CFGREG_PMU_CONF_IREF_TRIM_VAL_BITS_GET(x)                              ((x & CFGREG_PMU_CONF_IREF_TRIM_VAL_MASK) >> CFGREG_PMU_CONF_IREF_TRIM_VAL_SHIFT)                                        /*!<  PMU Configuration register Bits Get */
 #define CFGREG_PMU_CONF_IREF_TRIM_EN_BITS_GET(x)                               ((x & CFGREG_PMU_CONF_IREF_TRIM_EN_MASK) >> CFGREG_PMU_CONF_IREF_TRIM_EN_SHIFT)                                          /*!<  PMU Configuration register Bits Get */
 
+#define CFGREG_PMU_STAT_VREF_COMP_OUT_BITS_GET(x)                              ((x & CFGREG_PMU_STAT_VREF_COMP_OUT_MASK) >> CFGREG_PMU_STAT_VREF_COMP_OUT_SHIFT)                                        /*!<  Power Management Unit Status Bits Get */
 #define CFGREG_PMU_STAT_IREF_TRIM_VAL_BITS_GET(x)                              ((x & CFGREG_PMU_STAT_IREF_TRIM_VAL_MASK) >> CFGREG_PMU_STAT_IREF_TRIM_VAL_SHIFT)                                        /*!<  Power Management Unit Status Bits Get */
 #define CFGREG_PMU_STAT_IREF_CAL_RDY_BITS_GET(x)                               ((x & CFGREG_PMU_STAT_IREF_CAL_RDY_MASK) >> CFGREG_PMU_STAT_IREF_CAL_RDY_SHIFT)                                          /*!<  Power Management Unit Status Bits Get */
+
+#define CFGREG_PMU_BOD_CONF_VDD_MCU_ERR_CTR_BITS_GET(x)                        ((x & CFGREG_PMU_BOD_CONF_VDD_MCU_ERR_CTR_MASK) >> CFGREG_PMU_BOD_CONF_VDD_MCU_ERR_CTR_SHIFT)                            /*!<  GNSS-AFE PM Status Register Bits Get */
+#define CFGREG_PMU_BOD_CONF_VDD_MCU_ERR_EN_BITS_GET(x)                         ((x & CFGREG_PMU_BOD_CONF_VDD_MCU_ERR_EN_MASK) >> CFGREG_PMU_BOD_CONF_VDD_MCU_ERR_EN_SHIFT)                              /*!<  GNSS-AFE PM Status Register Bits Get */
+#define CFGREG_PMU_BOD_CONF_VDD_MCU_WRN_CTR_BITS_GET(x)                        ((x & CFGREG_PMU_BOD_CONF_VDD_MCU_WRN_CTR_MASK) >> CFGREG_PMU_BOD_CONF_VDD_MCU_WRN_CTR_SHIFT)                            /*!<  GNSS-AFE PM Status Register Bits Get */
+#define CFGREG_PMU_BOD_CONF_VDD_MCU_WRN_EN_BITS_GET(x)                         ((x & CFGREG_PMU_BOD_CONF_VDD_MCU_WRN_EN_MASK) >> CFGREG_PMU_BOD_CONF_VDD_MCU_WRN_EN_SHIFT)                              /*!<  GNSS-AFE PM Status Register Bits Get */
+
+#define CFGREG_PMU_BOD_STAT_VDD_MCU_ERR_BITS_GET(x)                            ((x & CFGREG_PMU_BOD_STAT_VDD_MCU_ERR_MASK) >> CFGREG_PMU_BOD_STAT_VDD_MCU_ERR_SHIFT)                                    /*!<  GNSS-AFE PM Status Register Bits Get */
+#define CFGREG_PMU_BOD_STAT_VDD_MCU_WRN_BITS_GET(x)                            ((x & CFGREG_PMU_BOD_STAT_VDD_MCU_WRN_MASK) >> CFGREG_PMU_BOD_STAT_VDD_MCU_WRN_SHIFT)                                    /*!<  GNSS-AFE PM Status Register Bits Get */
 
 #define CFGREG_PM_STAT_IREF_COMP_BITS_GET(x)                                   ((x & CFGREG_PM_STAT_IREF_COMP_MASK) >> CFGREG_PM_STAT_IREF_COMP_SHIFT)                                                  /*!<  GNSS-AFE PM Status Register Bits Get */
 #define CFGREG_PM_STAT_VREF_COMP_BITS_GET(x)                                   ((x & CFGREG_PM_STAT_VREF_COMP_MASK) >> CFGREG_PM_STAT_VREF_COMP_SHIFT)                                                  /*!<  GNSS-AFE PM Status Register Bits Get */
@@ -1504,6 +1672,22 @@ enum
 #define CFGREG_GNSSAFE_TEST_CONF_PLL1TEST_MOD_EN_BITS_GET(x)                   ((x & CFGREG_GNSSAFE_TEST_CONF_PLL1TEST_MOD_EN_MASK) >> CFGREG_GNSSAFE_TEST_CONF_PLL1TEST_MOD_EN_SHIFT)                  /*!<  GNSS-AFE PM Configuration Register Bits Get */
 #define CFGREG_GNSSAFE_TEST_CONF_PLL1TEST_MOD_DIR_BITS_GET(x)                  ((x & CFGREG_GNSSAFE_TEST_CONF_PLL1TEST_MOD_DIR_MASK) >> CFGREG_GNSSAFE_TEST_CONF_PLL1TEST_MOD_DIR_SHIFT)                /*!<  GNSS-AFE PM Configuration Register Bits Get */
 #define CFGREG_GNSSAFE_TEST_CONF_PLL1TEST_MOD_PRESC_BITS_GET(x)                ((x & CFGREG_GNSSAFE_TEST_CONF_PLL1TEST_MOD_PRESC_MASK) >> CFGREG_GNSSAFE_TEST_CONF_PLL1TEST_MOD_PRESC_SHIFT)            /*!<  GNSS-AFE PM Configuration Register Bits Get */
+
+#define CFGREG_GPADC_CONF_CLK_PRESC_BITS_GET(x)                                ((x & CFGREG_GPADC_CONF_CLK_PRESC_MASK) >> CFGREG_GPADC_CONF_CLK_PRESC_SHIFT)                                            /*!<  GPADC Configuration Register Bits Get */
+#define CFGREG_GPADC_CONF_CLK_SEL_BITS_GET(x)                                  ((x & CFGREG_GPADC_CONF_CLK_SEL_MASK) >> CFGREG_GPADC_CONF_CLK_SEL_SHIFT)                                                /*!<  GPADC Configuration Register Bits Get */
+#define CFGREG_GPADC_CONF_SEL_BITS_GET(x)                                      ((x & CFGREG_GPADC_CONF_SEL_MASK) >> CFGREG_GPADC_CONF_SEL_SHIFT)                                                        /*!<  GPADC Configuration Register Bits Get */
+#define CFGREG_GPADC_CONF_SINGLE_SAMPLE_BITS_GET(x)                            ((x & CFGREG_GPADC_CONF_SINGLE_SAMPLE_MASK) >> CFGREG_GPADC_CONF_SINGLE_SAMPLE_SHIFT)                                    /*!<  GPADC Configuration Register Bits Get */
+#define CFGREG_GPADC_CONF_EN_PROC_BITS_GET(x)                                  ((x & CFGREG_GPADC_CONF_EN_PROC_MASK) >> CFGREG_GPADC_CONF_EN_PROC_SHIFT)                                                /*!<  GPADC Configuration Register Bits Get */
+#define CFGREG_GPADC_CONF_EN_8BIT_BITS_GET(x)                                  ((x & CFGREG_GPADC_CONF_EN_8BIT_MASK) >> CFGREG_GPADC_CONF_EN_8BIT_SHIFT)                                                /*!<  GPADC Configuration Register Bits Get */
+#define CFGREG_GPADC_CONF_EN_BITS_GET(x)                                       ((x & CFGREG_GPADC_CONF_EN_MASK) >> CFGREG_GPADC_CONF_EN_SHIFT)                                                          /*!<  GPADC Configuration Register Bits Get */
+
+#define CFGREG_GPADC_STAT_DATA_RDY_BITS_GET(x)                                 ((x & CFGREG_GPADC_STAT_DATA_RDY_MASK) >> CFGREG_GPADC_STAT_DATA_RDY_SHIFT)                                              /*!<  GPADC Status Register Bits Get */
+#define CFGREG_GPADC_STAT_DATA_OUT_BITS_GET(x)                                 ((x & CFGREG_GPADC_STAT_DATA_OUT_MASK) >> CFGREG_GPADC_STAT_DATA_OUT_SHIFT)                                              /*!<  GPADC Status Register Bits Get */
+
+#define CFGREG_ANT_DET_CONF_EN_BITS_GET(x)                                     ((x & CFGREG_ANT_DET_CONF_EN_MASK) >> CFGREG_ANT_DET_CONF_EN_SHIFT)                                                      /*!<  Antenna Detection Configuration Register Bits Get */
+
+#define CFGREG_ANT_DET_STAT_SENSE_BITS_GET(x)                                  ((x & CFGREG_ANT_DET_STAT_SENSE_MASK) >> CFGREG_ANT_DET_STAT_SENSE_SHIFT)                                                /*!<  Antenna Detection Status Register Bits Get */
+#define CFGREG_ANT_DET_STAT_SHORT_BITS_GET(x)                                  ((x & CFGREG_ANT_DET_STAT_SHORT_MASK) >> CFGREG_ANT_DET_STAT_SHORT_SHIFT)                                                /*!<  Antenna Detection Status Register Bits Get */
 
 #define CFGREG_SPARE_CONF_SIG_BITS_GET(x)                                      ((x & CFGREG_SPARE_CONF_SIG_MASK) >> CFGREG_SPARE_CONF_SIG_SHIFT)                                                        /*!<  SPARE Configuration Register Bits Get */
 

@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2019 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2022-01-19 09:38:48 +0100 (śro, 19 sty 2022) $
-* $Revision: 814 $
+* $Date: 2023-03-17 14:31:06 +0100 (pią, 17 mar 2023) $
+* $Revision: 954 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -90,13 +90,8 @@ enum
 enum
 {
     MTIMECFG_SRC_CORE   = 0x0,  /*!< Processor Clock Source       */
-    MTIMECFG_SRC_L1E1   = 0x1,  /*!< GNSS L1/E1 Source            */
-    MTIMECFG_SRC_L5E5a  = 0x2,  /*!< GNSS L5/E5a Source           */
-    MTIMECFG_SRC_E5b    = 0x3,  /*!< GNSS E5b Source              */
-    MTIMECFG_SRC_L2     = 0x4,  /*!< GNSS L2 Source               */
-    MTIMECFG_SRC_E6     = 0x5,  /*!< GNSS E6 Source               */
-    MTIMECFG_SRC_AUX0   = 0xA,  /*!< GNSS AUX0 Source             */
-    MTIMECFG_SRC_AUX1   = 0xB,  /*!< GNSS AUX1 Source             */
+    MTIMECFG_SRC_AFE    = 0x1,  /*!< GNSS AFE Source              */
+    MTIMECFG_SRC_AUX    = 0xA,  /*!< GNSS AUX Source              */
     MTIMECFG_SRC_VIRT   = 0xF,  /*!< GNSS Virtual Frontend Source */
 };
 

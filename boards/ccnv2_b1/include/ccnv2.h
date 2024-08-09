@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2021 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2022-01-19 09:38:48 +0100 (Wed, 19 Jan 2022) $
-* $Revision: 814 $
+* $Date: 2023-09-25 11:14:06 +0200 (pon, 25 wrz 2023) $
+* $Revision: 1012 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -67,7 +67,7 @@ enum
  * @{
  */
 
-#define RAM_PARTITIONS     0x03  /*!< Number of main memory RAM partitions     */
+#define RAM_PARTITIONS     0x04  /*!< Number of main memory RAM partitions     */
 
 /** @} */
 

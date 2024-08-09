@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2019 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2022-10-29 17:01:05 +0200 (sob, 29 paź 2022) $
-* $Revision: 905 $
+* $Date: 2024-07-31 10:10:22 +0200 (śro, 31 lip 2024) $
+* $Revision: 1080 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -66,8 +66,14 @@ enum gnss_ise_rfafe_enum
     GNSS_ISE_RFAFE_E5b        = 3,  /*!< GNSS-ISE E5b RF AFE             */
     GNSS_ISE_RFAFE_L2         = 4,  /*!< GNSS-ISE L2 RF AFE              */
     GNSS_ISE_RFAFE_E6         = 5,  /*!< GNSS-ISE E6 RF AFE              */
-    GNSS_ISE_RFAFE_AUX0       = 10, /*!< GNSS-ISE AUX0 RF AFE            */
-    GNSS_ISE_RFAFE_AUX1       = 11, /*!< GNSS-ISE AUX1 RF AFE            */
+    GNSS_ISE_RFAFE_AUX0       = 7,  /*!< GNSS-ISE AUX0 RF AFE            */
+    GNSS_ISE_RFAFE_AUX1       = 8,  /*!< GNSS-ISE AUX1 RF AFE            */
+    GNSS_ISE_RFAFE_AUX2       = 9,  /*!< GNSS-ISE AUX2 RF AFE            */
+    GNSS_ISE_RFAFE_AUX3       = 10, /*!< GNSS-ISE AUX3 RF AFE            */
+    GNSS_ISE_RFAFE_AUX4       = 11, /*!< GNSS-ISE AUX4 RF AFE            */
+    GNSS_ISE_RFAFE_AUX5       = 12, /*!< GNSS-ISE AUX5 RF AFE            */
+    GNSS_ISE_RFAFE_AUX6       = 13, /*!< GNSS-ISE AUX6 RF AFE            */
+    GNSS_ISE_RFAFE_AUX7       = 14, /*!< GNSS-ISE AUX7 RF AFE            */
     GNSS_ISE_RFAFE_VIRT       = 15, /*!< GNSS-ISE Virtual RF AFE         */
 
     GNSS_ISE_RFAFE_MAX        = 16, /*!< GNSS-ISE Guard Value            */
@@ -565,7 +571,7 @@ INLINE void GNSS_PCODE_DIAG_WR(uint32_t addr, uint32_t data)
 /// set code length
 INLINE void GNSS_PCODE_LEN(uint32_t len, uint32_t integr_mult, uint32_t coef, uint32_t scale)
 {
-    uint32_t val = (((integr_mult&31)<<16)|(scale&7)<<4)|(coef&15);
+    uint32_t val = (((integr_mult&255)<<16)|(scale&7)<<4)|(coef&15);
     CUSTOM_INSTRUCTION_MACRO_2I(len, val, 12);
 }
 
@@ -629,11 +635,19 @@ INLINE uint32_t GNSS_BITS_GET(void)
     return res;
 }
 
-// read m2 value
-INLINE uint32_t GNSS_M2_VAL_GET(void)
+// read I2 value
+INLINE uint32_t GNSS_I2_VAL_GET(void)
 {
     volatile uint32_t res;
     CUSTOM_INSTRUCTION_MACRO_1O(res, 149);
+    return res;
+}
+
+// read Q2 value
+INLINE uint32_t GNSS_Q2_VAL_GET(void)
+{
+    volatile uint32_t res;
+    CUSTOM_INSTRUCTION_MACRO_1O(res, 152);
     return res;
 }
 

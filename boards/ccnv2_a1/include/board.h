@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2019 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2022-09-02 10:14:17 +0200 (pią, 02 wrz 2022) $
-* $Revision: 888 $
+* $Date: 2024-01-14 21:55:43 +0100 (nie, 14 sty 2024) $
+* $Revision: 1038 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -36,27 +36,7 @@
 #ifndef _BOARD_H
 #define _BOARD_H
 
-/* DO NOT MODIFY */
-#define IDCODE_PART_NUM         2
-#define IDCODE_PART_VER         0
-#define FLASH_SIZE              (2*1024*1024)
-#define FLASH_PAGE_SIZE         8192
-#define FLASH_DELAY             25UL // upper 3.472*7
-#define FLASH_ENDURANCE         10000 // 100000
-
-#define CORE_FREQ               256000000UL
-#define PERIPH0_FREQ             64000000UL
-#define PERIPH2_FREQ            128000000UL
-
-#define DBG_BAUDRATE            921600
-
-#define STDIO_UART              0
-#define STDIO_BAUDRATE          460800
-#define STDIO_RTSCTS            0
-
-#define TIME_SOURCE             TIMER32
-#define TIME_SOURCE_TIMER_ID    0
-#define TIME_SOURCE_PRSC        ((PERIPH0_FREQ/1000000)-1)
+#include "defines.h"
 
 /* Initialize GNSS AFE registers */
 void gnss_afe_regs(void);

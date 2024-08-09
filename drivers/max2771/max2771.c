@@ -32,11 +32,12 @@
 * File Name : max2771.c
 * Author    : Krzysztof Siwiec
 * ******************************************************************************
-* $Date: 2022-08-22 16:35:13 +0200 (pon, 22 sie 2022) $
-* $Revision: 884 $
+* $Date: 2024-04-22 09:02:05 +0200 (pon, 22 kwi 2024) $
+* $Revision: 1049 $
 *H*****************************************************************************/
 
 #include <stdio.h>
+#include <stdbool.h>
 #include <board.h>
 #include <ccrv32.h>
 #include <ccrv32-amba.h>
@@ -165,33 +166,90 @@ uint32_t max2771_spi_write(enum max2771_band band, uint32_t address,uint32_t dat
 //configure band
 uint32_t max2771_conf_band(enum max2771_band band)
 {
+
+    bool beidou = false;
+    bool glonass = false;
+
     max2771_gpio_conf();
     max2771_spi_conf();
     switch(band)
     {
         case L1E1:
-            //write register 0
-            max2771_spi_write(band,0x0,0xA2260625);
-            //write register 1
-            max2771_spi_write(band,0x1,0x28550288);
-            //write register 2
-            max2771_spi_write(band,0x2,0x0EBFB1DC);
-            //write register 3
-            max2771_spi_write(band,0x3,0x898C0000);
-            //write register 4
-            max2771_spi_write(band,0x4,0x000C0008);
-            //write register 5
-            max2771_spi_write(band,0x5,0x0A6E9B70);
-            //write register 6
-            max2771_spi_write(band,0x6,0x08000000);
-            //write register 7
-            max2771_spi_write(band,0x7,0x010061B2);
-            //write register 8
-            max2771_spi_write(band,0x8,0x01E0F401);
-            //write register 9
-            max2771_spi_write(band,0x9,0x00000002);
-            //write register 10
-            max2771_spi_write(band,0xA,0x010061B0);
+            if (beidou)
+            {
+                //write register 0
+                max2771_spi_write(band,0x0,0xA2260625);
+                //write register 1
+                max2771_spi_write(band,0x1,0x28550288);
+                //write register 2
+                max2771_spi_write(band,0x2,0x0EBFB1DC);
+                //write register 3
+                max2771_spi_write(band,0x3,0x898C0000);
+                //write register 4
+                max2771_spi_write(band,0x4,0x000BE008);
+                //write register 5
+                max2771_spi_write(band,0x5,0x0A6E9B70);
+                //write register 6
+                max2771_spi_write(band,0x6,0x08000000);
+                //write register 7
+                max2771_spi_write(band,0x7,0x010061B2);
+                //write register 8
+                max2771_spi_write(band,0x8,0x01E0F401);
+                //write register 9
+                max2771_spi_write(band,0x9,0x00000002);
+                //write register 10
+                max2771_spi_write(band,0xA,0x010061B0);
+            }
+            else if (glonass)
+            {
+                //write register 0
+                max2771_spi_write(band,0x0,0xA2260625);
+                //write register 1
+                max2771_spi_write(band,0x1,0x28550288);
+                //write register 2
+                max2771_spi_write(band,0x2,0x0EBFB1DC);
+                //write register 3
+                max2771_spi_write(band,0x3,0x898C0000);
+                //write register 4
+                max2771_spi_write(band,0x4,0x000C2008);
+                //write register 5
+                max2771_spi_write(band,0x5,0x0A6E9B70);
+                //write register 6
+                max2771_spi_write(band,0x6,0x08000000);
+                //write register 7
+                max2771_spi_write(band,0x7,0x010061B2);
+                //write register 8
+                max2771_spi_write(band,0x8,0x01E0F401);
+                //write register 9
+                max2771_spi_write(band,0x9,0x00000002);
+                //write register 10
+                max2771_spi_write(band,0xA,0x010061B0);
+            }
+            else
+            {
+                //write register 0
+                max2771_spi_write(band,0x0,0xA2260625);
+                //write register 1
+                max2771_spi_write(band,0x1,0x28550288);
+                //write register 2
+                max2771_spi_write(band,0x2,0x0EBFB1DC);
+                //write register 3
+                max2771_spi_write(band,0x3,0x898C0000);
+                //write register 4
+                max2771_spi_write(band,0x4,0x000C0008);
+                //write register 5
+                max2771_spi_write(band,0x5,0x0A6E9B70);
+                //write register 6
+                max2771_spi_write(band,0x6,0x08000000);
+                //write register 7
+                max2771_spi_write(band,0x7,0x010061B2);
+                //write register 8
+                max2771_spi_write(band,0x8,0x01E0F401);
+                //write register 9
+                max2771_spi_write(band,0x9,0x00000002);
+                //write register 10
+                max2771_spi_write(band,0xA,0x010061B0);
+            }
             break;
         case L5E5:
             //write register 0

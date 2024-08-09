@@ -1,40 +1,40 @@
-#H*****************************************************************************
-#
-# Copyright (c) 2018 ChipCraft Sp. z o.o. All rights reserved
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
-#   - Redistributions of source code must retain the above copyright
-#     notice, this list of conditions and the following disclaimer.
-#   - Redistributions in binary form must reproduce the above copyright
-#     notice, this list of conditions and the following disclaimer in
-#     the documentation and/or other materials provided with the
-#     distribution.
-#   - Neither the name of ChipCraft Sp. z o.o. nor the names of its
-#     contributors may be used to endorse or promote products derived
-#     from this software without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-# COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-# POSSIBILITY OF SUCH DAMAGE.
-#
-# ******************************************************************************
-# File Name : specialreg.h
-# Author    : Krzysztof Marcinek
-# ******************************************************************************
-# $Date: 2021-06-28 11:16:55 +0200 (pon, 28 cze 2021) $
-# $Revision: 712 $
-#H******************************************************************************
+/******************************************************************************
+
+  Copyright (c) 2018 ChipCraft Sp. z o.o. All rights reserved
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+    - Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    - Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in
+      the documentation and/or other materials provided with the
+      distribution.
+    - Neither the name of ChipCraft Sp. z o.o. nor the names of its
+      contributors may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  POSSIBILITY OF SUCH DAMAGE.
+
+  ******************************************************************************
+  File Name : specialreg.h
+  Author    : Krzysztof Marcinek
+  ******************************************************************************
+  $Date: 2024-01-14 21:55:43 +0100 (nie, 14 sty 2024) $
+  $Revision: 1038 $
+ ******************************************************************************/
 
 #ifndef _SPECIALREG_H_
 #define _SPECIALREG_H_
@@ -60,7 +60,7 @@
  */
 #define ICACHE_CTRL_BASE        0xF0070000   /* Instruction Cache Controller Base                */
 #define DCACHE_CTRL_BASE        0xF0072000   /* Data Cache Controller Base                       */
-#define CACHE_STAT_OFFSET       0x0          /* Cache Controller Status offset                   */
+#define CACHE_STCR_OFFSET       0x0          /* Cache Controller Status and Control offset       */
 #define CACHE_FLUSH_OFFSET      0x4          /* Cache Controller Flush offset                    */
 #define DCACHE_BUSY_MASK        0x4          /* Data Cache Controller busy bit mask              */
 
@@ -91,6 +91,8 @@
 #define WDT_RESET_MASK          0x8          /* watchdog reset mask                              */
 #define RST_RSN_OFFSET          0x4          /* power management reset reason offset             */
 #define SPROT_EN_MASK           0x8          /* stack protection enable mask                     */
+#define NMI_DIS_MASK            0x200        /* NMI enable mask                                  */
+
 #define IRQ_EN_MASK             0x8          /* interrupt enable mask                            */
 #define IRQ_EXT_EN_SHIFT        11           /* external interrupt enable shift                  */
 #define IRQ_CAUSE_SHIFT         31           /* interrupt cause shift                            */
@@ -104,6 +106,7 @@
 #define CACHE_SC_MASK           0x20         /* cache scrambling enable mask                     */
 #define CACHE_HE_MASK           0x100        /* hard error mask                                  */
 #define ROM_UNLOCK_KEY          0xA5000000   /* ROM unlock key                                   */
+#define ROM_UNLOCK_VALUE        0x00000001   /* ROM unlock value                                   */
 #define FPU_INIT_MASK           0x4000       /* FPU initial state mask                           */
 
 #endif /* _SPECIALREG_H_ */

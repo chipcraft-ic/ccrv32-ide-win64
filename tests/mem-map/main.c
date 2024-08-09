@@ -32,8 +32,8 @@
 * File Name : main.c
 * Author    : Krzysztof Marcinek
 * ******************************************************************************
-* $Date: 2022-01-19 09:38:48 +0100 (śro, 19 sty 2022) $
-* $Revision: 814 $
+* $Date: 2023-08-01 12:38:13 +0200 (wto, 01 sie 2023) $
+* $Revision: 976 $
 *H*****************************************************************************/
 
 #include "board.h"
@@ -265,10 +265,12 @@ int main(void)
     test_mem_access(0x9FFFFF00,0xA0000504,64);
     test_mem_access(0xAFFFFF00,0xB0000504,64);
     test_mem_access(0xBFFFFF00,0xC0000504,64);
-
     test_mem_access(0xCFFFFF00,0xD0000504,64);
     test_mem_access(0xDFFFFF00,0xE0000504,64);
-    test_mem_access(0xEFFFFF00,0xF0000504,64);
+
+    if ((AMBA_APB0_CFG_PTR->INFO_0 & 0x1f80) != 0){ // uart and wdt can be emulated, check for gpio
+        test_mem_access(0xEFFFFF00,0xF0000504,64);
+    }
 
     test_mem_access(0xF000FE00,0xF0010200,64);
     test_mem_access(0xF001FE00,0xF0020200,64);
@@ -282,7 +284,7 @@ int main(void)
     test_mem_access(0xF007FE00,0xF0080200,64);
     test_mem_access(0xF0087E00,0xF0088A00,64);
 
-    if (AMBA_APB0_CFG_PTR->INFO_0 != 0){
+    if ((AMBA_APB0_CFG_PTR->INFO_0 & 0x1f80) != 0){ // uart and wdt can be emulated, check for gpio
 
         test_mem_access(0xE0000000,0xE0010004,64);
 

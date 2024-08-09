@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2022 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2022-08-02 11:34:14 +0200 (wto, 02 sie 2022) $
-* $Revision: 876 $
+* $Date: 2023-08-24 18:02:23 +0200 (czw, 24 sie 2023) $
+* $Revision: 983 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -365,17 +365,17 @@ enum
     FLASH_INFO_PAGE_SIZE_OFFSET      = 4,                                               /*!< Flash Info Page Size offset            */
     FLASH_INFO_PAGE_SIZE_MASK        = 0x0000000F << FLASH_INFO_PAGE_SIZE_OFFSET,       /*!< Flash Info Page Size bit mask          */
     FLASH_INFO_REGION_SIZE_OFFSET    = 8,                                               /*!< Flash Info Region Size in pages offset */
-#ifndef BOARD_CCNV2_A1
-    FLASH_INFO_REGION_SIZE_MASK      = 0x000000FF << FLASH_INFO_REGION_SIZE_OFFSET,     /*!< Flash Info Region Size bit mask        */
-    FLASH_INFO_MODULE_SIZE_OFFSET    = 16,                                              /*!< Flash Info Module Size offset          */
-    FLASH_INFO_MODULE_SIZE_MASK      = 0x0000000F << FLASH_INFO_MODULE_SIZE_OFFSET,     /*!< Flash Info Module Size bit mask        */
-    FLASH_INFO_MODULES_NUMBER_OFFSET = 20,                                              /*!< Flash Info Modules Number offset       */
-    FLASH_INFO_MODULES_NUMBER_MASK   = 0x0000000F << FLASH_INFO_MODULES_NUMBER_OFFSET,  /*!< Flash Info Modules Number bit mask     */
-#else
+#ifdef BOARD_CCNV2_A1
     FLASH_INFO_REGION_SIZE_MASK      = 0x0000000F << FLASH_INFO_REGION_SIZE_OFFSET,     /*!< Flash Info Region Size bit mask        */
     FLASH_INFO_MODULE_SIZE_OFFSET    = 12,                                              /*!< Flash Info Module Size offset          */
     FLASH_INFO_MODULE_SIZE_MASK      = 0x0000000F << FLASH_INFO_MODULE_SIZE_OFFSET,     /*!< Flash Info Module Size bit mask        */
     FLASH_INFO_MODULES_NUMBER_OFFSET = 16,                                              /*!< Flash Info Modules Number offset       */
+    FLASH_INFO_MODULES_NUMBER_MASK   = 0x0000000F << FLASH_INFO_MODULES_NUMBER_OFFSET,  /*!< Flash Info Modules Number bit mask     */
+#else
+    FLASH_INFO_REGION_SIZE_MASK      = 0x000000FF << FLASH_INFO_REGION_SIZE_OFFSET,     /*!< Flash Info Region Size bit mask        */
+    FLASH_INFO_MODULE_SIZE_OFFSET    = 16,                                              /*!< Flash Info Module Size offset          */
+    FLASH_INFO_MODULE_SIZE_MASK      = 0x0000000F << FLASH_INFO_MODULE_SIZE_OFFSET,     /*!< Flash Info Module Size bit mask        */
+    FLASH_INFO_MODULES_NUMBER_OFFSET = 20,                                              /*!< Flash Info Modules Number offset       */
     FLASH_INFO_MODULES_NUMBER_MASK   = 0x0000000F << FLASH_INFO_MODULES_NUMBER_OFFSET,  /*!< Flash Info Modules Number bit mask     */
 #endif
 };
@@ -400,9 +400,6 @@ enum
     FLASH_INFO_MODULE_SIZE_UNDEFINED = 0,  /*!< Flash Info Module Size undefined */
     FLASH_INFO_MODULE_SIZE_128_PAGES = 1,  /*!< Flash Info Module Size 128 pages */
 };
-
-/** Helper macro for calculating read wait states count */
-#define FLASH_READ_WAIT_STATES_CALC(hclk) ( FLASH_DELAY / (1000000000UL/(hclk)) )
 
 /** @} */
 

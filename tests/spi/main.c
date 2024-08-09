@@ -32,8 +32,8 @@
 * File Name : main.c
 * Author    : Maciej Plasota
 * ******************************************************************************
-* $Date: 2022-01-19 09:38:48 +0100 (śro, 19 sty 2022) $
-* $Revision: 814 $
+* $Date: 2024-06-08 11:42:29 +0200 (sob, 08 cze 2024) $
+* $Revision: 1062 $
 *H*****************************************************************************/
 
 #include "board.h"
@@ -53,7 +53,7 @@
 #define TEST_CONTEXT_VARS ,g_spi_index
 #include "test.h"
 
-#if MCU == ccnv2
+#ifdef MCU_CCNV2
     #define SKIP_TEST
 #endif
 

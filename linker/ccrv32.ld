@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2018 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2022-08-02 11:34:14 +0200 (wto, 02 sie 2022) $
-* $Revision: 876 $
+* $Date: 2024-01-14 21:55:43 +0100 (nie, 14 sty 2024) $
+* $Revision: 1038 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -144,6 +144,7 @@ SECTIONS
   .spram_data : AT (_spram_data_load) {
     _sspram_data = .;
     *(.spram_data)
+    *(.xpram_text)
     _espram_data = .;
   } > spram
 

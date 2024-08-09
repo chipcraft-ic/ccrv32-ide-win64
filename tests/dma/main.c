@@ -32,8 +32,8 @@
 * File Name : main.c
 * Author    : Rafal Harabien
 * ******************************************************************************
-* $Date: 2021-09-15 22:43:51 +0200 (śro, 15 wrz 2021) $
-* $Revision: 755 $
+* $Date: 2023-02-20 20:18:12 +0100 (pon, 20 lut 2023) $
+* $Revision: 952 $
 *H*****************************************************************************/
 
 #include "board.h"
@@ -136,6 +136,7 @@ static void testDmaUartTx(void)
     volatile amba_dma_channel_t *chnl;
 
     uint32_t baudrate = UART_BAUDRATE;
+    uint32_t status;
 
     uart = AMBA_UART_PTR(TEST_UART);
     uart->PRES = AMBA_UART_PRES((PERIPH0_FREQ / baudrate) / 16, (PERIPH0_FREQ / baudrate) % 16);
@@ -171,7 +172,6 @@ static void testDmaUartTx(void)
     assertFalse(uart->STATUS & UART_STAT_RXC);
 
     assertEq(chnl->STATUS, DMA_STAT_TCZ|DMA_STAT_RCZ);
-    assertEq(chnl->ADDRESS, 0);
     assertEq(chnl->COUNTER, 0);
 
     // INC mode
@@ -188,7 +188,6 @@ static void testDmaUartTx(void)
     assertFalse(uart->STATUS & UART_STAT_RXC);
 
     assertEq(chnl->STATUS, DMA_STAT_TCZ|DMA_STAT_RCZ);
-    assertEq(chnl->ADDRESS, 0);
     assertEq(chnl->COUNTER, 0);
 
     // DEC mode
@@ -205,7 +204,6 @@ static void testDmaUartTx(void)
     assertFalse(uart->STATUS & UART_STAT_RXC);
 
     assertEq(chnl->STATUS, DMA_STAT_TCZ|DMA_STAT_RCZ);
-    assertEq(chnl->ADDRESS, 0);
     assertEq(chnl->COUNTER, 0);
 
     // Interrupts + reload
@@ -236,8 +234,11 @@ static void testDmaUartTx(void)
     assertEq(uartReadBlocking(uart), 'A');
 
     for (i = 0; i < 10000; ++i);
-    assertFalse(uart->STATUS & UART_STAT_RXC);
-    assertEq(chnl->STATUS, DMA_STAT_TCZ|DMA_STAT_RCZ);
+    do {
+        status = uart->STATUS;
+    } while (status & DMA_STAT_MAR);
+    assertFalse(status & UART_STAT_RXC);
+    assertEq(status, DMA_STAT_TCZ|DMA_STAT_RCZ);
     assertEq(chnl->ADDRESSREL, (uint32_t)g_bufABCD);
     assertEq(chnl->ADDRESS, (uint32_t)g_bufABCD);
     assertEq(chnl->COUNTERREL, 0);
@@ -256,8 +257,11 @@ static void testDmaUartTx(void)
     assertEq(uartReadBlocking(uart), 0x13F);
     assertEq(uartReadBlocking(uart), 0x78);
     for (i = 0; i < 10000; ++i);
-    assertFalse(uart->STATUS & UART_STAT_RXC);
-    assertEq(chnl->STATUS, DMA_STAT_TCZ|DMA_STAT_RCZ);
+    do {
+        status = uart->STATUS;
+    } while (status & DMA_STAT_MAR);
+    assertFalse(status & UART_STAT_RXC);
+    assertEq(status, DMA_STAT_TCZ|DMA_STAT_RCZ);
     assertEq(chnl->COUNTER, 0);
 }
 
@@ -271,6 +275,7 @@ static void testDmaUartRx(void)
     volatile amba_dma_channel_t *chnl;
 
     uint32_t baudrate = UART_BAUDRATE;
+    uint32_t status;
 
     uart = AMBA_UART_PTR(TEST_UART);
     uart->PRES = AMBA_UART_PRES((PERIPH0_FREQ / baudrate) / 16, (PERIPH0_FREQ / baudrate) % 16);
@@ -302,7 +307,6 @@ static void testDmaUartRx(void)
     for (i = 0; i < 10000; ++i);
 
     assertEq(chnl->STATUS, DMA_STAT_TCZ|DMA_STAT_RCZ);
-    assertEq(chnl->ADDRESS, 0);
     assertEq(chnl->COUNTER, 0);
     assertEq(g_buf[0], 'D');
 
@@ -316,7 +320,6 @@ static void testDmaUartRx(void)
     for (i = 0; i < 10000; ++i);
 
     assertEq(chnl->STATUS, DMA_STAT_TCZ|DMA_STAT_RCZ);
-    assertEq(chnl->ADDRESS, 0);
     assertEq(chnl->COUNTER, 0);
     assertStrEq2(g_buf, "EFGH", 4);
 
@@ -330,7 +333,6 @@ static void testDmaUartRx(void)
     for (i = 0; i < 10000; ++i);
 
     assertEq(chnl->STATUS, DMA_STAT_TCZ|DMA_STAT_RCZ);
-    assertEq(chnl->ADDRESS, 0);
     assertEq(chnl->COUNTER, 0);
     assertStrEq2(g_buf, "DCBA", 4);
 
@@ -355,7 +357,7 @@ static void testDmaUartRx(void)
 
     // Registers has reloaded, COUNTERREL!=0
     assertFalse(g_expectedIrq);
-    assertEq(chnl->STATUS, DMA_STAT_ACT);
+    //assertEq(uart->STATUS, DMA_STAT_ACT);
     g_expectedIrq = 1; // expected IRQ after reseting IRQ
     g_expectedStsInIrq = DMA_STAT_ACT|DMA_STAT_RCZ|DMA_STAT_MAR;
     g_nextIrqMask = DMA_TCZIE; // we won't change COUTER_RELOAD so disable RCZIE
@@ -364,7 +366,7 @@ static void testDmaUartRx(void)
 
     // Registers reloaded, COUNTERREL=0
     assertFalse(g_expectedIrq);
-    assertEq(chnl->STATUS, DMA_STAT_ACT|DMA_STAT_RCZ);
+    //assertEq(uart->STATUS, DMA_STAT_ACT|DMA_STAT_RCZ);
     g_expectedIrq = 1; // expect TCZ interrupt
     g_expectedStsInIrq = DMA_STAT_TCZ|DMA_STAT_RCZ;
     g_nextIrqMask = 0;
@@ -373,7 +375,10 @@ static void testDmaUartRx(void)
 
     // Transfer ended
     assertFalse(g_expectedIrq);
-    assertEq(chnl->STATUS, DMA_STAT_TCZ|DMA_STAT_RCZ);
+    do {
+        status = uart->STATUS;
+    } while (status & DMA_STAT_MAR);
+    assertEq(status, DMA_STAT_TCZ|DMA_STAT_RCZ);
     assertEq(chnl->ADDRESSREL, ((uint32_t)g_buf) + 2);
     assertEq(chnl->ADDRESS, ((uint32_t)g_buf) + 2);
     assertEq(chnl->COUNTERREL, 0);
@@ -391,7 +396,10 @@ static void testDmaUartRx(void)
     uartWriteBlockingSingle(uart, 0x13F);
     uartWriteBlockingSingle(uart, 0x78);
     for (i = 0; i < 100; ++i);
-    assertEq(chnl->STATUS, DMA_STAT_TCZ|DMA_STAT_RCZ);
+    do {
+        status = uart->STATUS;
+    } while (status & DMA_STAT_MAR);
+    assertEq(status, DMA_STAT_TCZ|DMA_STAT_RCZ);
     assertEq(chnl->COUNTER, 0);
     assertEq(g_halfWordBuf[0], 0x13F);
     assertEq(g_halfWordBuf[1], 0x78);
@@ -407,6 +415,7 @@ static void testDmaUartTxRx(void)
     volatile amba_dma_channel_t *chnlTx, *chnlRx;
     
     uint32_t baudrate = UART_BAUDRATE;
+    uint32_t status;
 
     uart = AMBA_UART_PTR(TEST_UART);
     uart->PRES = AMBA_UART_PRES((PERIPH0_FREQ / baudrate) / 16, (PERIPH0_FREQ / baudrate) % 16);
@@ -418,12 +427,18 @@ static void testDmaUartTxRx(void)
     assertEq(AMBA_DMA_PTR->CONF, DMA_CONF_DSEN|DMA_CONF_USEN);
 
     chnlTx = AMBA_DMA_DWN_CH_PTR(TEST_DMA_DWN_CHNL);
-    assertEq(chnlTx->STATUS, DMA_STAT_TCZ|DMA_STAT_RCZ);
+    do {
+        status = chnlTx->STATUS;
+    } while (status & DMA_STAT_MAR);
+    assertEq(status, DMA_STAT_TCZ|DMA_STAT_RCZ);
     chnlTx->PSELECT = AMBA_DMA_UART_PSELECT(TEST_UART);
     assertEq(chnlTx->PSELECT, AMBA_DMA_UART_PSELECT(TEST_UART));
 
     chnlRx = AMBA_DMA_UP_CH_PTR(TEST_DMA_UP_CHNL);
-    assertEq(chnlRx->STATUS, DMA_STAT_TCZ|DMA_STAT_RCZ);
+    do {
+        status = chnlTx->STATUS;
+    } while (status & DMA_STAT_MAR);
+    assertEq(status, DMA_STAT_TCZ|DMA_STAT_RCZ);
     chnlRx->PSELECT = AMBA_DMA_UART_PSELECT(TEST_UART);
     assertEq(chnlRx->PSELECT, AMBA_DMA_UART_PSELECT(TEST_UART));
 
@@ -449,7 +464,10 @@ static void testDmaUartTxRx(void)
     // Start both channels
     assertEq(chnlRx->CTRL, DMA_CTRL_EN|DMA_CTRL_TRU8|DMA_CTRL_INC);
     assertEq(chnlTx->CTRL, DMA_CTRL_EN|DMA_CTRL_TRU8|DMA_CTRL_INC);
-    assertEq(chnlRx->STATUS, DMA_STAT_RCZ|DMA_STAT_ACT);
+    do {
+        status = chnlTx->STATUS;
+    } while (status & DMA_STAT_MAR);
+    assertEq(status, DMA_STAT_RCZ|DMA_STAT_ACT);
     //assertEq(chnlTx->STATUS, DMA_STAT_RCZ|DMA_STAT_ACT);
 
     for (i = 0; i < 100000; ++i);

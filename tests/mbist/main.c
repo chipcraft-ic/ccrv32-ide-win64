@@ -32,8 +32,8 @@
 * File Name : main.c
 * Author    : Krzysztof Marcinek
 * ******************************************************************************
-* $Date: 2022-12-12 15:09:34 +0100 (pon, 12 gru 2022) $
-* $Revision: 936 $
+* $Date: 2024-04-08 13:38:29 +0200 (pon, 08 kwi 2024) $
+* $Revision: 1047 $
 *H*****************************************************************************/
 
 #include "board.h"
@@ -44,7 +44,10 @@
 #include <ccrv32-mcore.h>
 #include <ccrv32-dcache.h>
 #include <ccrv32-mbist.h>
+#include <ccrv32-amba.h>
+#include <ccrv32-amba-rtc.h>
 #include <core_util.h>
+#include <rtc_util.h>
 #include <stdio.h>
 #include "test.h"
 
@@ -83,7 +86,7 @@ void singleTests(void)
         uint8_t second_port = (MBIST_PTR->CTRL & MBIST_CTRL_SECOND_PORT) != 0;
         uint8_t switch_ports = (MBIST_PTR->CTRL & MBIST_CTRL_SWITCH_PORTS) != 0;
         uint8_t inject_idx_port0 = (MBIST_PTR->INJ & MBIST_INJ_IDX_PORT0_MASK) >> MBIST_INJ_IDX_PORT0_SHIFT;
-        uint8_t inject_idx_port1 = (MBIST_PTR->INJ & MBIST_INJ_IDX_PORT1_MASK) >> MBIST_INJ_IDX_PORT1_SHIFT;
+        //uint8_t inject_idx_port1 = (MBIST_PTR->INJ & MBIST_INJ_IDX_PORT1_MASK) >> MBIST_INJ_IDX_PORT1_SHIFT;
         if (region == 0 && MBIST_PTR->INJ_ADDR0 == 0){
             MBIST_PTR->INJ = MBIST_INJ_PORT0_EN | (region+1) << MBIST_INJ_IDX_PORT0_SHIFT;
             MBIST_PTR->INJ_ADDR0 = (region+1)*2;
@@ -168,8 +171,11 @@ void singleTests(void)
             MBIST_PTR->SCRATCH0 = g_failedTests;
             MBIST_PTR->SCRATCH1 = g_totalTests;
 
-            MBIST_PTR->INJ = MBIST_INJ_PORT1_EN | (region+10) << MBIST_INJ_IDX_PORT1_SHIFT;
-            MBIST_PTR->INJ_ADDR1 = (region+4)*3;
+            // port1 does not issue write, so we cant inject error on the test generator side
+            //MBIST_PTR->INJ = MBIST_INJ_PORT1_EN | (region+10) << MBIST_INJ_IDX_PORT1_SHIFT;
+            //MBIST_PTR->INJ_ADDR1 = (region+4)*3;
+            MBIST_PTR->INJ = MBIST_INJ_PORT0_EN | (region+10) << MBIST_INJ_IDX_PORT0_SHIFT;
+            MBIST_PTR->INJ_ADDR0 = (region+4)*3;
 
             MBIST_PTR->CTRL = MBIST_ALG_MARCH_D2PF << MBIST_CTRL_ALG_SHIFT | MBIST_CTRL_SINGLE | (region << MBIST_CTRL_REGN_SHIFT);
             MEMORY_BARRIER();
@@ -183,23 +189,45 @@ void singleTests(void)
                 //printf("REG0 %d: 0x%08x\n",i,(unsigned)MBIST_PTR->DET_LOGS[i]);
             }
             assertTrue(MBIST_PTR->DET_LOGS[1] != 0); // error count > 0
-            assertTrue(MBIST_PTR->DET_LOGS[10] == MBIST_PTR->INJ_ADDR1); // error address matches
-            assertTrue((MBIST_PTR->DET_LOGS[22] & 0xFF) == inject_idx_port1); // error index matches
+            //assertTrue(MBIST_PTR->DET_LOGS[10] == MBIST_PTR->INJ_ADDR1); // error address matches
+            //assertTrue((MBIST_PTR->DET_LOGS[22] & 0xFF) == inject_idx_port1); // error index matches
+            assertTrue(MBIST_PTR->DET_LOGS[10] == MBIST_PTR->INJ_ADDR0); // error address matches
+            assertTrue((MBIST_PTR->DET_LOGS[22] & 0xFF) == inject_idx_port0); // error index matches
         }
 
     }
 
 }
 
+void prepareRTC(void)
+{
+#ifndef BOARD_CCNV2_A1
+    if ((AMBA_APB0_CFG_PTR->INFO_0 & AMBA_RTC) != 0){
+        RTCenable();
+        RTCwrite((uint32_t*)&AMBA_RTC_PTR->PRES, 0);
+        RTCwrite((uint32_t*)&AMBA_RTC_PTR->PER, 0xFFFFFFFF);
+        RTCwrite((uint32_t*)&AMBA_RTC_PTR->COMPARE, 0xFFFFFFFF);
+        RTCwrite((uint32_t*)&AMBA_RTC_PTR->COUNT, 0);
+    }
+#endif
+}
+
 void fullTests(void)
 {
 
     uint32_t status, mask, core_num, i;
+    uint32_t count = 0;
     uint32_t *ptr, *reg;
 
     core_num = MCORE_PTR->CORE_NUM;
 
     if (PWD_PTR->RSTRSN == PWD_RSN_MBIST){
+
+#ifndef BOARD_CCNV2_A1
+        if ((AMBA_APB0_CFG_PTR->INFO_0 & AMBA_RTC) != 0){
+            count = RTCread((uint32_t*)&AMBA_RTC_PTR->COUNT);
+        }
+#endif
 
         g_failedTests = MBIST_PTR->SCRATCH0;
         g_totalTests = MBIST_PTR->SCRATCH1;
@@ -262,6 +290,13 @@ void fullTests(void)
             }
         }
 
+#ifndef BOARD_CCNV2_A1
+        if ((AMBA_APB0_CFG_PTR->INFO_0 & AMBA_RTC) != 0){
+            double time = (double)count/32.7680;
+            printf("\nMBIST time: %.5f ms\n\n",time);
+        }
+#endif
+
         MBIST_PTR->SCRATCH0 = g_failedTests;
         MBIST_PTR->SCRATCH1 = g_totalTests;
 
@@ -269,6 +304,7 @@ void fullTests(void)
             printf("\nAlgorithm: MATS+.\n");
             MBIST_PTR->CTRL = MBIST_ALG_MATS_P << MBIST_CTRL_ALG_SHIFT;
             MEMORY_BARRIER();
+            prepareRTC();
             MBIST_PTR->RUN = MBIST_RUN_KEY;
             for(;;);
         }
@@ -276,6 +312,7 @@ void fullTests(void)
             printf("\nAlgorithm: March C-.\n");
             MBIST_PTR->CTRL = MBIST_ALG_MARCH_CM << MBIST_CTRL_ALG_SHIFT;
             MEMORY_BARRIER();
+            prepareRTC();
             MBIST_PTR->RUN = MBIST_RUN_KEY;
             for(;;);
         }
@@ -290,8 +327,11 @@ void fullTests(void)
 
     printf("Starting MBIST test.\n");
     printf("\nAlgorithm: Zero-one.\n");
+    MBIST_PTR->SCRATCH0 = 0;
+    MBIST_PTR->SCRATCH1 = 0;
     MBIST_PTR->CTRL = MBIST_ALG_ZERO_ONE << MBIST_CTRL_ALG_SHIFT;
     MEMORY_BARRIER();
+    prepareRTC();
     MBIST_PTR->RUN = MBIST_RUN_KEY;
     for(;;);
 
@@ -317,7 +357,9 @@ int main(void)
     }
 
     fullTests();
+#ifndef BOARD_CCNV2_A1
     singleTests();
+#endif
 
     printTestSummary();
 
