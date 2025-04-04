@@ -32,8 +32,8 @@
 # File Name : core.S
 # Author    : Krzysztof Marcinek
 # ******************************************************************************
-# $Date: 2023-06-12 13:23:03 +0200 (pon, 12 cze 2023) $
-# $Revision: 974 $
+# $Date: 2025-02-26 14:42:34 +0100 (śro, 26 lut 2025) $
+# $Revision: 1129 $
 #H******************************************************************************
 
 #include <specialreg.h>
@@ -53,6 +53,7 @@ core_entrypoint:
   csrw mtvec, t0
 
   jal common_start                    # common core init (startup.S)
+  jal pmp_init                        # pmp init (startup.S)
   jal __libc_impure_init              # initialize impure data
 
   add sp, sp, -16                     # call argument area
@@ -63,7 +64,7 @@ core_entrypoint:
   fence
 
   li gp, 1
-  sw gp, tohost, t5
+  sw gp, tohost, t2
 
 # safety loop
 safety_loop:

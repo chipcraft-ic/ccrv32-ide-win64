@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2019 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2024-01-14 21:55:43 +0100 (nie, 14 sty 2024) $
-* $Revision: 1038 $
+* $Date: 2024-09-17 20:06:05 +0200 (wto, 17 wrz 2024) $
+* $Revision: 1107 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -64,6 +64,11 @@ typedef struct
     uint32_t ERR_CNT_1;       /*!< Error Counter 1 (FT-only)        */
     uint32_t INJECT_MASK_LO;  /*!< Error Injection Mask (FT-only)   */
     uint32_t INJECT_MASK_HI;  /*!< Error Injection Mask (FT-only)   */
+    uint32_t _reserved0[5];
+    uint32_t HIT_CNT;         /*!< Hit Counter Register             */
+    uint32_t MISS_CNT;        /*!< Miss Counter Register            */
+    uint32_t HIT_CNT_BUF;     /*!< Hit Counter Buffer Register      */
+    uint32_t MISS_CNT_BUF;    /*!< Miss Counter Buffer Register     */
 } icache_regs_t;
 
 static volatile icache_regs_t * const ICACHE_PTR = (icache_regs_t*)ICACHE_BASE;
@@ -71,6 +76,7 @@ static volatile icache_regs_t * const ICACHE_PTR = (icache_regs_t*)ICACHE_BASE;
 /** ICC Status Register bits */
 enum
 {
+
     ICACHE_STCR_EN              = 1 << 0,  /*!< Instruction Cache Enable                 */
     ICACHE_STCR_PARITY_EN       = 1 << 3,  /*!< Parity Enable (FT-only)                  */
     ICACHE_STCR_ERR_TRIG        = 1 << 4,  /*!< Error Count Trigger (FT-only)            */
@@ -79,6 +85,12 @@ enum
     ICACHE_STCR_TAG_ERR_INJECT  = 1 << 7,  /*!< Tag Error Injection Enable (FT-only)     */
     ICACHE_STCR_HARD_ERR_EN     = 1 << 8,  /*!< Hard error enable (FT-only)              */
     ICACHE_STCR_HARD_ERR_FLAG   = 1 << 9,  /*!< Hard error flag (FT-only)                */
+
+    ICACHE_STCR_PERF_EN         = 1 << 24, /*!< Enable Performance Counters              */
+    ICACHE_STCR_PERF_UPDATE     = 1 << 25, /*!< Update Performance Counters              */
+    ICACHE_STCR_PERF_READY      = 1 << 26, /*!< Performance Counters Ready               */
+    ICACHE_STCR_PERF_OVF        = 1 << 27, /*!< Performance Counters Overflow            */
+
 };
 
 /** ICC Status Register bit offsets */

@@ -32,8 +32,8 @@
 * File Name : main.c
 * Author    : Rafal Harabien
 * ******************************************************************************
-* $Date: 2019-12-19 12:13:42 +0100 (czw, 19 gru 2019) $
-* $Revision: 491 $
+* $Date: 2024-09-17 20:06:05 +0200 (wto, 17 wrz 2024) $
+* $Revision: 1107 $
 *H*****************************************************************************/
 
 #include "board.h"
@@ -201,7 +201,7 @@ static void testInterrupts(void)
     PLIC_PTR->ENABLE = BIT(0);
 }
 
-void testStackProtection(void);
+void testStackProtection(void); // TODO
 
 int main(void)
 {

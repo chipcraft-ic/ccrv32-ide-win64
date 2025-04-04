@@ -2,6 +2,7 @@ HW_TESTS   := $(shell cat tests.list)
 SIM_TESTS  := $(addsuffix _ccsim,$(HW_TESTS))
 STDOUT_LOG ?= $(CURDIR)/tests.log
 TEMP_LOG   ?= /tmp/cctest-last.log
+JOBS       ?= 4
 
 Q ?= @
 
@@ -18,15 +19,16 @@ sim-tests: before_tests $(SIM_TESTS) after_tests parse_logs show_logs
 
 $(HW_TESTS):
 	@echo -ne "$(ANSI_COLOR)Compiling $@$(ANSI_RESET)\n"
-	$(Q)$(MAKE) -C "../$@" clean all
+	$(Q)$(MAKE) -j$(JOBS) -C "../$@" clean
+	$(Q)$(MAKE) -j$(JOBS) -C "../$@" all
 	@echo -ne "$(ANSI_COLOR)Running $@$(ANSI_RESET)\n"
 	$(Q)cd "../$@" && $(CURDIR)/run-hw-test.sh "$(TEMP_LOG)"
 	$(Q)cat "$(TEMP_LOG)" >> "$(STDOUT_LOG)"
 
 $(SIM_TESTS):
 	@echo -ne "$(ANSI_COLOR)Compiling $@$(ANSI_RESET)\n"
-	$(Q)$(MAKE) -C "../$(subst _ccsim,,$@)" clean
-	$(Q)$(MAKE) -C "../$(subst _ccsim,,$@)"
+	$(Q)$(MAKE) -j$(JOBS) -C "../$(subst _ccsim,,$@)" clean
+	$(Q)$(MAKE) -j$(JOBS) -C "../$(subst _ccsim,,$@)" all
 	@echo -ne "$(ANSI_COLOR)Running $@$(ANSI_RESET)\n"
 	$(Q)$(MAKE) -C "../$(subst _ccsim,,$@)" sim | tee -a "$(STDOUT_LOG)"
 

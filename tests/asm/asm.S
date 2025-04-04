@@ -56,8 +56,8 @@ test:
   add  x3,x1,x1         # x3 = 2
   add  x1,x1,x3         # x1 = 3
   add  x3,x1,x1         # x3 = 6
-  beqz x2,skok
-  beqz x0,skok
+  beqz x2,jump
+  beqz x0,jump
   nop
   nop
   nop
@@ -78,14 +78,14 @@ test:
   addi x1,x0,0
   slt x1,x1,x3
   sltu x1,x1,x3
-  jal x3,  skok
+  jal x3,  jump
   ori x1,x2,10
   nop
   nop
-  jal x3, skok2
+  jal x3, jump2
   nop
 
-skok:
+jump:
   addi  x2,x1,1
   lui x1, 1
   auipc x2, 1
@@ -93,7 +93,7 @@ skok:
   nop
   nop
 
-skok2:
+jump2:
   nop
   nop
   nop
@@ -101,20 +101,20 @@ skok2:
   nop
   nop
   nop
-  jal x1, skok3
+  jal x1, jump3
   nop
   nop
   nop
   nop
-  jal x1, skok4
+  jal x1, jump4
   nop
   nop
 
-skok3:
+jump3:
   addi x2,x0,4
   jalr x0,x1,0
 
-skok4:
+jump4:
   nop
   nop
   nop
@@ -132,7 +132,7 @@ loop:
   nop
   nop
   addi x3,zero,0
-  addi x10,x3,-1        # x10 = 0xffffffff (-1 ze znakiem)
+  addi x10,x3,-1        # x10 = 0xffffffff (-1 with sign)
   slt x1,x10,x3
   sltu x1,x10,x3
   addi x2,x0,5

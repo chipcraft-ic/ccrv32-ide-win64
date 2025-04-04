@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2021 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2024-08-06 11:52:57 +0200 (wto, 06 sie 2024) $
-* $Revision: 1090 $
+* $Date: 2024-11-06 21:54:21 +0100 (śro, 06 lis 2024) $
+* $Revision: 1115 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -109,15 +109,32 @@ void configure_pll(void)
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
     CFG_REGS_PTR->CFGREG_COREFREQ_CLK |= (1 << CFGREG_COREFREQ_CLK_CORE_XTAL_SCALE_SHIFT);
 
+    //Fix reset
+    CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
+    CFG_REGS_PTR->CFGREG_COREFREQ_CLK |= CFGREG_COREFREQ_CLK_XTAL_CORE_TEST_MASK;
+
     //CCNV2_B1 TCXO fix
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;    
     CFG_REGS_PTR->CFGREG_PM_CONF = CFGREG_PM_CONF_DEF  | CFGREG_PM_CONF_BGVR_EN_MASK  | CFGREG_PM_CONF_IREF_EN_MASK | CFGREG_PM_CONF_VREF_EN_MASK |
     CFGREG_PM_CONF_LDO_ADC_EXT_DECAP_MASK | CFGREG_PM_CONF_LDO_IF_EXT_DECAP_MASK | CFGREG_PM_CONF_LDO_DPLL_EXT_DECAP_MASK |
                             CFGREG_PM_CONF_LDO_APLL_EXT_DECAP_MASK | CFGREG_PM_CONF_LDO_RF_EXT_DECAP_MASK |
                             CFGREG_PM_CONF_LDO_ADC_EN_MASK | CFGREG_PM_CONF_LDO_IF_EN_MASK | CFGREG_PM_CONF_LDO_DPLL_EN_MASK | CFGREG_PM_CONF_LDO_APLL_EN_MASK |
-                            CFGREG_PM_CONF_LDO_RF_EN_MASK;
+                            CFGREG_PM_CONF_LDO_RF_EN_MASK | CFGREG_PM_CONF_IREF_TRIM_SRC_MASK | CFGREG_PM_CONF_BGVR_TRIM_SRC_MASK;
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF; 
     CFG_REGS_PTR->CFGREG_SPARE_CONF = 0x8;
+
+   CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
+   CFG_REGS_PTR->CFGREG_PM_CONF |= CFGREG_PM_CONF_CAL_EN_MASK;
+
+    //CCNV2B1 RTC fix
+    CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
+    CFG_REGS_PTR->CFGREG_RTCCONF |= CFGREG_RTCCONF_XTAL_RTC_TEST_MASK;
+
+	//Fix reset
+    CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
+    CFG_REGS_PTR->CFGREG_COREFREQ_CLK |= CFGREG_COREFREQ_CLK_XTAL_LOCK_OV_MASK;
+    CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
+    CFG_REGS_PTR->CFGREG_COREFREQ_CLK |= CFGREG_COREFREQ_CLK_RC_CORE_CAL_MASK;
 
     /* Configure PLL */
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
@@ -125,9 +142,10 @@ void configure_pll(void)
     while ((CFG_REGS_PTR->CFGREG_COREFREQ_STAT & CFGREG_COREFREQ_STAT_PLL_LOCK_MASK) == 0);
     /* Switch to PLL */
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
-    CFG_REGS_PTR->CFGREG_COREFREQ_CLK = (CFGREG_COREFREQ_CLK_DEF & ~CFGREG_COREFREQ_CLK_CORE_SEL_MASK) | 2 << CFGREG_COREFREQ_CLK_CORE_SEL_SHIFT;
+    CFG_REGS_PTR->CFGREG_COREFREQ_CLK = (CFG_REGS_PTR->CFGREG_COREFREQ_CLK  & ~CFGREG_COREFREQ_CLK_CORE_SEL_MASK) | 2 << CFGREG_COREFREQ_CLK_CORE_SEL_SHIFT;
     /* switch debugger to new baud rate */
     csr_write(mdbgbaud,DBG_UART_PRES((CORE_FREQ / DBG_BAUDRATE) / 16, (CORE_FREQ / DBG_BAUDRATE) % 16));
+
 }
 
 /**
@@ -182,13 +200,13 @@ void gnss_splitter_init(void)
 
     // Set carrier frequency to remove 0 when sample freq is 64*1.023MHz -> (0MHz / 64*1.023MHz) * 2^32 = 0
     // Signal present at 4*1.023MHz - remaining IF equal to 4*1.023MHz
+    // Remove 58620120.662258148193359375 to zero assuming sampling frequency of 192*1.023e6
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
-    CFG_REGS_PTR->CFGREG_SPLIT1_L1E1_CFG_CARR_FREQ = (1 <<28) << CFGREG_SPLIT1_L1E1_CFG_CARR_FREQ_STEP_SHIFT;
+    CFG_REGS_PTR->CFGREG_SPLIT1_L1E1_CFG_CARR_FREQ = 3403336456 << CFGREG_SPLIT1_L1E1_CFG_CARR_FREQ_STEP_SHIFT;
 
     // Set smooth filter alpha, disble carrier removal and set carrier mode, set decimation to 3
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
-    CFG_REGS_PTR->CFGREG_SPLIT1_L1E1_CFG =  CFGREG_SPLIT1_L1E1_CFG_DEC_BY_THREE_EN_MASK          | // decimation by 3
-                                           (0 << CFGREG_SPLIT1_L1E1_CFG_CARR_MODE_SHIFT)         | // carr mode 0
+    CFG_REGS_PTR->CFGREG_SPLIT1_L1E1_CFG = (0 << CFGREG_SPLIT1_L1E1_CFG_CARR_MODE_SHIFT)         | // carr mode 0
                                            (0 << CFGREG_SPLIT1_L1E1_CFG_CARR_ENABLE_SHIFT)       | // carr enable
                                            (7 << CFGREG_SPLIT1_L1E1_CFG_LPF_K_PARAM_SHIFT)       ; // alpha = (1 / 1024)
 
@@ -229,16 +247,15 @@ void gnss_splitter_init(void)
     CFG_REGS_PTR->CFGREG_SPLIT25_L2_CFG_THRESHOLD_Q = (0x1000 << CFGREG_SPLIT25_L2_CFG_THRESHOLD_Q_MAX_SHIFT) |
                                                       (0x0C00 << CFGREG_SPLIT25_L2_CFG_THRESHOLD_Q_MIN_SHIFT) ;
 
-    // Set carrier frequency to remove 6*1.023MHz when sample freq is 192*1.023MHz -> (6*1.023MHz / 192*1.023MHz) * 2^32 = 134217728
-    // Signal present at 6*1.023MHz - remaining IF equal to 0MHz
+    // Set carrier frequency to remove 4*1.023MHz when sample freq is 96*1.023MHz -> (4*1.023MHz / 96*1.023MHz) * 2^32 = 178962776
+    // Signal present at 4*1.023MHz - remaining IF equal to 0.00769495964050293Hz
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
-    CFG_REGS_PTR->CFGREG_SPLIT25_L2_CFG_CARR_FREQ = 134217728 << CFGREG_SPLIT25_L2_CFG_CARR_FREQ_STEP_SHIFT;
+    CFG_REGS_PTR->CFGREG_SPLIT25_L2_CFG_CARR_FREQ = 178962776 << CFGREG_SPLIT25_L2_CFG_CARR_FREQ_STEP_SHIFT;
 
     // Set smooth filter alpha, enable carrier removal and set carrier mode, set decimation to 3
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
-    CFG_REGS_PTR->CFGREG_SPLIT25_L2_CFG = CFGREG_SPLIT25_L2_CFG_DEC_BY_THREE_EN_MASK           | // decimation by 3
-                                          (0 << CFGREG_SPLIT25_L2_CFG_CARR_MODE_SHIFT)         | // carr mode 1
-                                          CFGREG_SPLIT25_L2_CFG_CARR_ENABLE_MASK               | // enable carrier removal
+    CFG_REGS_PTR->CFGREG_SPLIT25_L2_CFG = (0 << CFGREG_SPLIT25_L2_CFG_CARR_MODE_SHIFT)         | // carr mode 1
+                                          (0 << CFGREG_SPLIT25_L2_CFG_CARR_ENABLE_SHIFT)       | // enable carrier removal
                                           (7 << CFGREG_SPLIT25_L2_CFG_LPF_K_PARAM_SHIFT)       ; // alpha = (1 / 1024)
 
     /* E6 */
@@ -253,16 +270,15 @@ void gnss_splitter_init(void)
     CFG_REGS_PTR->CFGREG_SPLIT25_E6_CFG_THRESHOLD_Q = (0x1000 << CFGREG_SPLIT25_E6_CFG_THRESHOLD_Q_MAX_SHIFT) |
                                                       (0x0C00 << CFGREG_SPLIT25_E6_CFG_THRESHOLD_Q_MIN_SHIFT) ;
 
-    // Set carrier frequency to remove 51*1.023MHz when sample freq is 192*1.023MHz -> (51*1.023MHz / 192*1.023MHz) * 2^32 = 1140850688
-    // Signal present at 56*1.023MHz - remaining IF equal to 4*1.023MHz
+    // Set carrier frequency to remove 54*1.023MHz when sample freq is 96*1.023MHz -> (54*1.023MHz / 96*1.023MHz) * 2^32 = 2415924910
+    // Signal present at 55242132.751470804 Hz  - remaining IF equal to -0.007548928260803223Hz
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
-    CFG_REGS_PTR->CFGREG_SPLIT25_E6_CFG_CARR_FREQ = 1140850688 << CFGREG_SPLIT25_E6_CFG_CARR_FREQ_STEP_SHIFT;
+    CFG_REGS_PTR->CFGREG_SPLIT25_E6_CFG_CARR_FREQ = 2415924910 << CFGREG_SPLIT25_E6_CFG_CARR_FREQ_STEP_SHIFT;
 
     // Set smooth filter alpha, enable carrier removal and set carrier mode, set decimation to 3
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
-    CFG_REGS_PTR->CFGREG_SPLIT25_E6_CFG =  CFGREG_SPLIT25_E6_CFG_DEC_BY_THREE_EN_MASK          | // decimation by 3
-                                          (0 << CFGREG_SPLIT25_E6_CFG_CARR_MODE_SHIFT)         | // carr mode 1
-                                          (1 << CFGREG_SPLIT25_E6_CFG_CARR_ENABLE_SHIFT)       | // enable carrier removal
+    CFG_REGS_PTR->CFGREG_SPLIT25_E6_CFG = (0 << CFGREG_SPLIT25_E6_CFG_CARR_MODE_SHIFT)         | // carr mode 1
+                                          (0 << CFGREG_SPLIT25_E6_CFG_CARR_ENABLE_SHIFT)       | // enable carrier removal
                                           (7 << CFGREG_SPLIT25_E6_CFG_LPF_K_PARAM_SHIFT)       ; // alpha = (1 / 1024)
 
     /* L5E5A */
@@ -277,17 +293,16 @@ void gnss_splitter_init(void)
     CFG_REGS_PTR->CFGREG_SPLIT25_L5E5A_CFG_THRESHOLD_Q = (0x1000 << CFGREG_SPLIT25_L5E5A_CFG_THRESHOLD_Q_MAX_SHIFT) |
                                                          (0x0C00 << CFGREG_SPLIT25_L5E5A_CFG_THRESHOLD_Q_MIN_SHIFT) ;
 
-    // Set carrier frequency to remove -45*1.023MHz when sample freq is 192*1.023MHz -> 2^32 - (45*1.023MHz / 192*1.023MHz) * 2^32 = 1006632960
-    // Signal present at -44*1.023MHz - remaining IF equal to 1.023MHz
+    // Set carrier frequency to remove -46*1.023MHz when sample freq is 96*1.023MHz -> 2^32 - (46*1.023MHz / 96*1.023MHz) * 2^32 = 2236967939
+    // Signal present at -46*1.023MHz - remaining IF equal to 7.301568984985352e-05Hz
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
-    CFG_REGS_PTR->CFGREG_SPLIT25_L5E5A_CFG_CARR_FREQ = 1006632960 << CFGREG_SPLIT25_L5E5A_CFG_CARR_FREQ_STEP_SHIFT;
+    CFG_REGS_PTR->CFGREG_SPLIT25_L5E5A_CFG_CARR_FREQ = 2236967939 << CFGREG_SPLIT25_L5E5A_CFG_CARR_FREQ_STEP_SHIFT;
 
     // Set smooth filter alpha, enable carrier removal and set carrier mode, set decimation to 3
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
-    CFG_REGS_PTR->CFGREG_SPLIT25_L5E5A_CFG = CFGREG_SPLIT25_L5E5A_CFG_DEC_BY_THREE_EN_MASK         | // decimation by 3
-                                           (1 << CFGREG_SPLIT25_L5E5A_CFG_CARR_MODE_SHIFT)         | // carr mode 0
-                                           (1 << CFGREG_SPLIT25_L5E5A_CFG_CARR_ENABLE_SHIFT)       | // carr enable
-                                           (7 << CFGREG_SPLIT25_L5E5A_CFG_LPF_K_PARAM_SHIFT)       ; // alpha = (1 / 1024)
+    CFG_REGS_PTR->CFGREG_SPLIT25_L5E5A_CFG = (0 << CFGREG_SPLIT25_L5E5A_CFG_CARR_MODE_SHIFT)         | // carr mode 0
+                                             (0 << CFGREG_SPLIT25_L5E5A_CFG_CARR_ENABLE_SHIFT)       | // carr enable
+                                             (7 << CFGREG_SPLIT25_L5E5A_CFG_LPF_K_PARAM_SHIFT)       ; // alpha = (1 / 1024)
 
     /* E5B */
 
@@ -301,15 +316,14 @@ void gnss_splitter_init(void)
     CFG_REGS_PTR->CFGREG_SPLIT25_E5B_CFG_THRESHOLD_Q = (0x1000 << CFGREG_SPLIT25_E5B_CFG_THRESHOLD_Q_MAX_SHIFT) |
                                                        (0x0C00 << CFGREG_SPLIT25_E5B_CFG_THRESHOLD_Q_MIN_SHIFT) ;
 
-    // Set carrier frequency to remove 0 when sample freq is 192*1.023MHz -> (0MHz / 192*1.023MHz) * 2^32 = 0
-    // Signal present at -14*1.023MHz - remaining IF equal to -14*1.023MHz
+    // Set carrier frequency to remove -16*1.023MHz when sample freq is 96*1.023MHz -> 2^32 - (16*1.023MHz / 96*1.023MHz) * 2^32 = 3579145219
+    // Signal present at -16*1.023MHz - remaining IF equal to 7.301568984985352e-5Hz
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
-    CFG_REGS_PTR->CFGREG_SPLIT25_E5B_CFG_CARR_FREQ = 0 << CFGREG_SPLIT25_E5B_CFG_CARR_FREQ_STEP_SHIFT;
+    CFG_REGS_PTR->CFGREG_SPLIT25_E5B_CFG_CARR_FREQ = 3579145219 << CFGREG_SPLIT25_E5B_CFG_CARR_FREQ_STEP_SHIFT;
 
     // Set smooth filter alpha, enable carrier removal and set carrier mode, set decimation to 3
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
-    CFG_REGS_PTR->CFGREG_SPLIT25_E5B_CFG = CFGREG_SPLIT25_E5B_CFG_DEC_BY_THREE_EN_MASK           | // decimation by 3
-                                           (1 << CFGREG_SPLIT25_E5B_CFG_CARR_MODE_SHIFT)         | // carr mode 1
+    CFG_REGS_PTR->CFGREG_SPLIT25_E5B_CFG = (0 << CFGREG_SPLIT25_E5B_CFG_CARR_MODE_SHIFT)         | // carr mode 0
                                            (0 << CFGREG_SPLIT25_E5B_CFG_CARR_ENABLE_MASK)        | // disable carrier removal
                                            (7 << CFGREG_SPLIT25_E5B_CFG_LPF_K_PARAM_SHIFT)       ; // alpha = (1 / 1024)
 
@@ -348,21 +362,27 @@ void gnss_afe_regs(void)
     CFGREG_PM_CONF_LDO_ADC_EXT_DECAP_MASK | CFGREG_PM_CONF_LDO_IF_EXT_DECAP_MASK | CFGREG_PM_CONF_LDO_DPLL_EXT_DECAP_MASK |
                             CFGREG_PM_CONF_LDO_APLL_EXT_DECAP_MASK | CFGREG_PM_CONF_LDO_RF_EXT_DECAP_MASK |
                             CFGREG_PM_CONF_LDO_ADC_EN_MASK | CFGREG_PM_CONF_LDO_IF_EN_MASK | CFGREG_PM_CONF_LDO_DPLL_EN_MASK | CFGREG_PM_CONF_LDO_APLL_EN_MASK |
-                            CFGREG_PM_CONF_LDO_RF_EN_MASK;
+                            CFGREG_PM_CONF_LDO_RF_EN_MASK | CFGREG_PM_CONF_IREF_TRIM_SRC_MASK  | CFGREG_PM_CONF_IREF_TRIM_MASK | CFGREG_PM_CONF_BGVR_TRIM_SRC_MASK | CFGREG_PM_CONF_BGVR_TRIM_MASK | CFGREG_PM_CONF_RC_FILTER_MASK;
     //CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
     //CFG_REGS_PTR->CFGREG_SPARE_CONF  = 1;
+
+   CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
+   CFG_REGS_PTR->CFGREG_PM_CONF |= CFGREG_PM_CONF_CAL_EN_MASK;
   
     /* Configure GNSSAFE1 */
 
     /* Configure PLL1 */
-	// Set the prescaler to 2 and multipliaction factor to 5363466 (81.84 * 38.4M/2 ~= 1536*1.023e6, the error is 70 Hz, which is negligable) - hex 0x51d70a, gives ADC freq of 192*1.023e6 when divided by 8
+	// Set the prescaler to 2 and multipliaction factor to 0x51d70a (81.84 * 38.4M/2 ~= 1536*1.023e6, the error is 70 Hz, which is negligable) - hex 0x51d70a, gives ADC freq of 254*1.023e6 when divided by 6
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
-    CFG_REGS_PTR->CFGREG_PLL1_CONF  = CFGREG_PLL1_CONF_EN_MASK | (1 << CFGREG_PLL1_CONF_PRESC_SHIFT) | (0x51d70a << CFGREG_PLL1_CONF_FCW_SHIFT) | CFGREG_PLL1_CONF_ADC_CLK_DIV_MASK;
+    CFG_REGS_PTR->CFGREG_PLL1_CONF  = CFGREG_PLL1_CONF_EN_MASK | (1 << CFGREG_PLL1_CONF_PRESC_SHIFT) | (0x51d70a << CFGREG_PLL1_CONF_FCW_SHIFT);
+    // fif_L1 = 1540*1.023 MHz-flo_l1 = 4*1.023e6
 
     /* Configure LNA125*/
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
     CFG_REGS_PTR->CFGREG_LNA125_CONF = CFGREG_LNA125_CONF_DEF | CFGREG_LNA125_CONF_EN_L1_MASK | CFGREG_LNA125_CONF_EN_L25_MASK | CFGREG_LNA125_CONF_L1_TUNE_SRC_MASK |
                                         CFGREG_LNA125_CONF_L25_TUNE_SRC_MASK;
+    CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
+    CFG_REGS_PTR->CFGREG_LNA125_TUNE_CONF = (0x00FF << CFGREG_LNA125_TUNE_CONF_L1_SHIFT) | (0x00FF << CFGREG_LNA125_TUNE_CONF_L25_SHIFT);
 
     /* Configure BALUN_MIXER1*/
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
@@ -376,14 +396,18 @@ void gnss_afe_regs(void)
 
     /* Configure ADC1 */
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
-    CFG_REGS_PTR->CFGREG_ADC1_CONF = CFGREG_ADC1_CONF_DEF | CFGREG_ADC1_CONF_ADC_EN_MASK | CFGREG_ADC1_CONF_SAH_EN_MASK | (0 << CFGREG_ADC1_CONF_CLK_SEL_SHIFT) | (0 << CFGREG_ADC1_CONF_CLK_CONF_SHIFT) | CFGREG_ADC1_CONF_CAL_EN_MASK;
+    CFG_REGS_PTR->CFGREG_ADC1_CONF = CFGREG_ADC1_CONF_DEF | CFGREG_ADC1_CONF_ADC_EN_MASK | CFGREG_ADC1_CONF_SAH_EN_MASK | (0 << CFGREG_ADC1_CONF_CLK_SEL_SHIFT) | (2 << CFGREG_ADC1_CONF_CLK_CONF_SHIFT);
 
     /* Configure GNSSAFE25 */
 	
-	/* Configure PLL25 */
-	// Set the prescaler to 2 and multipliaction factor to 4169257 (63.61781311035156 * 38.4M/2 ~= 1194*1.023e6, the error is 12 Hz, which is negligable) - hex 0x3f9e29
+    /* Configure PLL25 */
+    // Set the prescaler to 2 and multipliaction factor to 4176240 (ftcxo resulted from L1 PLL1 is 1536/0x51d70a*2=19200000.859145932), flo_l25 = 1223507867.2485292
+    // fif_L5 = 1176450000.0-flo_l25 = -47057867.248529196
+    // fif_E5b = 1207140000.0- flo_l25 = -16367867.248529196
+    // fif_l2 = 1227600000.0-flo_l25 = 4092132.751470804
+    // fif_e6 = 1278750000.0-flo_l25 = 55242132.751470804
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
-    CFG_REGS_PTR->CFGREG_PLL25_CONF  = CFGREG_PLL25_CONF_EN_MASK | (0x3f9e29 << CFGREG_PLL25_CONF_FCW_SHIFT) | CFGREG_PLL25_CONF_ADC_CLK_DIV_MASK;
+    CFG_REGS_PTR->CFGREG_PLL25_CONF  = CFGREG_PLL25_CONF_EN_MASK  | (1 << CFGREG_PLL25_CONF_PRESC_SHIFT) | ((4176240) << CFGREG_PLL25_CONF_FCW_SHIFT) | 0*CFGREG_PLL25_CONF_ADC_CLK_DIV_MASK;
 
     /* Configure BALUN_MIXER25*/
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
@@ -396,7 +420,7 @@ void gnss_afe_regs(void)
                                       CFGREG_IF25_CONF_PGA1_EN_MASK | CFGREG_IF25_CONF_PGA2_EN_MASK                     ;
     /* Configure ADC25 */
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
-    CFG_REGS_PTR->CFGREG_ADC25_CONF = CFGREG_ADC25_CONF_DEF | CFGREG_ADC25_CONF_ADC_EN_MASK | CFGREG_ADC25_CONF_SAH_EN_MASK | (0 << CFGREG_ADC25_CONF_CLK_SEL_SHIFT) | (0 << CFGREG_ADC25_CONF_CLK_CONF_SHIFT) | CFGREG_ADC25_CONF_CAL_EN_MASK;
+    CFG_REGS_PTR->CFGREG_ADC25_CONF = CFGREG_ADC25_CONF_DEF | CFGREG_ADC25_CONF_ADC_EN_MASK | CFGREG_ADC25_CONF_SAH_EN_MASK | (0 << CFGREG_ADC25_CONF_CLK_SEL_SHIFT) | (2 << CFGREG_ADC25_CONF_CLK_CONF_SHIFT);
 
     while( (CFG_REGS_PTR->CFGREG_PM_STAT & CFGREG_PM_STAT_PWR_UP_P_MASK) == 0) ;
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
@@ -404,7 +428,7 @@ void gnss_afe_regs(void)
 
 
     while( (CFG_REGS_PTR->CFGREG_PLL1_STAT & CFGREG_PLL1_STAT_LOCK_MASK) == 0){};
-	while( (CFG_REGS_PTR->CFGREG_PLL25_STAT & CFGREG_PLL25_STAT_LOCK_MASK) == 0){};
+    while( (CFG_REGS_PTR->CFGREG_PLL25_STAT & CFGREG_PLL25_STAT_LOCK_MASK) == 0){};
 }
 
 /**

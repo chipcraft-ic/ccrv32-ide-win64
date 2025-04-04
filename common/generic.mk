@@ -32,8 +32,8 @@
 # File Name : generic.mk
 # Author    : Rafal Harabien
 # ******************************************************************************
-# $Date: 2024-06-18 12:14:03 +0200 (wto, 18 cze 2024) $
-# $Revision: 1067 $
+# $Date: 2024-08-19 09:13:00 +0200 (pon, 19 sie 2024) $
+# $Revision: 1100 $
 #H******************************************************************************
 
 ifeq ($(OS),Windows_NT)
@@ -361,7 +361,7 @@ $(PROGBIN): $(ALL_OBJECTS)
 
 $(PROGSREC): $(PROGBIN)
 	$(ECHO) Generating $@
-	$(Q)$(OBJCOPY) --remove-section=.tohost -O srec $^ $@
+	$(Q)$(OBJCOPY) --remove-section=.tohost --gap-fill 0xFF -O srec $^ $@
 
 size: $(PROGBIN)
 	$(Q)$(SIZE) $(PROGBIN)

@@ -32,8 +32,8 @@
   File Name : specialreg.h
   Author    : Krzysztof Marcinek
   ******************************************************************************
-  $Date: 2024-01-14 21:55:43 +0100 (nie, 14 sty 2024) $
-  $Revision: 1038 $
+  $Date: 2025-03-24 10:59:53 +0100 (Mon, 24 Mar 2025) $
+  $Revision: 1137 $
  ******************************************************************************/
 
 #ifndef _SPECIALREG_H_
@@ -49,6 +49,28 @@
 #define mstackmin               0x07C9       /* Stack Pointer Protection Min. Register           */
 #define mstackmax               0x07CA       /* Stack Pointer Protection Max. Register           */
 #define mromunlock              0x07CD       /* ROM Unlock Register                              */
+
+#define miopmpcfg0              0x08A0      /* ioPMP Configuration Register 0                    */
+#define miopmpcfg1              0x08A1      /* ioPMP Configuration Register 1                    */
+#define miopmpcfg2              0x08A2      /* ioPMP Configuration Register 2                    */
+#define miopmpcfg3              0x08A3      /* ioPMP Configuration Register 3                    */
+
+#define miopmpaddr0             0x08B0      /* ioPMP Configuration Register 0                    */
+#define miopmpaddr1             0x08B1      /* ioPMP Configuration Register 1                    */
+#define miopmpaddr2             0x08B2      /* ioPMP Configuration Register 2                    */
+#define miopmpaddr3             0x08B3      /* ioPMP Configuration Register 3                    */
+#define miopmpaddr4             0x08B4      /* ioPMP Configuration Register 4                    */
+#define miopmpaddr5             0x08B5      /* ioPMP Configuration Register 5                    */
+#define miopmpaddr6             0x08B6      /* ioPMP Configuration Register 6                    */
+#define miopmpaddr7             0x08B7      /* ioPMP Configuration Register 7                    */
+#define miopmpaddr8             0x08B8      /* ioPMP Configuration Register 8                    */
+#define miopmpaddr9             0x08B9      /* ioPMP Configuration Register 9                    */
+#define miopmpaddr10            0x08BA      /* ioPMP Configuration Register 10                   */
+#define miopmpaddr11            0x08BB      /* ioPMP Configuration Register 11                   */
+#define miopmpaddr12            0x08BC      /* ioPMP Configuration Register 12                   */
+#define miopmpaddr13            0x08BD      /* ioPMP Configuration Register 13                   */
+#define miopmpaddr14            0x08BE      /* ioPMP Configuration Register 14                   */
+#define miopmpaddr15            0x08BF      /* ioPMP Configuration Register 15                   */
 
 /*
  * Exception codes definitions
@@ -105,8 +127,22 @@
 #define CACHE_FT_MASK           0x8          /* cache parity/ecc enable mask                     */
 #define CACHE_SC_MASK           0x20         /* cache scrambling enable mask                     */
 #define CACHE_HE_MASK           0x100        /* hard error mask                                  */
+#define CACHE_BM_MASK           0x400        /* store buffer merging mask                        */
+#define CACHE_NM_MASK           0x800        /* NMI mask                                         */
 #define ROM_UNLOCK_KEY          0xA5000000   /* ROM unlock key                                   */
-#define ROM_UNLOCK_VALUE        0x00000001   /* ROM unlock value                                   */
+#define ROM_UNLOCK_VALUE        0x00000001   /* ROM unlock value                                 */
 #define FPU_INIT_MASK           0x4000       /* FPU initial state mask                           */
+
+/*
+ * PMP definitions
+ */
+#define PMP_READ                0x1          /* PMP read mask                                    */
+#define PMP_WRITE               0x2          /* PMP write mask                                   */
+#define PMP_EXEC                0x4          /* PMP execute mask                                 */
+#define PMP_OFF                 0x00         /* PMP OFF mask                                     */
+#define PMP_TOR                 0x08         /* PMP TOR mask                                     */
+#define PMP_NA4                 0x10         /* PMP NA4 mask                                     */
+#define PMP_NAPOT               0x18         /* PMP NAPOT mask                                   */
+#define PMP_LOCKED              0x80         /* PMP locked mask                                  */
 
 #endif /* _SPECIALREG_H_ */

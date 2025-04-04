@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2018 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2024-01-14 21:55:43 +0100 (nie, 14 sty 2024) $
-* $Revision: 1038 $
+* $Date: 2024-09-17 20:06:05 +0200 (wto, 17 wrz 2024) $
+* $Revision: 1107 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -66,6 +66,11 @@ typedef struct
     uint32_t INJECT_MASK_HI;    /*!< Error Injection Mask (FT-only)   */
     uint32_t ERR_ADDR;          /*!< Error Address (FT-only)          */
     uint32_t ERR_STAT;          /*!< Error Statistics (FT-only)       */
+    uint32_t _reserved0[3];
+    uint32_t HIT_CNT;           /*!< Hit Counter Register             */
+    uint32_t MISS_CNT;          /*!< Miss Counter Register            */
+    uint32_t HIT_CNT_BUF;       /*!< Hit Counter Buffer Register      */
+    uint32_t MISS_CNT_BUF;      /*!< Miss Counter Buffer Register     */
 } dcache_regs_t;
 
 static volatile dcache_regs_t * const DCACHE_PTR = (dcache_regs_t*)DCACHE_BASE;
@@ -73,9 +78,10 @@ static volatile dcache_regs_t * const DCACHE_PTR = (dcache_regs_t*)DCACHE_BASE;
 /** DCC Status Register bits */
 enum
 {
+
     DCACHE_STCR_EN                = 1 << 0,  /*!< Data Cache Enable                                             */
     DCACHE_STCR_FLUSH             = 1 << 1,  /*!< Data Cache Flush in Progress (not available in lockstep mode) */
-    DCACHE_STCR_BUSY              = 1 << 2,  /*!< Data Cache Write Buffer Busy (not available in lockstep mode) */
+    DCACHE_STCR_BUSY              = 1 << 2,  /*!< Data Cache Store Buffer Busy (not available in lockstep mode) */
     DCACHE_STCR_ECC_EN            = 1 << 3,  /*!< ECC Enable (FT-only)                                          */
     DCACHE_STCR_ERR_TRIG          = 1 << 4,  /*!< Error Count Trigger (FT-only)                                 */
     DCACHE_STCR_SCRAMBLE_EN       = 1 << 5,  /*!< Scramble Enable (FT-only)                                     */
@@ -83,6 +89,13 @@ enum
     DCACHE_STCR_TAG_ERR_INJECT    = 1 << 7,  /*!< Tag Error Injection Enable (FT-only)                          */
     DCACHE_STCR_HARD_ERR_EN       = 1 << 8,  /*!< Hard error enable (FT-only)                                   */
     DCACHE_STCR_HARD_ERR_FLAG     = 1 << 9,  /*!< Hard error flag (FT-only)                                     */
+    DCACHE_STCR_MERGE_EN          = 1 << 10, /*!< Store Buffer Merging Enable                                   */
+
+    DCACHE_STCR_PERF_EN           = 1 << 24, /*!< Enable Performance Counters                                   */
+    DCACHE_STCR_PERF_UPDATE       = 1 << 25, /*!< Update Performance Counters                                   */
+    DCACHE_STCR_PERF_READY        = 1 << 26, /*!< Performance Counters Ready                                    */
+    DCACHE_STCR_PERF_OVF          = 1 << 27, /*!< Performance Counters Overflow                                 */
+
 };
 
 /** DCC Info Register bit offsets */
@@ -104,7 +117,7 @@ enum
     DCACHE_DCLINE_MASK = 0x0F << DCACHE_DCLINE_SHIFT,  /*!< Data Cache Line Mask           */
     DCACHE_DCALG_MASK  = 0x03 << DCACHE_DCALG_SHIFT,   /*!< Data Cache Algorithm Mask      */
     DCACHE_DCTAG_MASK  = 0x7F << DCACHE_DCTAG_SHIFT,   /*!< Data Cache Tag Mask            */
-	DCACHE_IMPL_MASK   = 0x0F << DCACHE_IMPL_SHIFT,    /*!< Data Cache Implementation Mask */
+    DCACHE_IMPL_MASK   = 0x0F << DCACHE_IMPL_SHIFT,    /*!< Data Cache Implementation Mask */
 };
 
 /** DCC Implementation */

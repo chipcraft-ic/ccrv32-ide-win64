@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2021 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2023-09-25 11:14:06 +0200 (pon, 25 wrz 2023) $
-* $Revision: 1012 $
+* $Date: 2024-09-04 12:09:10 +0200 (śro, 04 wrz 2024) $
+* $Revision: 1104 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -61,6 +61,9 @@ enum
 
 #define AMBA_EDAC_BASE(index) (AMBA_EDAC0_BASE+(index)*0x2000)                  /*!< Main Memory EDAC base address      */
 #define AMBA_EDAC_PTR(index) ((volatile amba_edac_t*)AMBA_EDAC_BASE(index))     /*!< Main Memory EDAC pointer           */
+
+#define AMBA_MBIST_BASE(index) (AMBA_MBIST0_BASE+(index)*0x2000)                /*!< Main Memory MBIST base address     */
+#define AMBA_MBIST_PTR(index) ((volatile amba_mbist_t*)AMBA_MBIST_BASE(index))  /*!< Main Memory MBIST pointer          */
 
 /**
  * @name CCNV2 defines

@@ -32,8 +32,8 @@
 * File Name : max2771.c
 * Author    : Krzysztof Siwiec
 * ******************************************************************************
-* $Date: 2024-04-22 09:02:05 +0200 (pon, 22 kwi 2024) $
-* $Revision: 1049 $
+* $Date: 2025-02-26 14:42:34 +0100 (śro, 26 lut 2025) $
+* $Revision: 1129 $
 *H*****************************************************************************/
 
 #include <stdio.h>
@@ -163,12 +163,104 @@ uint32_t max2771_spi_write(enum max2771_band band, uint32_t address,uint32_t dat
     return 1;
 }
 
+//Perform read operation
+uint32_t max2771_spi_read(enum max2771_band band, uint32_t address)
+{
+
+    uint32_t data = 0;
+
+    uint32_t watchdog_spi = (20000 / (1000000000 / PERIPH0_FREQ)) + 1;
+    while((AMBA_SPI_PTR(MAX2771_SPI_NUM)->STATUS & SPI_STAT_TDRE) == 0 && watchdog_spi > 0 )
+    {
+        watchdog_spi -= 1;
+    }
+    
+    //chip select gpio number for proper band
+    uint8_t max_gpio_cs;
+    switch(band)
+    {
+        case L1E1:
+            max_gpio_cs = MAX2771_L1E1_CS;
+            break;
+        case L5E5:
+            max_gpio_cs = MAX2771_L5E5_CS;
+            break;
+        case L2E6:
+            max_gpio_cs = MAX2771_L2E6_CS;
+            break;
+        default:
+            max_gpio_cs = 0;
+            return 0;
+    }
+
+    //Disable SPI at MAX2771
+    AMBA_GPIO_PTR->OUTSET = 1 << max_gpio_cs;
+
+    //Wait more than 200 ns
+    watchdog_spi = (200 / (1000000000 / PERIPH0_FREQ)) + 1;
+    while(watchdog_spi>0)
+    {
+        watchdog_spi -= 1;
+    }
+
+    //Enable SPI at MAX2771
+    AMBA_GPIO_PTR->OUTCLR = 1 << max_gpio_cs;
+
+    //Send frame
+    //send address
+    AMBA_SPI_PTR(MAX2771_SPI_NUM)->TDR = ((((address & 0x0000000F) << 1) + 1) << 3);
+
+    //wait for transmission end
+    watchdog_spi = (200000 / (1000000000 / PERIPH0_FREQ)) + 1;
+    while((AMBA_SPI_PTR(MAX2771_SPI_NUM)->STATUS & SPI_STAT_TXC) == 0 && watchdog_spi > 0 )
+    {
+        watchdog_spi -= 1;
+    }
+
+    data = AMBA_SPI_PTR(MAX2771_SPI_NUM)->RDR;
+    data = 0;
+
+    //send data MSB
+    AMBA_SPI_PTR(MAX2771_SPI_NUM)->TDR = 0xFFFFFFFF;
+
+    //wait for transmission end
+    watchdog_spi = (200000 / (1000000000 / PERIPH0_FREQ)) + 1;
+    while((AMBA_SPI_PTR(MAX2771_SPI_NUM)->STATUS & SPI_STAT_TXC) == 0 && watchdog_spi > 0 )
+    {
+        watchdog_spi -= 1;
+    }
+
+    data = (AMBA_SPI_PTR(MAX2771_SPI_NUM)->RDR) << 16;
+
+    //send data LSB
+    AMBA_SPI_PTR(MAX2771_SPI_NUM)->TDR = 0xFFFFFFFF;
+
+    //wait for transmission end
+    watchdog_spi = (200000 / (1000000000 / PERIPH0_FREQ)) + 1;
+    while(((AMBA_SPI_PTR(MAX2771_SPI_NUM)->STATUS & SPI_STAT_TXC) == 0) && watchdog_spi > 0 )
+    {
+        watchdog_spi -= 1;
+    }
+
+    data |= AMBA_SPI_PTR(MAX2771_SPI_NUM)->RDR & 0x0000FFFF;
+
+    //Disable SPI at MAX2771
+    AMBA_GPIO_PTR->OUTSET = 1 << max_gpio_cs;
+
+    return data;
+}
+
 //configure band
-uint32_t max2771_conf_band(enum max2771_band band)
+uint32_t max2771_conf_band(enum max2771_band band, uint32_t adc_freq)
 {
 
     bool beidou = false;
     bool glonass = false;
+
+    if ((adc_freq != 16368000) &&(adc_freq != 32736000) && (adc_freq != 65472000))
+    {
+        return -1;
+    }
 
     max2771_gpio_conf();
     max2771_spi_conf();
@@ -184,7 +276,9 @@ uint32_t max2771_conf_band(enum max2771_band band)
                 //write register 2
                 max2771_spi_write(band,0x2,0x0EBFB1DC);
                 //write register 3
-                max2771_spi_write(band,0x3,0x898C0000);
+				if (adc_freq == 16368000) max2771_spi_write(band,0x3,0x698C0000);
+                if (adc_freq == 32736000) max2771_spi_write(band,0x3,0x098C0000);
+                if (adc_freq == 65472000) max2771_spi_write(band,0x3,0x898C0000);
                 //write register 4
                 max2771_spi_write(band,0x4,0x000BE008);
                 //write register 5
@@ -209,7 +303,9 @@ uint32_t max2771_conf_band(enum max2771_band band)
                 //write register 2
                 max2771_spi_write(band,0x2,0x0EBFB1DC);
                 //write register 3
-                max2771_spi_write(band,0x3,0x898C0000);
+				if (adc_freq == 16368000) max2771_spi_write(band,0x3,0x698C0000);
+                if (adc_freq == 32736000) max2771_spi_write(band,0x3,0x098C0000);
+                if (adc_freq == 65472000) max2771_spi_write(band,0x3,0x898C0000);
                 //write register 4
                 max2771_spi_write(band,0x4,0x000C2008);
                 //write register 5
@@ -234,7 +330,9 @@ uint32_t max2771_conf_band(enum max2771_band band)
                 //write register 2
                 max2771_spi_write(band,0x2,0x0EBFB1DC);
                 //write register 3
-                max2771_spi_write(band,0x3,0x898C0000);
+				if (adc_freq == 16368000) max2771_spi_write(band,0x3,0x698C0000);
+                if (adc_freq == 32736000) max2771_spi_write(band,0x3,0x098C0000);
+                if (adc_freq == 65472000) max2771_spi_write(band,0x3,0x898C0000);
                 //write register 4
                 max2771_spi_write(band,0x4,0x000C0008);
                 //write register 5

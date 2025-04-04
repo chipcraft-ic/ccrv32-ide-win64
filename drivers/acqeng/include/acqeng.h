@@ -32,8 +32,8 @@
  * File Name : acqeng.h
  * Author    : Sebastian Cieslak
  * ******************************************************************************
- * $Date: 2022-12-12 15:09:34 +0100 (pon, 12 gru 2022) $
- * $Revision: 936 $
+ * $Date: 2025-03-26 14:59:44 +0100 (Wed, 26 Mar 2025) $
+ * $Revision: 1138 $
  *H*****************************************************************************/
 
 #ifndef _ACQENG_H_
@@ -1460,53 +1460,6 @@ static inline bool acqeng_is_boc_mixer_enabled_from_config(uint32_t config) {
     return config & AEC_CONFIG_BOCMIX;
 }
 
-//-----
-// SPCS
-//-----
-/*! \brief Sets a number of samples per chip (number = (1 << SPCS)).
- *
- * \param acqeng    Base address of the Acquisition Engine instance.
- * \param spc_shift Shift to calculate number of samples per chip.
- *
- * This function additionally checks if a number of samples per chip is in the correct range.
- *
- * \return Operation status.
- *   \retval true  ERROR: Illegal number of samples per chip.
- *   \retval false OK
- */
-bool acqeng_set_samples_per_chip(volatile amba_acqeng_t *acqeng, uint8_t spc_shift);
-
-/*! \brief Sets a number of samples per chip (number = (1 << SPCS)).
- *
- * \param acqeng    Base address of the Acquisition Engine instance.
- * \param spc_shift Shift to calculate number of samples per chip.
- *
- * Be aware, this function does not check if a number of samples per chip is in the legal range.
- */
-static inline void _acqeng_set_samples_per_chip(volatile amba_acqeng_t *acqeng, uint8_t spc_shift) {
-    acqeng->CONFIG = (acqeng->CONFIG & ~AEC_CONFIG_SPCS_MASK) | ((spc_shift << AEC_CONFIG_SPCS_SHIFT) & AEC_CONFIG_SPCS_MASK);
-}
-
-/*! \brief Returns a number of samples per chip (number = (1 << SPCS)).
- *
- * \param acqeng Base address of the Acquisition Engine instance.
- *
- * \return \c Number of samples per chip (number = (1 << SPCS)).
- */
-static inline uint8_t acqeng_get_samples_per_chip(volatile amba_acqeng_t *acqeng) {
-    return (acqeng->CONFIG & AEC_CONFIG_SPCS_MASK) >> AEC_CONFIG_SPCS_SHIFT;
-}
-
-/*! \brief Returns a number of samples per chip (number = (1 << SPCS)).
- *
- * \param config Content of the configuration register.
- *
- * \return \c Number of samples per chip (number = (1 << SPCS)).
- */
-static inline uint8_t acqeng_get_samples_per_chip_from_config(uint32_t config) {
-    return (config & AEC_CONFIG_SPCS_MASK) >> AEC_CONFIG_SPCS_SHIFT;
-}
-
 //-------
 // CYCLIC
 //-------
@@ -1655,6 +1608,7 @@ static inline bool acqeng_is_always_fine_enabled_from_config(uint32_t config) {
 //------
 // Mixed
 //------
+
 /* \brief Sets configuration for GPS L1 with carrier mixer enabled.
  *
  * \param acqeng    Base address of the Acquisition Engine instance.
@@ -1664,6 +1618,24 @@ static inline void acqeng_enable_gps_l1_mixer(volatile amba_acqeng_t *acqeng, ui
     acqeng->CONFIG = AEC_CONFIG_GPS | AEC_CONFIG_L1E1F | AEC_CONFIG_MIXER | ((carr_mode << AEC_CONFIG_CARRM_SHIFT) & AEC_CONFIG_CARRM_MASK);
 }
 
+/* \brief Sets configuration for GPS L5 with carrier mixer enabled.
+ *
+ * \param acqeng    Base address of the Acquisition Engine instance.
+ * \param carr_mode Carrier mode.
+ */
+static inline void acqeng_enable_gps_l5_mixer(volatile amba_acqeng_t *acqeng, uint8_t carr_mode) {
+    acqeng->CONFIG = AEC_CONFIG_GPS | AEC_CONFIG_L5E5AF | AEC_CONFIG_MIXER | ((carr_mode << AEC_CONFIG_CARRM_SHIFT) & AEC_CONFIG_CARRM_MASK);
+}
+
+/* \brief Sets configuration for GPS L2C with carrier mixer enabled.
+ *
+ * \param acqeng    Base address of the Acquisition Engine instance.
+ * \param carr_mode Carrier mode.
+ */
+static inline void acqeng_enable_gps_l2c_mixer(volatile amba_acqeng_t *acqeng, uint8_t carr_mode) {
+    acqeng->CONFIG = AEC_CONFIG_GPS | AEC_CONFIG_L2F | AEC_CONFIG_MIXER | ((carr_mode << AEC_CONFIG_CARRM_SHIFT) & AEC_CONFIG_CARRM_MASK);
+}
+
 /* \brief Sets configuration for Galileo E1 with carrier mixer and BOC mixer enabled.
  *
  * \param acqeng    Base address of the Acquisition Engine instance.
@@ -1671,6 +1643,15 @@ static inline void acqeng_enable_gps_l1_mixer(volatile amba_acqeng_t *acqeng, ui
  */
 static inline void acqeng_enable_galileo_e1_mixer(volatile amba_acqeng_t *acqeng, uint8_t carr_mode) {
     acqeng->CONFIG = AEC_CONFIG_GALIL | AEC_CONFIG_L1E1F | AEC_CONFIG_MIXER | ((carr_mode << AEC_CONFIG_CARRM_SHIFT) & AEC_CONFIG_CARRM_MASK) | AEC_CONFIG_BOCMIX;
+}
+
+/* \brief Sets configuration for GAL E5a with carrier mixer enabled.
+ *
+ * \param acqeng    Base address of the Acquisition Engine instance.
+ * \param carr_mode Carrier mode.
+ */
+static inline void acqeng_enable_galileo_e5a_mixer(volatile amba_acqeng_t *acqeng, uint8_t carr_mode) {
+    acqeng->CONFIG = AEC_CONFIG_GALIL | AEC_CONFIG_L5E5AF | AEC_CONFIG_MIXER | ((carr_mode << AEC_CONFIG_CARRM_SHIFT) & AEC_CONFIG_CARRM_MASK);
 }
 
 /* \brief Sets configuration for GLONASS L1 with carrier mixer enabled.
@@ -1687,8 +1668,17 @@ static inline void acqeng_enable_glonass_l1_mixer(volatile amba_acqeng_t *acqeng
  * \param acqeng    Base address of the Acquisition Engine instance.
  * \param carr_mode Carrier mode.
  */
-static inline void acqeng_enable_beidou_mixer(volatile amba_acqeng_t *acqeng, uint8_t carr_mode) {
-    acqeng->CONFIG = AEC_CONFIG_BEID | AEC_CONFIG_MIXER | ((carr_mode << AEC_CONFIG_CARRM_SHIFT) & AEC_CONFIG_CARRM_MASK);
+static inline void acqeng_enable_beidou_b1_mixer(volatile amba_acqeng_t *acqeng, uint8_t carr_mode) {
+    acqeng->CONFIG = AEC_CONFIG_BEID | AEC_CONFIG_L1E1F | AEC_CONFIG_MIXER | ((carr_mode << AEC_CONFIG_CARRM_SHIFT) & AEC_CONFIG_CARRM_MASK);
+}
+
+/* \brief Sets configuration for Beidou B2a with carrier mixer enabled.
+ *
+ * \param acqeng    Base address of the Acquisition Engine instance.
+ * \param carr_mode Carrier mode.
+ */
+static inline void acqeng_enable_beidou_b2a_mixer(volatile amba_acqeng_t *acqeng, uint8_t carr_mode) {
+    acqeng->CONFIG = AEC_CONFIG_BEID | AEC_CONFIG_L5E5AF | AEC_CONFIG_MIXER | ((carr_mode << AEC_CONFIG_CARRM_SHIFT) & AEC_CONFIG_CARRM_MASK);
 }
 
 /* \brief Sets configuration for SBAS L1 with carrier mixer enabled.
@@ -1718,40 +1708,85 @@ static inline void acqeng_enable_qzss_l1_mixer(volatile amba_acqeng_t *acqeng, u
     acqeng->CONFIG = AEC_CONFIG_QZSS | AEC_CONFIG_L1E1F | AEC_CONFIG_MIXER | ((carr_mode << AEC_CONFIG_CARRM_SHIFT) & AEC_CONFIG_CARRM_MASK);
 }
 
-/* \brief Sets configuration for auto mode for GPS L1 with carrier mixer enabled.
+/* \brief Sets configuration for QZSS L5 with carrier mixer enabled.
  *
  * \param acqeng    Base address of the Acquisition Engine instance.
  * \param carr_mode Carrier mode.
- * \param spc_shift Samples per Chip as Shift.
+ */
+static inline void acqeng_enable_qzss_l5_mixer(volatile amba_acqeng_t *acqeng, uint8_t carr_mode) {
+    acqeng->CONFIG = AEC_CONFIG_QZSS | AEC_CONFIG_L5E5AF | AEC_CONFIG_MIXER | ((carr_mode << AEC_CONFIG_CARRM_SHIFT) & AEC_CONFIG_CARRM_MASK);
+}
+
+/* \brief Sets configuration for auto mode for GPS L1 with carrier mixer enabled.
+ *
+ * \param acqeng     Base address of the Acquisition Engine instance.
+ * \param carr_mode  Carrier mode.
+ * \param rclb_shift Real Code Length Base as Shift.
+ * \param is_cyclic  Cyclic Data enable.
+ */
+static inline void acqeng_enable_auto_gps_l1_mixer(volatile amba_acqeng_t *acqeng, uint8_t carr_mode, uint8_t rclb_shift, bool is_cyclic, bool always_fine) {
+    acqeng->CONFIG = AEC_CONFIG_AUTO | AEC_CONFIG_GPS | AEC_CONFIG_L1E1F | AEC_CONFIG_MIXER | ((carr_mode << AEC_CONFIG_CARRM_SHIFT) & AEC_CONFIG_CARRM_MASK) |
+                     ((rclb_shift << AEC_CONFIG_RCLB_SHIFT) & AEC_CONFIG_RCLB_MASK) | (is_cyclic ? AEC_CONFIG_CYCLIC : 0) | (always_fine ? AEC_CONFIG_ALWFINE : 0);
+}
+
+/* \brief Sets configuration for auto mode for GPS L2C with carrier mixer enabled.
+ *
+ * \param acqeng    Base address of the Acquisition Engine instance.
+ * \param carr_mode Carrier mode.
+ * \param rclb_shift Real Code Length Base as Shift.
  * \param is_cyclic Cyclic Data enable.
  */
-static inline void acqeng_enable_auto_gps_l1_mixer(volatile amba_acqeng_t *acqeng, uint8_t carr_mode, uint8_t spc_shift, bool is_cyclic, bool always_fine) {
-    acqeng->CONFIG = AEC_CONFIG_AUTO | AEC_CONFIG_GPS | AEC_CONFIG_L1E1F | AEC_CONFIG_MIXER | ((carr_mode << AEC_CONFIG_CARRM_SHIFT) & AEC_CONFIG_CARRM_MASK) |
-                     ((spc_shift << AEC_CONFIG_SPCS_SHIFT) & AEC_CONFIG_SPCS_MASK) | (is_cyclic ? AEC_CONFIG_CYCLIC : 0) | (always_fine ? AEC_CONFIG_ALWFINE : 0);
+static inline void acqeng_enable_auto_gps_l2c_mixer(volatile amba_acqeng_t *acqeng, uint8_t carr_mode, uint8_t rclb_shift, bool is_cyclic, bool always_fine) {
+    acqeng->CONFIG = AEC_CONFIG_AUTO | AEC_CONFIG_GPS | AEC_CONFIG_L2F | AEC_CONFIG_MIXER | ((carr_mode << AEC_CONFIG_CARRM_SHIFT) & AEC_CONFIG_CARRM_MASK) |
+                     ((rclb_shift << AEC_CONFIG_RCLB_SHIFT) & AEC_CONFIG_RCLB_MASK) | (is_cyclic ? AEC_CONFIG_CYCLIC : 0) | (always_fine ? AEC_CONFIG_ALWFINE : 0);
+}
+
+/* \brief Sets configuration for auto mode for GPS L5 with carrier mixer enabled.
+ *
+ * \param acqeng    Base address of the Acquisition Engine instance.
+ * \param carr_mode Carrier mode.
+ * \param rclb_shift Real Code Length Base as Shift.
+ * \param is_cyclic Cyclic Data enable.
+ */
+static inline void acqeng_enable_auto_gps_l5_mixer(volatile amba_acqeng_t *acqeng, uint8_t carr_mode, uint8_t rclb_shift, bool is_cyclic, bool always_fine) {
+    acqeng->CONFIG = AEC_CONFIG_AUTO | AEC_CONFIG_GPS | AEC_CONFIG_L5E5AF | AEC_CONFIG_MIXER | ((carr_mode << AEC_CONFIG_CARRM_SHIFT) & AEC_CONFIG_CARRM_MASK) |
+                     ((rclb_shift << AEC_CONFIG_RCLB_SHIFT) & AEC_CONFIG_RCLB_MASK) | (is_cyclic ? AEC_CONFIG_CYCLIC : 0) | (always_fine ? AEC_CONFIG_ALWFINE : 0);
 }
 
 /* \brief Sets configuration for auto mode for Galileo E1 with carrier mixer and BOC mixer enabled.
  *
  * \param acqeng    Base address of the Acquisition Engine instance.
  * \param carr_mode Carrier mode.
- * \param spc_shift Samples per Chip as Shift.
+ * \param rclb_shift Real Code Length Base as Shift.
  * \param is_cyclic Cyclic Data enable.
  */
-static inline void acqeng_enable_auto_galileo_e1_mixer(volatile amba_acqeng_t *acqeng, uint8_t carr_mode, uint8_t spc_shift, bool is_cyclic, bool always_fine) {
+static inline void acqeng_enable_auto_galileo_e1_mixer(volatile amba_acqeng_t *acqeng, uint8_t carr_mode, uint8_t rclb_shift, bool is_cyclic, bool always_fine) {
     acqeng->CONFIG = AEC_CONFIG_AUTO | AEC_CONFIG_GALIL | AEC_CONFIG_L1E1F | AEC_CONFIG_MIXER | ((carr_mode << AEC_CONFIG_CARRM_SHIFT) & AEC_CONFIG_CARRM_MASK) |
-                     AEC_CONFIG_BOCMIX | ((spc_shift << AEC_CONFIG_SPCS_SHIFT) & AEC_CONFIG_SPCS_MASK) | (is_cyclic ? AEC_CONFIG_CYCLIC : 0) | (always_fine ? AEC_CONFIG_ALWFINE : 0);
+                     AEC_CONFIG_BOCMIX | ((rclb_shift << AEC_CONFIG_RCLB_SHIFT) & AEC_CONFIG_RCLB_MASK) | (is_cyclic ? AEC_CONFIG_CYCLIC : 0) | (always_fine ? AEC_CONFIG_ALWFINE : 0);
+}
+
+/* \brief Sets configuration for auto mode for Galileo E5a with carrier mixer and BOC mixer enabled.
+ *
+ * \param acqeng    Base address of the Acquisition Engine instance.
+ * \param carr_mode Carrier mode.
+ * \param rclb_shift Real Code Length Base as Shift.
+ * \param is_cyclic Cyclic Data enable.
+ */
+static inline void acqeng_enable_auto_galileo_e5a_mixer(volatile amba_acqeng_t *acqeng, uint8_t carr_mode, uint8_t rclb_shift, bool is_cyclic, bool always_fine) {
+    acqeng->CONFIG = AEC_CONFIG_AUTO | AEC_CONFIG_GALIL | AEC_CONFIG_L5E5AF | AEC_CONFIG_MIXER | ((carr_mode << AEC_CONFIG_CARRM_SHIFT) & AEC_CONFIG_CARRM_MASK) |
+                     ((rclb_shift << AEC_CONFIG_RCLB_SHIFT) & AEC_CONFIG_RCLB_MASK) | (is_cyclic ? AEC_CONFIG_CYCLIC : 0) | (always_fine ? AEC_CONFIG_ALWFINE : 0);
 }
 
 /* \brief Sets configuration for auto mode for GLONASS L1 with carrier mixer enabled.
  *
  * \param acqeng    Base address of the Acquisition Engine instance.
  * \param carr_mode Carrier mode.
- * \param spc_shift Samples per Chip as Shift.
+ * \param rclb_shift Real Code Length Base as Shift.
  * \param is_cyclic Cyclic Data enable.
  */
-static inline void acqeng_enable_auto_glonass_l1_mixer(volatile amba_acqeng_t *acqeng, uint8_t carr_mode, uint8_t spc_shift, bool is_cyclic, bool always_fine) {
+static inline void acqeng_enable_auto_glonass_l1_mixer(volatile amba_acqeng_t *acqeng, uint8_t carr_mode, uint8_t rclb_shift, bool is_cyclic, bool always_fine) {
     acqeng->CONFIG = AEC_CONFIG_AUTO | AEC_CONFIG_GLONA | AEC_CONFIG_L1E1F | AEC_CONFIG_MIXER | ((carr_mode << AEC_CONFIG_CARRM_SHIFT) & AEC_CONFIG_CARRM_MASK) |
-                     ((spc_shift << AEC_CONFIG_SPCS_SHIFT) & AEC_CONFIG_SPCS_MASK) | (is_cyclic ? AEC_CONFIG_CYCLIC : 0) | (always_fine ? AEC_CONFIG_ALWFINE : 0);
+                     ((rclb_shift << AEC_CONFIG_RCLB_SHIFT) & AEC_CONFIG_RCLB_MASK) | (is_cyclic ? AEC_CONFIG_CYCLIC : 0) | (always_fine ? AEC_CONFIG_ALWFINE : 0);
 }
 
 /* \brief Sets configuration for auto mode for Beidou with carrier mixer enabled.
@@ -1759,47 +1794,48 @@ static inline void acqeng_enable_auto_glonass_l1_mixer(volatile amba_acqeng_t *a
  * \param acqeng    Base address of the Acquisition Engine instance.
  * \param carr_mode Carrier mode.
  * \param spc_shift Samples per Chip as Shift.
+ * \param rclb_shift Real Code Length Base as Shift.
  * \param is_cyclic Cyclic Data enable
  */
-static inline void acqeng_enable_auto_beidou_mixer(volatile amba_acqeng_t *acqeng, uint8_t carr_mode, uint8_t spc_shift, bool is_cyclic, bool always_fine) {
-    acqeng->CONFIG = AEC_CONFIG_AUTO | AEC_CONFIG_BEID | AEC_CONFIG_MIXER | ((carr_mode << AEC_CONFIG_CARRM_SHIFT) & AEC_CONFIG_CARRM_MASK) |
-                     ((spc_shift << AEC_CONFIG_SPCS_SHIFT) & AEC_CONFIG_SPCS_MASK) | (is_cyclic ? AEC_CONFIG_CYCLIC : 0) | (always_fine ? AEC_CONFIG_ALWFINE : 0);
+static inline void acqeng_enable_auto_beidou_b1_mixer(volatile amba_acqeng_t *acqeng, uint8_t carr_mode, uint8_t rclb_shift, bool is_cyclic, bool always_fine) {
+    acqeng->CONFIG = AEC_CONFIG_AUTO | AEC_CONFIG_BEID | AEC_CONFIG_L1E1F | AEC_CONFIG_MIXER | ((carr_mode << AEC_CONFIG_CARRM_SHIFT) & AEC_CONFIG_CARRM_MASK) |
+                     ((rclb_shift << AEC_CONFIG_RCLB_SHIFT) & AEC_CONFIG_RCLB_MASK) | (is_cyclic ? AEC_CONFIG_CYCLIC : 0) | (always_fine ? AEC_CONFIG_ALWFINE : 0);
 }
 
 /* \brief Sets configuration for auto mode for SBAS L1 with carrier mixer enabled.
  *
  * \param acqeng    Base address of the Acquisition Engine instance.
  * \param carr_mode Carrier mode.
- * \param spc_shift Samples per Chip as Shift.
+ * \param rclb_shift Real Code Length Base as Shift.
  * \param is_cyclic Cyclic Data enable.
  */
-static inline void acqeng_enable_auto_sbas_l1_mixer(volatile amba_acqeng_t *acqeng, uint8_t carr_mode, uint8_t spc_shift, bool is_cyclic, bool always_fine) {
+static inline void acqeng_enable_auto_sbas_l1_mixer(volatile amba_acqeng_t *acqeng, uint8_t carr_mode, uint8_t rclb_shift, bool is_cyclic, bool always_fine) {
     acqeng->CONFIG = AEC_CONFIG_AUTO | AEC_CONFIG_SBAS | AEC_CONFIG_L1E1F | AEC_CONFIG_MIXER | ((carr_mode << AEC_CONFIG_CARRM_SHIFT) & AEC_CONFIG_CARRM_MASK) |
-                     ((spc_shift << AEC_CONFIG_SPCS_SHIFT) & AEC_CONFIG_SPCS_MASK) | (is_cyclic ? AEC_CONFIG_CYCLIC : 0) | (always_fine ? AEC_CONFIG_ALWFINE : 0);
+                     ((rclb_shift << AEC_CONFIG_RCLB_SHIFT) & AEC_CONFIG_RCLB_MASK) | (is_cyclic ? AEC_CONFIG_CYCLIC : 0) | (always_fine ? AEC_CONFIG_ALWFINE : 0);
 }
 
 /* \brief Sets configuration for auto mode for NavIC L5 with carrier mixer enabled.
  *
  * \param acqeng    Base address of the Acquisition Engine instance.
  * \param carr_mode Carrier mode.
- * \param spc_shift Samples per Chip as Shift.
+ * \param rclb_shift Real Code Length Base as Shift.
  * \param is_cyclic Cyclic Data enable.
  */
-static inline void acqeng_enable_auto_navic_l5_mixer(volatile amba_acqeng_t *acqeng, uint8_t carr_mode, uint8_t spc_shift, bool is_cyclic, bool always_fine) {
+static inline void acqeng_enable_auto_navic_l5_mixer(volatile amba_acqeng_t *acqeng, uint8_t carr_mode, uint8_t rclb_shift, bool is_cyclic, bool always_fine) {
     acqeng->CONFIG = AEC_CONFIG_AUTO | AEC_CONFIG_NAVIC | AEC_CONFIG_L5E5AF | AEC_CONFIG_MIXER | ((carr_mode << AEC_CONFIG_CARRM_SHIFT) & AEC_CONFIG_CARRM_MASK) |
-                     ((spc_shift << AEC_CONFIG_SPCS_SHIFT) & AEC_CONFIG_SPCS_MASK) | (is_cyclic ? AEC_CONFIG_CYCLIC : 0) | (always_fine ? AEC_CONFIG_ALWFINE : 0);
+                     ((rclb_shift << AEC_CONFIG_RCLB_SHIFT) & AEC_CONFIG_RCLB_MASK) | (is_cyclic ? AEC_CONFIG_CYCLIC : 0) | (always_fine ? AEC_CONFIG_ALWFINE : 0);
 }
 
 /* \brief Sets configuration for auto mode for QZSS L1 with carrier mixer enabled.
  *
  * \param acqeng    Base address of the Acquisition Engine instance.
  * \param carr_mode Carrier mode.
- * \param spc_shift Samples per Chip as Shift.
+ * \param rclb_shift Real Code Length Base as Shift.
  * \param is_cyclic Cyclic Data enable.
  */
-static inline void acqeng_enable_auto_qzss_l1_mixer(volatile amba_acqeng_t *acqeng, uint8_t carr_mode, uint8_t spc_shift, bool is_cyclic, bool always_fine) {
+static inline void acqeng_enable_auto_qzss_l1_mixer(volatile amba_acqeng_t *acqeng, uint8_t carr_mode, uint8_t rclb_shift, bool is_cyclic, bool always_fine) {
     acqeng->CONFIG = AEC_CONFIG_AUTO | AEC_CONFIG_QZSS | AEC_CONFIG_L1E1F | AEC_CONFIG_MIXER | ((carr_mode << AEC_CONFIG_CARRM_SHIFT) & AEC_CONFIG_CARRM_MASK) |
-                     ((spc_shift << AEC_CONFIG_SPCS_SHIFT) & AEC_CONFIG_SPCS_MASK) | (is_cyclic ? AEC_CONFIG_CYCLIC : 0) | (always_fine ? AEC_CONFIG_ALWFINE : 0);
+                     ((rclb_shift << AEC_CONFIG_RCLB_SHIFT) & AEC_CONFIG_RCLB_MASK) | (is_cyclic ? AEC_CONFIG_CYCLIC : 0) | (always_fine ? AEC_CONFIG_ALWFINE : 0);
 }
 
 //------------------------------------------------------------------------------
@@ -2004,27 +2040,6 @@ static inline uint32_t acqeng_get_prn_freq(volatile amba_acqeng_t *acqeng) {
 //------------------------------------------------------------------------------
 // CFG_POST
 //------------------------------------------------------------------------------
-//----
-// All
-//----
-/*! \brief Sets a post-processing configuration register.
- *
- * \param acqeng          Base address of the Acquisition Engine instance.
- * \param post_processing Post-processing configuration.
- */
-static inline void acqeng_set_post_processing(volatile amba_acqeng_t *acqeng, uint32_t post_processing) {
-    acqeng->CFG_POST = post_processing;
-}
-
-/*! \brief Returns a post-processing configuration register.
- *
- * \param acqeng Base address of the Acquisition Engine instance.
- *
- * \return \c Post-processing configuration.
- */
-static inline uint32_t acqeng_get_post_processing(volatile amba_acqeng_t *acqeng) {
-    return acqeng->CFG_POST;
-}
 
 //-------
 // PERIOD
@@ -2061,33 +2076,13 @@ static inline uint16_t acqeng_get_post_processing_period_from_post_processing(ui
 //--------
 // NPERCOH
 //--------
-/*! \brief Sets a number of periods to accumulate coherently (number = (1 << NPERCOH)).
+/*! \brief Sets a number of periods to accumulate coherently.
  *
  * \param acqeng       Base address of the Acquisition Engine instance.
- * \param shift_number Shift to calculate number of accumulations.
+ * \param shift_number Number of accumulations.
  */
-static inline void acqeng_set_number_of_coh_periods(volatile amba_acqeng_t *acqeng, uint8_t shift_number) {
-    acqeng->CFG_POST = (acqeng->CFG_POST & ~AEC_CFG_POST_NPERCOH_MASK) | ((shift_number << AEC_CFG_POST_NPERCOH_SHIFT) & AEC_CFG_POST_NPERCOH_MASK);
-}
-
-/*! \brief Returns a number of periods to accumulate coherently (number = (1 << NPERCOH)).
- *
- * \param acqeng Base address of the Acquisition Engine instance.
- *
- * \return \c Number of periods to accumulate coherently.
- */
-static inline uint8_t acqeng_get_number_of_coh_periods(volatile amba_acqeng_t *acqeng) {
-    return (acqeng->CFG_POST & AEC_CFG_POST_NPERCOH_MASK) >> AEC_CFG_POST_NPERCOH_SHIFT;
-}
-
-/*! \brief Returns a number of periods to accumulate coherently (number = (1 << NPERCOH)).
- *
- * \param post_processing Content of the post-processing configuration register.
- *
- * \return \c Number of periods to accumulate coherently.
- */
-static inline uint8_t acqeng_get_number_of_coh_periods_from_post_processing(uint32_t post_processing) {
-    return (post_processing & AEC_CFG_POST_NPERCOH_MASK) >> AEC_CFG_POST_NPERCOH_SHIFT;
+static inline void acqeng_set_number_of_coh_periods(volatile amba_acqeng_t *acqeng, uint8_t number) {
+    acqeng->CFG_POST = (acqeng->CFG_POST & ~AEC_CFG_POST_NPERCOH_MASK) | ((number << AEC_CFG_POST_NPERCOH_SHIFT) & AEC_CFG_POST_NPERCOH_MASK);
 }
 
 //---------
@@ -2472,6 +2467,18 @@ static inline bool acqeng_has_qzss_l1ca_prn_gen_from_info(uint32_t info) {
     return info & AEC_INFO_QZSS_L1CA;
 }
 
+/*! \brief Tests if info indicates that the Acquisition Engine has a QZSS L5 PRN generator.
+ *
+ * \param info Content of the info register.
+ *
+ * \return Value of the QZSS L5 bit.
+ *   \retval true  QZSS L5 PRN generator is present.
+ *   \retval false QZSS L5 PRN generator is not present.
+ */
+static inline bool acqeng_has_qzss_l5_prn_gen_from_info(uint32_t info) {
+    return info & AEC_INFO_QZSS_L5;
+}
+
 //-----
 // BEID_B1I
 //-----
@@ -2497,6 +2504,30 @@ static inline bool acqeng_has_beidou_b1i_prn_gen(volatile amba_acqeng_t *acqeng)
  */
 static inline bool acqeng_has_beidou_b1i_prn_gen_from_info(uint32_t info) {
     return info & AEC_INFO_BEID_B1I;
+}
+
+/*! \brief Tests if info indicates that the Acquisition Engine has a Beidou B3I PRN generator.
+ *
+ * \param info Content of the info register.
+ *
+ * \return Value of the BEID_B3I bit.
+ *   \retval true  Beidou B3I PRN generator is present.
+ *   \retval false Beidou B3I PRN generator is not present.
+ */
+static inline bool acqeng_has_beidou_b3i_prn_gen_from_info(uint32_t info) {
+    return info & AEC_INFO_BEID_B3I;
+}
+
+/*! \brief Tests if info indicates that the Acquisition Engine has a Beidou B2a PRN generator.
+ *
+ * \param info Content of the info register.
+ *
+ * \return Value of the BEID_B2a bit.
+ *   \retval true  Beidou B2a PRN generator is present.
+ *   \retval false Beidou B2a PRN generator is not present.
+ */
+static inline bool acqeng_has_beidou_b2a_prn_gen_from_info(uint32_t info) {
+    return info & AEC_INFO_BEID_B2A;
 }
 
 //---------

@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2018 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2021-11-03 11:41:26 +0100 (śro, 03 lis 2021) $
-* $Revision: 782 $
+* $Date: 2024-10-15 20:09:44 +0200 (wto, 15 paź 2024) $
+* $Revision: 1112 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -33,10 +33,15 @@
 * POSSIBILITY OF SUCH DAMAGE.
  * -------------------------------------------------------------------- */
 
+#include <ccrv32.h>
+#include <ccrv32-csr.h>
+
 /**
  * @brief Initialize the simulation board
  */
-void board_init(void){}
+void board_init(void){
+    csr_write(mromunlock,CSR_ROM_UNLOCK_KEY); // to pass regression simulations
+}
 
 /**
  * @brief Initialize the simulation hardware

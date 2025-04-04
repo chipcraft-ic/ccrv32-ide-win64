@@ -1,0 +1,1799 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- External Memory Controller -->
+<peripheral>
+  <name>MEMCTRL</name>
+  <description>External Memory Controller</description>
+  <baseAddress>0xE1001000</baseAddress>
+  <addressBlock>
+    <offset>0</offset>
+    <size>0x300</size>
+    <usage>registers</usage>
+  </addressBlock>
+  <registers>
+
+    <register>
+      <name>STATUS</name>
+      <description>Status Register</description>
+      <addressOffset>0x0</addressOffset>
+      <access>read-only</access>
+      <fields>
+        <field>
+          <name>BUSY</name>
+          <description>Bypass Command in Progress</description>
+          <bitRange>[0:0]</bitRange>
+        </field>
+        <field>
+          <name>ADDR_ERR</name>
+          <description>Address Error</description>
+          <bitRange>[1:1]</bitRange>
+        </field>
+        <field>
+          <name>NOT_INIT</name>
+          <description>Controller Not Initialized</description>
+          <bitRange>[2:2]</bitRange>
+        </field>
+        <field>
+          <name>HB_RD_DATA</name>
+          <description>Bypass Data Output</description>
+          <bitRange>[31:16]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>CONF</name>
+      <description>Configuration Register</description>
+      <addressOffset>0x4</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>CS</name>
+          <description>Chip Select</description>
+          <bitRange>[7:0]</bitRange>
+        </field>
+        <field>
+          <name>CS_OVR</name>
+          <description>Device Chip Select Override</description>
+          <bitRange>[8:8]</bitRange>
+        </field>
+        <field>
+          <name>CS_ENA</name>
+          <description>Device Chip Select Enable</description>
+          <bitRange>[9:9]</bitRange>
+        </field>
+        <field>
+          <name>CK_ENA</name>
+          <description>Device CLock Enable</description>
+          <bitRange>[10:10]</bitRange>
+        </field>
+        <field>
+          <name>BURST_LIM</name>
+          <description>Burst Size Limit</description>
+          <bitRange>[13:12]</bitRange>
+          <enumeratedValues>
+            <enumeratedValue>
+              <name>16_BEAT</name>
+              <description>Max 16-beats burt</description>
+              <value>0x0</value>
+            </enumeratedValue>
+            <enumeratedValue>
+              <name>8_BEAT</name>
+              <description>Max 8-beats burt</description>
+              <value>0x1</value>
+            </enumeratedValue>
+            <enumeratedValue>
+              <name>4_BEAT</name>
+              <description>Max 4-beats burt</description>
+              <value>0x2</value>
+            </enumeratedValue>
+          </enumeratedValues>
+        </field>
+        <field>
+          <name>PRESC</name>
+          <description>Device Clock prescaler</description>
+          <bitRange>[27:16]</bitRange>
+        </field>
+        <field>
+          <name>CLK_REQ</name>
+          <description>Clock Request</description>
+          <bitRange>[31:31]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>COMMAND</name>
+      <description>Command Register</description>
+      <addressOffset>0x8</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>HB_READ</name>
+          <description>HyperBus Read</description>
+          <bitRange>[0:0]</bitRange>
+        </field>
+        <field>
+          <name>HB_WRITE</name>
+          <description>HyperBus Write</description>
+          <bitRange>[1:1]</bitRange>
+        </field>
+        <field>
+          <name>HB_WRITE_ZD</name>
+          <description>HyperBus Write Zero-Delay</description>
+          <bitRange>[2:2]</bitRange>
+        </field>
+        <field>
+          <name>SPI_READ</name>
+          <description>SPI Read</description>
+          <bitRange>[3:3]</bitRange>
+        </field>
+        <field>
+          <name>SPI_WRITE</name>
+          <description>SPI Write</description>
+          <bitRange>[4:4]</bitRange>
+        </field>
+        <field>
+          <name>SPI_CMD_CNT</name>
+          <description>SPI Command Bytes</description>
+          <bitRange>[10:8]</bitRange>
+        </field>
+        <field>
+          <name>SPI_DUM_CNT</name>
+          <description>SPI Dummy Count</description>
+          <bitRange>[16:11]</bitRange>
+        </field>
+        <field>
+          <name>SPI_DAT_CNT</name>
+          <description>SPI Data Count</description>
+          <bitRange>[22:17]</bitRange>
+        </field>
+        <field>
+          <name>CS_HOLD</name>
+          <description>Chip Select Hold</description>
+          <bitRange>[31:31]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>COMM_DATA_0</name>
+      <description>Command Daa Register 0</description>
+      <addressOffset>0x40</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>COMM_DATA_1</name>
+      <description>Command Daa Register 1</description>
+      <addressOffset>0x44</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>DEVICE_DATA</name>
+      <description>Device Data Register</description>
+      <addressOffset>0x48</addressOffset>
+      <access>read-only</access>
+    </register>
+
+    <register>
+      <dim>8</dim>
+      <dimIncrement>4</dimIncrement>
+      <name>DEVICE_CONF[%s]</name>
+      <description>Device Configuration Register</description>
+      <addressOffset>0x200</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>LATENCY</name>
+          <description>Device Latency</description>
+          <bitRange>[5:0]</bitRange>
+        </field>
+        <field>
+          <name>CS_HOLD</name>
+          <description>Chip Select Hold</description>
+          <bitRange>[8:8]</bitRange>
+        </field>
+        <field>
+          <name>DEV_ACT</name>
+          <description>Device Active</description>
+          <bitRange>[9:9]</bitRange>
+        </field>
+        <field>
+          <name>ZD_WRITE</name>
+          <description>Zero-Delay Write</description>
+          <bitRange>[10:10]</bitRange>
+        </field>
+        <field>
+          <name>SPI_DEV</name>
+          <description>SPI Device</description>
+          <bitRange>[16:16]</bitRange>
+        </field>
+        <field>
+          <name>SPI_EXT</name>
+          <description>Extended SPI Mode</description>
+          <bitRange>[17:17]</bitRange>
+        </field>
+        <field>
+          <name>SPI_DDR</name>
+          <description>SPI Double Data Rate</description>
+          <bitRange>[18:18]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <dim>8</dim>
+      <dimIncrement>4</dimIncrement>
+      <name>DEVICE_ADD_HIGH[%s]</name>
+      <description>Device Higher Bound Address Space Register</description>
+      <addressOffset>0x240</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <dim>8</dim>
+      <dimIncrement>4</dimIncrement>
+      <name>DEVICE_ADD_LOW[%s]</name>
+      <description>Device Lower Bound Address Space Register</description>
+      <addressOffset>0x280</addressOffset>
+      <access>read-write</access>
+    </register>
+
+  </registers>
+</peripheral>
+
+<!-- EDAC Memory Controller -->
+<peripheral>
+  <name>EDAC0</name>
+  <description>EDAC Memory Controller</description>
+  <groupName>EDAC</groupName>
+  <baseAddress>0xE1002000</baseAddress>
+  <addressBlock>
+    <offset>0</offset>
+    <size>0x200</size>
+    <usage>registers</usage>
+  </addressBlock>
+  <registers>
+
+    <register>
+      <name>CTRL</name>
+      <description>Control Register</description>
+      <addressOffset>0x0</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>IRQ_EN</name>
+          <description>Interrupt Enable</description>
+          <bitRange>[0:0]</bitRange>
+        </field>
+        <field>
+          <name>SLP_EN</name>
+          <description>Sleep Enable</description>
+          <bitRange>[1:1]</bitRange>
+        </field>   
+        <field>
+          <name>ECC_EN</name>
+          <description>ECC Enable</description>
+          <bitRange>[2:2]</bitRange>
+        </field>
+        <field>
+          <name>ERR_EN</name>
+          <description>Error response Enable</description>
+          <bitRange>[3:3]</bitRange>
+        </field>
+        <field>
+          <name>SCR_EN</name>
+          <description>Scrubber Enable</description>
+          <bitRange>[4:4]</bitRange>
+        </field>
+        <field>
+          <name>INJ_EN</name>
+          <description>Error Injection Enable</description>
+          <bitRange>[5:5]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>STATUS</name>
+      <description>Status Register</description>
+      <addressOffset>0x8</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>IRQ_FLG</name>
+          <description>Interrupt Flag</description>
+          <bitRange>[0:0]</bitRange>
+        </field>
+        <field>
+          <name>BLK_SIZE</name>
+          <description>Data Block Size</description>
+          <bitRange>[17:8]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>SERR_CNT</name>
+      <description>Single Errors Count Register</description>
+      <addressOffset>0x10</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>DERR_CNT</name>
+      <description>Double Errors Count Register</description>
+      <addressOffset>0x14</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>SERR_ADDR</name>
+      <description>Single Errors Address Register</description>
+      <addressOffset>0x18</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>DERR_ADDR</name>
+      <description>Double Errors Address Register</description>
+      <addressOffset>0x1C</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>ERR_INJ0</name>
+      <description>Error Injection Register 0</description>
+      <addressOffset>0x20</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>ERR_INJ</name>
+          <description>Bit Number to Flip</description>
+          <bitRange>[7:0]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>ERR_INJ1</name>
+      <description>Error Injection Register 1</description>
+      <addressOffset>0x24</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>ERR_INJ</name>
+          <description>Bit Number to Flip</description>
+          <bitRange>[7:0]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>SCR_START_ADDR</name>
+      <description>Scrubber Start Address Register</description>
+      <addressOffset>0x28</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>SCR_END_ADDR</name>
+      <description>Scrubber End Address Register</description>
+      <addressOffset>0x2C</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>SCR_PERIOD</name>
+      <description>Scrubber Period Register</description>
+      <addressOffset>0x30</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>SCR_PERIOD</name>
+          <description>Scrubber Period</description>
+          <bitRange>[23:0]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>IRQ_MAP</name>
+      <description>Interrupt Mapping Register</description>
+      <addressOffset>0x34</addressOffset>
+      <access>read-write</access>
+    </register>
+
+  </registers>
+</peripheral>
+
+<!-- EDAC Memory Controller -->
+<peripheral>
+  <name>EDAC1</name>
+  <description>EDAC Memory Controller</description>
+  <groupName>EDAC</groupName>
+  <baseAddress>0xE1004000</baseAddress>
+  <addressBlock>
+    <offset>0</offset>
+    <size>0x200</size>
+    <usage>registers</usage>
+  </addressBlock>
+  <registers>
+
+    <register>
+      <name>CTRL</name>
+      <description>Control Register</description>
+      <addressOffset>0x0</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>IRQ_EN</name>
+          <description>Interrupt Enable</description>
+          <bitRange>[0:0]</bitRange>
+        </field>
+        <field>
+          <name>SLP_EN</name>
+          <description>Sleep Enable</description>
+          <bitRange>[1:1]</bitRange>
+        </field>   
+        <field>
+          <name>ECC_EN</name>
+          <description>ECC Enable</description>
+          <bitRange>[2:2]</bitRange>
+        </field>
+        <field>
+          <name>ERR_EN</name>
+          <description>Error response Enable</description>
+          <bitRange>[3:3]</bitRange>
+        </field>
+        <field>
+          <name>SCR_EN</name>
+          <description>Scrubber Enable</description>
+          <bitRange>[4:4]</bitRange>
+        </field>
+        <field>
+          <name>INJ_EN</name>
+          <description>Error Injection Enable</description>
+          <bitRange>[5:5]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>STATUS</name>
+      <description>Status Register</description>
+      <addressOffset>0x8</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>IRQ_FLG</name>
+          <description>Interrupt Flag</description>
+          <bitRange>[0:0]</bitRange>
+        </field>
+        <field>
+          <name>BLK_SIZE</name>
+          <description>Data Block Size</description>
+          <bitRange>[17:8]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>SERR_CNT</name>
+      <description>Single Errors Count Register</description>
+      <addressOffset>0x10</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>DERR_CNT</name>
+      <description>Double Errors Count Register</description>
+      <addressOffset>0x14</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>SERR_ADDR</name>
+      <description>Single Errors Address Register</description>
+      <addressOffset>0x18</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>DERR_ADDR</name>
+      <description>Double Errors Address Register</description>
+      <addressOffset>0x1C</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>ERR_INJ0</name>
+      <description>Error Injection Register 0</description>
+      <addressOffset>0x20</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>ERR_INJ</name>
+          <description>Bit Number to Flip</description>
+          <bitRange>[7:0]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>ERR_INJ1</name>
+      <description>Error Injection Register 1</description>
+      <addressOffset>0x24</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>ERR_INJ</name>
+          <description>Bit Number to Flip</description>
+          <bitRange>[7:0]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>SCR_START_ADDR</name>
+      <description>Scrubber Start Address Register</description>
+      <addressOffset>0x28</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>SCR_END_ADDR</name>
+      <description>Scrubber End Address Register</description>
+      <addressOffset>0x2C</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>SCR_PERIOD</name>
+      <description>Scrubber Period Register</description>
+      <addressOffset>0x30</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>SCR_PERIOD</name>
+          <description>Scrubber Period</description>
+          <bitRange>[23:0]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>IRQ_MAP</name>
+      <description>Interrupt Mapping Register</description>
+      <addressOffset>0x34</addressOffset>
+      <access>read-write</access>
+    </register>
+
+  </registers>
+</peripheral>
+
+<!-- EDAC Memory Controller -->
+<peripheral>
+  <name>EDAC2</name>
+  <description>EDAC Memory Controller</description>
+  <groupName>EDAC</groupName>
+  <baseAddress>0xE1006000</baseAddress>
+  <addressBlock>
+    <offset>0</offset>
+    <size>0x200</size>
+    <usage>registers</usage>
+  </addressBlock>
+  <registers>
+
+    <register>
+      <name>CTRL</name>
+      <description>Control Register</description>
+      <addressOffset>0x0</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>IRQ_EN</name>
+          <description>Interrupt Enable</description>
+          <bitRange>[0:0]</bitRange>
+        </field>
+        <field>
+          <name>SLP_EN</name>
+          <description>Sleep Enable</description>
+          <bitRange>[1:1]</bitRange>
+        </field>   
+        <field>
+          <name>ECC_EN</name>
+          <description>ECC Enable</description>
+          <bitRange>[2:2]</bitRange>
+        </field>
+        <field>
+          <name>ERR_EN</name>
+          <description>Error response Enable</description>
+          <bitRange>[3:3]</bitRange>
+        </field>
+        <field>
+          <name>SCR_EN</name>
+          <description>Scrubber Enable</description>
+          <bitRange>[4:4]</bitRange>
+        </field>
+        <field>
+          <name>INJ_EN</name>
+          <description>Error Injection Enable</description>
+          <bitRange>[5:5]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>STATUS</name>
+      <description>Status Register</description>
+      <addressOffset>0x8</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>IRQ_FLG</name>
+          <description>Interrupt Flag</description>
+          <bitRange>[0:0]</bitRange>
+        </field>
+        <field>
+          <name>BLK_SIZE</name>
+          <description>Data Block Size</description>
+          <bitRange>[17:8]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>SERR_CNT</name>
+      <description>Single Errors Count Register</description>
+      <addressOffset>0x10</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>DERR_CNT</name>
+      <description>Double Errors Count Register</description>
+      <addressOffset>0x14</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>SERR_ADDR</name>
+      <description>Single Errors Address Register</description>
+      <addressOffset>0x18</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>DERR_ADDR</name>
+      <description>Double Errors Address Register</description>
+      <addressOffset>0x1C</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>ERR_INJ0</name>
+      <description>Error Injection Register 0</description>
+      <addressOffset>0x20</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>ERR_INJ</name>
+          <description>Bit Number to Flip</description>
+          <bitRange>[7:0]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>ERR_INJ1</name>
+      <description>Error Injection Register 1</description>
+      <addressOffset>0x24</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>ERR_INJ</name>
+          <description>Bit Number to Flip</description>
+          <bitRange>[7:0]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>SCR_START_ADDR</name>
+      <description>Scrubber Start Address Register</description>
+      <addressOffset>0x28</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>SCR_END_ADDR</name>
+      <description>Scrubber End Address Register</description>
+      <addressOffset>0x2C</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>SCR_PERIOD</name>
+      <description>Scrubber Period Register</description>
+      <addressOffset>0x30</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>SCR_PERIOD</name>
+          <description>Scrubber Period</description>
+          <bitRange>[23:0]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>IRQ_MAP</name>
+      <description>Interrupt Mapping Register</description>
+      <addressOffset>0x34</addressOffset>
+      <access>read-write</access>
+    </register>
+
+  </registers>
+</peripheral>
+
+<!-- MBIST Controller -->
+<peripheral>
+  <name>MBIST0</name>
+  <description>MBIST Controller</description>
+  <groupName>EMBIST</groupName>
+  <baseAddress>0xE1003000</baseAddress>
+  <addressBlock>
+    <offset>0</offset>
+    <size>0x200</size>
+    <usage>registers</usage>
+  </addressBlock>
+  <registers>
+
+    <register>
+      <name>STATUS</name>
+      <description>Status Register</description>
+      <addressOffset>0x0</addressOffset>
+      <access>read-only</access>
+      <fields>
+        <field>
+          <name>EN</name>
+          <description>MBIST Enable</description>
+          <bitRange>[0:0]</bitRange>
+        </field>
+        <field>
+          <name>BUSY</name>
+          <description>MBIST Busy</description>
+          <bitRange>[1:1]</bitRange>
+        </field>
+        <field>
+          <name>ERR</name>
+          <description>MBIST Errors</description>
+          <bitRange>[2:2]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>CTRL</name>
+      <description>Control Register</description>
+      <addressOffset>0x4</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>EN</name>
+          <description>MBIST Enable</description>
+          <bitRange>[0:0]</bitRange>
+        </field>
+        <field>
+          <name>START</name>
+          <description>MBIST Start</description>
+          <bitRange>[1:1]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>ALGO</name>
+      <description>Algorithm Register</description>
+      <addressOffset>0x8</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>ALGO</name>
+          <description>Algorithm Selection</description>
+          <bitRange>[7:0]</bitRange>
+          <enumeratedValues>
+            <enumeratedValue>
+              <name>ZERO_ONE</name>
+              <description>Zero-one</description>
+              <value>0x0</value>
+            </enumeratedValue>
+            <enumeratedValue>
+              <name>MATS_P</name>
+              <description>MATS+</description>
+              <value>0x4</value>
+            </enumeratedValue>
+            <enumeratedValue>
+              <name>MARCH_CM</name>
+              <description>March C-</description>
+              <value>0x9</value>
+            </enumeratedValue>
+          </enumeratedValues>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>DMASK0</name>
+      <description>Data Mask 0 Register</description>
+      <addressOffset>0x10</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>DMASK1</name>
+      <description>Data Mask 1 Register</description>
+      <addressOffset>0x14</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>DMASK2</name>
+      <description>Data Mask 2 Register</description>
+      <addressOffset>0x18</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>DMASK3</name>
+      <description>Data Mask 3 Register</description>
+      <addressOffset>0x18</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>DMASK4</name>
+      <description>Data Mask 4 Register</description>
+      <addressOffset>0x1C</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>PATTERN</name>
+      <description>Pattern Register</description>
+      <addressOffset>0x20</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>PATTERN</name>
+          <description>MBIST Pattern</description>
+          <bitRange>[3:0]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>START_ADDR</name>
+      <description>Start Address Register</description>
+      <addressOffset>0x2C</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>END_ADDR</name>
+      <description>End Address Register</description>
+      <addressOffset>0x30</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>ERRCNT</name>
+      <description>Error Count Register</description>
+      <addressOffset>0x34</addressOffset>
+      <access>read-only</access>
+    </register>
+
+    <register>
+      <name>FIRST_ERR0</name>
+      <description>First Error Address 0 Register</description>
+      <addressOffset>0x3C</addressOffset>
+      <access>read-only</access>
+    </register>
+
+    <register>
+      <name>FIRST_ERR1</name>
+      <description>First Error Address 1 Register</description>
+      <addressOffset>0x40</addressOffset>
+      <access>read-only</access>
+    </register>
+
+    <register>
+      <name>FIRST_ERR2</name>
+      <description>First Error Address 2 Register</description>
+      <addressOffset>0x44</addressOffset>
+      <access>read-only</access>
+    </register>
+
+    <register>
+      <name>FIRST_ERR3</name>
+      <description>First Error Address 3 Register</description>
+      <addressOffset>0x48</addressOffset>
+      <access>read-only</access>
+    </register>
+
+    <register>
+      <name>LAST_ERR0</name>
+      <description>Last Error Address 0 Register</description>
+      <addressOffset>0x4C</addressOffset>
+      <access>read-only</access>
+    </register>
+
+    <register>
+      <name>LAST_ERR1</name>
+      <description>Last Error Address 1 Register</description>
+      <addressOffset>0x50</addressOffset>
+      <access>read-only</access>
+    </register>
+
+    <register>
+      <name>LAST_ERR2</name>
+      <description>Last Error Address 2 Register</description>
+      <addressOffset>0x54</addressOffset>
+      <access>read-only</access>
+    </register>
+
+    <register>
+      <name>LAST_ERR3</name>
+      <description>Last Error Address 3 Register</description>
+      <addressOffset>0x58</addressOffset>
+      <access>read-only</access>
+    </register>
+
+    <register>
+      <name>FIRST_IDX_ERR0</name>
+      <description>First Error Index 0 Register</description>
+      <addressOffset>0x7C</addressOffset>
+      <access>read-only</access>
+      <fields>
+        <field>
+          <name>ERR_IDX0</name>
+          <description>Error Index</description>
+          <bitRange>[7:0]</bitRange>
+        </field>
+        <field>
+          <name>ERR_CNT0</name>
+          <description>Error Count</description>
+          <bitRange>[15:8]</bitRange>
+        </field>
+        <field>
+          <name>ERR_IDX1</name>
+          <description>Error Index</description>
+          <bitRange>[23:16]</bitRange>
+        </field>
+        <field>
+          <name>ERR_CNT1</name>
+          <description>Error Count</description>
+          <bitRange>[31:24]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>FIRST_IDX_ERR1</name>
+      <description>First Error Index 1 Register</description>
+      <addressOffset>0x80</addressOffset>
+      <access>read-only</access>
+      <fields>
+        <field>
+          <name>ERR_IDX2</name>
+          <description>Error Index</description>
+          <bitRange>[7:0]</bitRange>
+        </field>
+        <field>
+          <name>ERR_CNT2</name>
+          <description>Error Count</description>
+          <bitRange>[15:8]</bitRange>
+        </field>
+        <field>
+          <name>ERR_IDX3</name>
+          <description>Error Index</description>
+          <bitRange>[23:16]</bitRange>
+        </field>
+        <field>
+          <name>ERR_CNT3</name>
+          <description>Error Count</description>
+          <bitRange>[31:24]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>LAST_IDX_ERR0</name>
+      <description>Last Error Index 0 Register</description>
+      <addressOffset>0x84</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>ERR_IDX0</name>
+          <description>Error Index</description>
+          <bitRange>[7:0]</bitRange>
+        </field>
+        <field>
+          <name>ERR_CNT0</name>
+          <description>Error Count</description>
+          <bitRange>[15:8]</bitRange>
+        </field>
+        <field>
+          <name>ERR_IDX1</name>
+          <description>Error Index</description>
+          <bitRange>[23:16]</bitRange>
+        </field>
+        <field>
+          <name>ERR_CNT1</name>
+          <description>Error Count</description>
+          <bitRange>[31:24]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>LAST_IDX_ERR1</name>
+      <description>Last Error Index 1 Register</description>
+      <addressOffset>0x88</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>ERR_IDX2</name>
+          <description>Error Index</description>
+          <bitRange>[7:0]</bitRange>
+        </field>
+        <field>
+          <name>ERR_CNT2</name>
+          <description>Error Count</description>
+          <bitRange>[15:8]</bitRange>
+        </field>
+        <field>
+          <name>ERR_IDX3</name>
+          <description>Error Index</description>
+          <bitRange>[23:16]</bitRange>
+        </field>
+        <field>
+          <name>ERR_CNT3</name>
+          <description>Error Count</description>
+          <bitRange>[31:24]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>INJ_ADDR</name>
+      <description>Fault Injection Address Register</description>
+      <addressOffset>0x9C</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>INJ_CTRL</name>
+      <description>Fault Injection Control Register</description>
+      <addressOffset>0x104</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>INJ_IDX</name>
+          <description>Error Injeciton Index</description>
+          <bitRange>[7:0]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+  </registers>
+</peripheral>
+
+<!-- MBIST Controller -->
+<peripheral>
+  <name>MBIST1</name>
+  <description>MBIST Controller</description>
+  <groupName>EMBIST</groupName>
+  <baseAddress>0xE1005000</baseAddress>
+  <addressBlock>
+    <offset>0</offset>
+    <size>0x200</size>
+    <usage>registers</usage>
+  </addressBlock>
+  <registers>
+
+    <register>
+      <name>STATUS</name>
+      <description>Status Register</description>
+      <addressOffset>0x0</addressOffset>
+      <access>read-only</access>
+      <fields>
+        <field>
+          <name>EN</name>
+          <description>MBIST Enable</description>
+          <bitRange>[0:0]</bitRange>
+        </field>
+        <field>
+          <name>BUSY</name>
+          <description>MBIST Busy</description>
+          <bitRange>[1:1]</bitRange>
+        </field>
+        <field>
+          <name>ERR</name>
+          <description>MBIST Errors</description>
+          <bitRange>[2:2]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>CTRL</name>
+      <description>Control Register</description>
+      <addressOffset>0x4</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>EN</name>
+          <description>MBIST Enable</description>
+          <bitRange>[0:0]</bitRange>
+        </field>
+        <field>
+          <name>START</name>
+          <description>MBIST Start</description>
+          <bitRange>[1:1]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>ALGO</name>
+      <description>Algorithm Register</description>
+      <addressOffset>0x8</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>ALGO</name>
+          <description>Algorithm Selection</description>
+          <bitRange>[7:0]</bitRange>
+          <enumeratedValues>
+            <enumeratedValue>
+              <name>ZERO_ONE</name>
+              <description>Zero-one</description>
+              <value>0x0</value>
+            </enumeratedValue>
+            <enumeratedValue>
+              <name>MATS_P</name>
+              <description>MATS+</description>
+              <value>0x4</value>
+            </enumeratedValue>
+            <enumeratedValue>
+              <name>MARCH_CM</name>
+              <description>March C-</description>
+              <value>0x9</value>
+            </enumeratedValue>
+          </enumeratedValues>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>DMASK0</name>
+      <description>Data Mask 0 Register</description>
+      <addressOffset>0x10</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>DMASK1</name>
+      <description>Data Mask 1 Register</description>
+      <addressOffset>0x14</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>DMASK2</name>
+      <description>Data Mask 2 Register</description>
+      <addressOffset>0x18</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>DMASK3</name>
+      <description>Data Mask 3 Register</description>
+      <addressOffset>0x18</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>DMASK4</name>
+      <description>Data Mask 4 Register</description>
+      <addressOffset>0x1C</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>PATTERN</name>
+      <description>Pattern Register</description>
+      <addressOffset>0x20</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>PATTERN</name>
+          <description>MBIST Pattern</description>
+          <bitRange>[3:0]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>START_ADDR</name>
+      <description>Start Address Register</description>
+      <addressOffset>0x2C</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>END_ADDR</name>
+      <description>End Address Register</description>
+      <addressOffset>0x30</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>ERRCNT</name>
+      <description>Error Count Register</description>
+      <addressOffset>0x34</addressOffset>
+      <access>read-only</access>
+    </register>
+
+    <register>
+      <name>FIRST_ERR0</name>
+      <description>First Error Address 0 Register</description>
+      <addressOffset>0x3C</addressOffset>
+      <access>read-only</access>
+    </register>
+
+    <register>
+      <name>FIRST_ERR1</name>
+      <description>First Error Address 1 Register</description>
+      <addressOffset>0x40</addressOffset>
+      <access>read-only</access>
+    </register>
+
+    <register>
+      <name>FIRST_ERR2</name>
+      <description>First Error Address 2 Register</description>
+      <addressOffset>0x44</addressOffset>
+      <access>read-only</access>
+    </register>
+
+    <register>
+      <name>FIRST_ERR3</name>
+      <description>First Error Address 3 Register</description>
+      <addressOffset>0x48</addressOffset>
+      <access>read-only</access>
+    </register>
+
+    <register>
+      <name>LAST_ERR0</name>
+      <description>Last Error Address 0 Register</description>
+      <addressOffset>0x4C</addressOffset>
+      <access>read-only</access>
+    </register>
+
+    <register>
+      <name>LAST_ERR1</name>
+      <description>Last Error Address 1 Register</description>
+      <addressOffset>0x50</addressOffset>
+      <access>read-only</access>
+    </register>
+
+    <register>
+      <name>LAST_ERR2</name>
+      <description>Last Error Address 2 Register</description>
+      <addressOffset>0x54</addressOffset>
+      <access>read-only</access>
+    </register>
+
+    <register>
+      <name>LAST_ERR3</name>
+      <description>Last Error Address 3 Register</description>
+      <addressOffset>0x58</addressOffset>
+      <access>read-only</access>
+    </register>
+
+    <register>
+      <name>FIRST_IDX_ERR0</name>
+      <description>First Error Index 0 Register</description>
+      <addressOffset>0x7C</addressOffset>
+      <access>read-only</access>
+      <fields>
+        <field>
+          <name>ERR_IDX0</name>
+          <description>Error Index</description>
+          <bitRange>[7:0]</bitRange>
+        </field>
+        <field>
+          <name>ERR_CNT0</name>
+          <description>Error Count</description>
+          <bitRange>[15:8]</bitRange>
+        </field>
+        <field>
+          <name>ERR_IDX1</name>
+          <description>Error Index</description>
+          <bitRange>[23:16]</bitRange>
+        </field>
+        <field>
+          <name>ERR_CNT1</name>
+          <description>Error Count</description>
+          <bitRange>[31:24]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>FIRST_IDX_ERR1</name>
+      <description>First Error Index 1 Register</description>
+      <addressOffset>0x80</addressOffset>
+      <access>read-only</access>
+      <fields>
+        <field>
+          <name>ERR_IDX2</name>
+          <description>Error Index</description>
+          <bitRange>[7:0]</bitRange>
+        </field>
+        <field>
+          <name>ERR_CNT2</name>
+          <description>Error Count</description>
+          <bitRange>[15:8]</bitRange>
+        </field>
+        <field>
+          <name>ERR_IDX3</name>
+          <description>Error Index</description>
+          <bitRange>[23:16]</bitRange>
+        </field>
+        <field>
+          <name>ERR_CNT3</name>
+          <description>Error Count</description>
+          <bitRange>[31:24]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>LAST_IDX_ERR0</name>
+      <description>Last Error Index 0 Register</description>
+      <addressOffset>0x84</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>ERR_IDX0</name>
+          <description>Error Index</description>
+          <bitRange>[7:0]</bitRange>
+        </field>
+        <field>
+          <name>ERR_CNT0</name>
+          <description>Error Count</description>
+          <bitRange>[15:8]</bitRange>
+        </field>
+        <field>
+          <name>ERR_IDX1</name>
+          <description>Error Index</description>
+          <bitRange>[23:16]</bitRange>
+        </field>
+        <field>
+          <name>ERR_CNT1</name>
+          <description>Error Count</description>
+          <bitRange>[31:24]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>LAST_IDX_ERR1</name>
+      <description>Last Error Index 1 Register</description>
+      <addressOffset>0x88</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>ERR_IDX2</name>
+          <description>Error Index</description>
+          <bitRange>[7:0]</bitRange>
+        </field>
+        <field>
+          <name>ERR_CNT2</name>
+          <description>Error Count</description>
+          <bitRange>[15:8]</bitRange>
+        </field>
+        <field>
+          <name>ERR_IDX3</name>
+          <description>Error Index</description>
+          <bitRange>[23:16]</bitRange>
+        </field>
+        <field>
+          <name>ERR_CNT3</name>
+          <description>Error Count</description>
+          <bitRange>[31:24]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>INJ_ADDR</name>
+      <description>Fault Injection Address Register</description>
+      <addressOffset>0x9C</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>INJ_CTRL</name>
+      <description>Fault Injection Control Register</description>
+      <addressOffset>0x104</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>INJ_IDX</name>
+          <description>Error Injeciton Index</description>
+          <bitRange>[7:0]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+  </registers>
+</peripheral>
+
+<!-- MBIST Controller -->
+<peripheral>
+  <name>MBIST2</name>
+  <description>MBIST Controller</description>
+  <groupName>EMBIST</groupName>
+  <baseAddress>0xE1007000</baseAddress>
+  <addressBlock>
+    <offset>0</offset>
+    <size>0x200</size>
+    <usage>registers</usage>
+  </addressBlock>
+  <registers>
+
+    <register>
+      <name>STATUS</name>
+      <description>Status Register</description>
+      <addressOffset>0x0</addressOffset>
+      <access>read-only</access>
+      <fields>
+        <field>
+          <name>EN</name>
+          <description>MBIST Enable</description>
+          <bitRange>[0:0]</bitRange>
+        </field>
+        <field>
+          <name>BUSY</name>
+          <description>MBIST Busy</description>
+          <bitRange>[1:1]</bitRange>
+        </field>
+        <field>
+          <name>ERR</name>
+          <description>MBIST Errors</description>
+          <bitRange>[2:2]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>CTRL</name>
+      <description>Control Register</description>
+      <addressOffset>0x4</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>EN</name>
+          <description>MBIST Enable</description>
+          <bitRange>[0:0]</bitRange>
+        </field>
+        <field>
+          <name>START</name>
+          <description>MBIST Start</description>
+          <bitRange>[1:1]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>ALGO</name>
+      <description>Algorithm Register</description>
+      <addressOffset>0x8</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>ALGO</name>
+          <description>Algorithm Selection</description>
+          <bitRange>[7:0]</bitRange>
+          <enumeratedValues>
+            <enumeratedValue>
+              <name>ZERO_ONE</name>
+              <description>Zero-one</description>
+              <value>0x0</value>
+            </enumeratedValue>
+            <enumeratedValue>
+              <name>MATS_P</name>
+              <description>MATS+</description>
+              <value>0x4</value>
+            </enumeratedValue>
+            <enumeratedValue>
+              <name>MARCH_CM</name>
+              <description>March C-</description>
+              <value>0x9</value>
+            </enumeratedValue>
+          </enumeratedValues>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>DMASK0</name>
+      <description>Data Mask 0 Register</description>
+      <addressOffset>0x10</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>DMASK1</name>
+      <description>Data Mask 1 Register</description>
+      <addressOffset>0x14</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>DMASK2</name>
+      <description>Data Mask 2 Register</description>
+      <addressOffset>0x18</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>DMASK3</name>
+      <description>Data Mask 3 Register</description>
+      <addressOffset>0x18</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>DMASK4</name>
+      <description>Data Mask 4 Register</description>
+      <addressOffset>0x1C</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>PATTERN</name>
+      <description>Pattern Register</description>
+      <addressOffset>0x20</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>PATTERN</name>
+          <description>MBIST Pattern</description>
+          <bitRange>[3:0]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>START_ADDR</name>
+      <description>Start Address Register</description>
+      <addressOffset>0x2C</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>END_ADDR</name>
+      <description>End Address Register</description>
+      <addressOffset>0x30</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>ERRCNT</name>
+      <description>Error Count Register</description>
+      <addressOffset>0x34</addressOffset>
+      <access>read-only</access>
+    </register>
+
+    <register>
+      <name>FIRST_ERR0</name>
+      <description>First Error Address 0 Register</description>
+      <addressOffset>0x3C</addressOffset>
+      <access>read-only</access>
+    </register>
+
+    <register>
+      <name>FIRST_ERR1</name>
+      <description>First Error Address 1 Register</description>
+      <addressOffset>0x40</addressOffset>
+      <access>read-only</access>
+    </register>
+
+    <register>
+      <name>FIRST_ERR2</name>
+      <description>First Error Address 2 Register</description>
+      <addressOffset>0x44</addressOffset>
+      <access>read-only</access>
+    </register>
+
+    <register>
+      <name>FIRST_ERR3</name>
+      <description>First Error Address 3 Register</description>
+      <addressOffset>0x48</addressOffset>
+      <access>read-only</access>
+    </register>
+
+    <register>
+      <name>LAST_ERR0</name>
+      <description>Last Error Address 0 Register</description>
+      <addressOffset>0x4C</addressOffset>
+      <access>read-only</access>
+    </register>
+
+    <register>
+      <name>LAST_ERR1</name>
+      <description>Last Error Address 1 Register</description>
+      <addressOffset>0x50</addressOffset>
+      <access>read-only</access>
+    </register>
+
+    <register>
+      <name>LAST_ERR2</name>
+      <description>Last Error Address 2 Register</description>
+      <addressOffset>0x54</addressOffset>
+      <access>read-only</access>
+    </register>
+
+    <register>
+      <name>LAST_ERR3</name>
+      <description>Last Error Address 3 Register</description>
+      <addressOffset>0x58</addressOffset>
+      <access>read-only</access>
+    </register>
+
+    <register>
+      <name>FIRST_IDX_ERR0</name>
+      <description>First Error Index 0 Register</description>
+      <addressOffset>0x7C</addressOffset>
+      <access>read-only</access>
+      <fields>
+        <field>
+          <name>ERR_IDX0</name>
+          <description>Error Index</description>
+          <bitRange>[7:0]</bitRange>
+        </field>
+        <field>
+          <name>ERR_CNT0</name>
+          <description>Error Count</description>
+          <bitRange>[15:8]</bitRange>
+        </field>
+        <field>
+          <name>ERR_IDX1</name>
+          <description>Error Index</description>
+          <bitRange>[23:16]</bitRange>
+        </field>
+        <field>
+          <name>ERR_CNT1</name>
+          <description>Error Count</description>
+          <bitRange>[31:24]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>FIRST_IDX_ERR1</name>
+      <description>First Error Index 1 Register</description>
+      <addressOffset>0x80</addressOffset>
+      <access>read-only</access>
+      <fields>
+        <field>
+          <name>ERR_IDX2</name>
+          <description>Error Index</description>
+          <bitRange>[7:0]</bitRange>
+        </field>
+        <field>
+          <name>ERR_CNT2</name>
+          <description>Error Count</description>
+          <bitRange>[15:8]</bitRange>
+        </field>
+        <field>
+          <name>ERR_IDX3</name>
+          <description>Error Index</description>
+          <bitRange>[23:16]</bitRange>
+        </field>
+        <field>
+          <name>ERR_CNT3</name>
+          <description>Error Count</description>
+          <bitRange>[31:24]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>LAST_IDX_ERR0</name>
+      <description>Last Error Index 0 Register</description>
+      <addressOffset>0x84</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>ERR_IDX0</name>
+          <description>Error Index</description>
+          <bitRange>[7:0]</bitRange>
+        </field>
+        <field>
+          <name>ERR_CNT0</name>
+          <description>Error Count</description>
+          <bitRange>[15:8]</bitRange>
+        </field>
+        <field>
+          <name>ERR_IDX1</name>
+          <description>Error Index</description>
+          <bitRange>[23:16]</bitRange>
+        </field>
+        <field>
+          <name>ERR_CNT1</name>
+          <description>Error Count</description>
+          <bitRange>[31:24]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>LAST_IDX_ERR1</name>
+      <description>Last Error Index 1 Register</description>
+      <addressOffset>0x88</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>ERR_IDX2</name>
+          <description>Error Index</description>
+          <bitRange>[7:0]</bitRange>
+        </field>
+        <field>
+          <name>ERR_CNT2</name>
+          <description>Error Count</description>
+          <bitRange>[15:8]</bitRange>
+        </field>
+        <field>
+          <name>ERR_IDX3</name>
+          <description>Error Index</description>
+          <bitRange>[23:16]</bitRange>
+        </field>
+        <field>
+          <name>ERR_CNT3</name>
+          <description>Error Count</description>
+          <bitRange>[31:24]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+    <register>
+      <name>INJ_ADDR</name>
+      <description>Fault Injection Address Register</description>
+      <addressOffset>0x9C</addressOffset>
+      <access>read-write</access>
+    </register>
+
+    <register>
+      <name>INJ_CTRL</name>
+      <description>Fault Injection Control Register</description>
+      <addressOffset>0x104</addressOffset>
+      <access>read-write</access>
+      <fields>
+        <field>
+          <name>INJ_IDX</name>
+          <description>Error Injeciton Index</description>
+          <bitRange>[7:0]</bitRange>
+        </field>
+      </fields>
+    </register>
+
+  </registers>
+</peripheral>

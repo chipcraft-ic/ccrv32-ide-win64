@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2018 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2024-01-14 21:55:43 +0100 (nie, 14 sty 2024) $
-* $Revision: 1038 $
+* $Date: 2025-02-26 14:42:34 +0100 (śro, 26 lut 2025) $
+* $Revision: 1129 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -108,7 +108,8 @@ SECTIONS
     KEEP (*(SORT(.dtors.*)))
     KEEP (*crtend.o(.dtors))
 
-    . = ALIGN(4);
+    /* alignment for PMP granularity */
+    . = ALIGN(1024);
     _etext = .;
     _data_load = .;
   } > rom
@@ -118,6 +119,7 @@ SECTIONS
   .uninitialized (NOLOAD) :
   {
     . = ALIGN(4);
+    *(.uninitialized)
   } > ram
 
   .data : AT (_data_load) {
@@ -143,8 +145,11 @@ SECTIONS
   _spram_data_load = _data_load + SIZEOF(.data);
   .spram_data : AT (_spram_data_load) {
     _sspram_data = .;
-    *(.spram_data)
     *(.xpram_text)
+    /* alignment for PMP granularity */
+    . = ALIGN(1024);
+    _expram_data = .;
+    *(.spram_data)
     _espram_data = .;
   } > spram
 

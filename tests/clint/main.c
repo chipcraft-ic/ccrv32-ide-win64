@@ -32,14 +32,15 @@
 * File Name : main.c
 * Author    : Krzysztof Marcinek
 * ******************************************************************************
-* $Date: 2022-01-19 09:38:48 +0100 (śro, 19 sty 2022) $
-* $Revision: 814 $
+* $Date: 2024-11-13 22:00:39 +0100 (śro, 13 lis 2024) $
+* $Revision: 1116 $
 *H*****************************************************************************/
 
 #include "board.h"
 #include <ccrv32.h>
 #include <ccrv32-csr.h>
 #include <ccrv32-mcore.h>
+#include <ccrv32-dcache.h>
 #include <ccrv32-clint.h>
 #include <ccrv32-utils.h>
 #include <core_util.h>
@@ -79,6 +80,7 @@ static void coreProcSoft()
     g_coreProcState = 0;
     g_expectedSoftIrqDestCore = 0;
     g_expectedSoftIrq = 1;
+    while(DCACHE_PTR->STCR & DCACHE_STCR_BUSY);
     CLINT_PTR->MSIP[0] = 1;
 
     /* Wait */
@@ -122,6 +124,7 @@ static void testSoftwareInterrupt(unsigned coreIndex)
     /* Make another software interrupt from core 0 */
     g_expectedSoftIrqDestCore = coreIndex;
     g_expectedSoftIrq = 1;
+    while(DCACHE_PTR->STCR & DCACHE_STCR_BUSY);
     CLINT_PTR->MSIP[coreIndex] = 1; // trigger interrupt on another core
 
     /* wait for software interrupt */

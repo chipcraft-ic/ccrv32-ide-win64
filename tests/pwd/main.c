@@ -32,8 +32,8 @@
 * File Name : main.c
 * Author    : Krzysztof Marcinek
 * ******************************************************************************
-* $Date: 2022-01-19 09:38:48 +0100 (śro, 19 sty 2022) $
-* $Revision: 814 $
+* $Date: 2024-10-29 19:59:18 +0100 (wto, 29 paź 2024) $
+* $Revision: 1114 $
 *H*****************************************************************************/
 
 #include "board.h"
@@ -241,7 +241,14 @@ int main(void){
             printf("Disabling lockstep mode!\n");
         }
 
-        testSingleCoreShutDown();
+        if (AMBA_TIMER32_COUNT() != 0){
+            testSingleCoreShutDown();
+        }
+        else{
+            assertEq(1,1); // To mask unavailable function
+            assertEq(1,1);
+        }
+
         testShutDown();
         testMulticore();
         testCores();

@@ -32,8 +32,8 @@
  * File Name : acqeng.c
  * Author    : Sebastian Cieslak
  * ******************************************************************************
- * $Date: 2022-12-12 15:09:34 +0100 (pon, 12 gru 2022) $
- * $Revision: 936 $
+ * $Date: 2025-03-26 14:59:44 +0100 (Wed, 26 Mar 2025) $
+ * $Revision: 1138 $
  *H*****************************************************************************/
 
 #include "acqeng.h"
@@ -140,17 +140,6 @@ bool acqeng_set_carrier_mode(volatile amba_acqeng_t *acqeng, uint8_t carr_mode) 
     }
     else {
         _acqeng_set_carrier_mode(acqeng, carr_mode);
-        return 0;
-    }
-}
-
-bool acqeng_set_samples_per_chip(volatile amba_acqeng_t *acqeng, uint8_t spc_shift) {
-    // Check if a number of samples per chip is in the correct range
-    if (spc_shift > 15) {
-        return 1;
-    }
-    else {
-        _acqeng_set_samples_per_chip(acqeng, spc_shift);
         return 0;
     }
 }

@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2019 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2024-04-22 09:02:05 +0200 (pon, 22 kwi 2024) $
-* $Revision: 1049 $
+* $Date: 2025-01-11 22:33:12 +0100 (sob, 11 sty 2025) $
+* $Revision: 1126 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -44,7 +44,7 @@
 #define FLASH_DELAY             25UL // upper 3.472*7
 #define FLASH_ENDURANCE         100000
 
-#define RAM_SIZE                1572864
+#define RAM_SIZE                1572864 // must be specified if not power of 2
 
 #define TCXO_FREQ               16368000UL
 #define MCU_PLL_N               16

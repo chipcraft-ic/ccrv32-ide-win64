@@ -32,8 +32,8 @@
 * File Name : main.c
 * Author    : Krzysztof Marcinek
 * ******************************************************************************
-* $Date: 2024-04-08 13:38:29 +0200 (pon, 08 kwi 2024) $
-* $Revision: 1047 $
+* $Date: 2024-09-04 12:09:10 +0200 (śro, 04 wrz 2024) $
+* $Revision: 1104 $
 *H*****************************************************************************/
 
 #include "board.h"
@@ -76,20 +76,23 @@ void singleTests(void)
         g_failedTests = MBIST_PTR->SCRATCH0;
         g_totalTests = MBIST_PTR->SCRATCH1;
 
-        if ((MBIST_PTR->CTRL&MBIST_CTRL_ALG_MASK)>>MBIST_CTRL_ALG_SHIFT != MBIST_ALG_ZERO_ONE || g_totalTests == 0){
-            if ((MBIST_PTR->CTRL&MBIST_CTRL_ALG_MASK)>>MBIST_CTRL_ALG_SHIFT != MBIST_ALG_MARCH_D2PF) {
+        if ((MBIST_PTR->CTRL & MBIST_CTRL_ALG_MASK) >> MBIST_CTRL_ALG_SHIFT != MBIST_ALG_ZERO_ONE || g_totalTests == 0){
+            if ((MBIST_PTR->CTRL & MBIST_CTRL_ALG_MASK) >> MBIST_CTRL_ALG_SHIFT != MBIST_ALG_MARCH_D2PF) {
                 return;
             }
         }
 
-        uint8_t region = (MBIST_PTR->CTRL&MBIST_CTRL_REGN_MASK)>>MBIST_CTRL_REGN_SHIFT;
+        uint8_t region = (MBIST_PTR->CTRL & MBIST_CTRL_REGN_MASK) >> MBIST_CTRL_REGN_SHIFT;
         uint8_t second_port = (MBIST_PTR->CTRL & MBIST_CTRL_SECOND_PORT) != 0;
         uint8_t switch_ports = (MBIST_PTR->CTRL & MBIST_CTRL_SWITCH_PORTS) != 0;
-        uint8_t inject_idx_port0 = (MBIST_PTR->INJ & MBIST_INJ_IDX_PORT0_MASK) >> MBIST_INJ_IDX_PORT0_SHIFT;
-        //uint8_t inject_idx_port1 = (MBIST_PTR->INJ & MBIST_INJ_IDX_PORT1_MASK) >> MBIST_INJ_IDX_PORT1_SHIFT;
-        if (region == 0 && MBIST_PTR->INJ_ADDR0 == 0){
-            MBIST_PTR->INJ = MBIST_INJ_PORT0_EN | (region+1) << MBIST_INJ_IDX_PORT0_SHIFT;
-            MBIST_PTR->INJ_ADDR0 = (region+1)*2;
+        uint8_t inject_idx_port0 = (MBIST_PTR->INJ & MBIST_INJ_IDX0_PORT0_MASK) >> MBIST_INJ_IDX0_PORT0_SHIFT;
+        //uint8_t inject_idx_port1 = (MBIST_PTR->INJ & MBIST_INJ_IDX0_PORT1_MASK) >> MBIST_INJ_IDX0_PORT1_SHIFT;
+        if (region == 0 && MBIST_PTR->INJ_ADDR_PORT0 == 0){
+
+                            // enable injection   first error index                          second error index
+            MBIST_PTR->INJ = MBIST_INJ_PORT0_EN | (region+1) << MBIST_INJ_IDX0_PORT0_SHIFT | (region+2) << MBIST_INJ_IDX1_PORT0_SHIFT;
+
+            MBIST_PTR->INJ_ADDR_PORT0 = (region+1)*2;
             MBIST_PTR->CTRL = MBIST_CTRL_SINGLE;
             MEMORY_BARRIER();
             MBIST_PTR->RUN = MBIST_RUN_KEY;
@@ -101,15 +104,22 @@ void singleTests(void)
             {
                 //printf("REG0 %d: 0x%08x\n",i,(unsigned)MBIST_PTR->DET_LOGS[i]);
             }
-            assertTrue(MBIST_PTR->DET_LOGS[0] != 0); // error count > 0
-            assertTrue(MBIST_PTR->DET_LOGS[2] == MBIST_PTR->INJ_ADDR0); // error address matches
-            assertTrue((MBIST_PTR->DET_LOGS[18] & 0xFF) == inject_idx_port0); // error index matches
+            assertTrue(MBIST_PTR->ERRCNT_PORT0 != 0); // error count > 0
+            assertTrue(MBIST_PTR->FIRST_ERR_PORT0[0] == MBIST_PTR->INJ_ADDR_PORT0); // error address matches
+            assertTrue((MBIST_PTR->FIRST_IDX_PORT0[0] & 0xFF) == inject_idx_port0); // error index matches
+            assertTrue(MBIST_PTR->FIRST_IDX_PORT0[0] & MBIST_ERR_IDX0_SGL); // single error indicator
+
+            // check only if hardware support multiple errors injection
+            if (MBIST_PTR->INJ & MBIST_INJ_IDX1_PORT0_MASK)
+            {
+                assertTrue(MBIST_PTR->FIRST_IDX_PORT0[0] & MBIST_ERR_IDX0_MPL); // multiple error error indicator
+            }
 
             MBIST_PTR->SCRATCH0 = g_failedTests;
             MBIST_PTR->SCRATCH1 = g_totalTests;
 
-            MBIST_PTR->INJ = MBIST_INJ_PORT0_EN | 4*(region+1) << MBIST_INJ_IDX_PORT0_SHIFT;
-            MBIST_PTR->INJ_ADDR0 = (region+1)*5;
+            MBIST_PTR->INJ = MBIST_INJ_PORT0_EN | 4*(region+1) << MBIST_INJ_IDX0_PORT0_SHIFT;
+            MBIST_PTR->INJ_ADDR_PORT0 = (region+1)*5;
             MBIST_PTR->CTRL |= MBIST_CTRL_SECOND_PORT;
             MEMORY_BARRIER();
             MBIST_PTR->RUN = MBIST_RUN_KEY;
@@ -121,17 +131,19 @@ void singleTests(void)
             {
                 //printf("REG0 %d: 0x%08x\n",i,(unsigned)MBIST_PTR->DET_LOGS[i]);
             }
-            assertTrue(MBIST_PTR->DET_LOGS[0] != 0); // error count > 0
-            assertTrue(MBIST_PTR->DET_LOGS[2] == MBIST_PTR->INJ_ADDR0); // error address matches
-            assertTrue((MBIST_PTR->DET_LOGS[18] & 0xFF) == inject_idx_port0); // error index matches
+            assertTrue(MBIST_PTR->ERRCNT_PORT0 != 0); // error count > 0
+            assertTrue(MBIST_PTR->FIRST_ERR_PORT0[0] == MBIST_PTR->INJ_ADDR_PORT0); // error address matches
+            assertTrue((MBIST_PTR->FIRST_IDX_PORT0[0] & 0xFF) == inject_idx_port0); // error index matches
+            assertTrue(MBIST_PTR->FIRST_IDX_PORT0[0] & MBIST_ERR_IDX0_SGL); // single error indicator
+            assertFalse(MBIST_PTR->FIRST_IDX_PORT0[0] & MBIST_ERR_IDX0_MPL); // multiple error error indicator
 
             MBIST_PTR->SCRATCH0 = g_failedTests;
             MBIST_PTR->SCRATCH1 = g_totalTests;
 
             if (dctag_region > 0){
                 region = dctag_region;
-                MBIST_PTR->INJ = MBIST_INJ_PORT0_EN | (region+1) << MBIST_INJ_IDX_PORT0_SHIFT;
-                MBIST_PTR->INJ_ADDR0 = (region+1)*2;
+                MBIST_PTR->INJ = MBIST_INJ_PORT0_EN | (region+1) << MBIST_INJ_IDX0_PORT0_SHIFT;
+                MBIST_PTR->INJ_ADDR_PORT0 = (region+1)*2;
                 MBIST_PTR->CTRL = MBIST_CTRL_SINGLE | (region << MBIST_CTRL_REGN_SHIFT);
                 MEMORY_BARRIER();
                 MBIST_PTR->RUN = MBIST_RUN_KEY;
@@ -144,15 +156,17 @@ void singleTests(void)
             {
                 //printf("REG0 %d: 0x%08x\n",i,(unsigned)MBIST_PTR->DET_LOGS[i]);
             }
-            assertTrue(MBIST_PTR->DET_LOGS[0] != 0); // error count > 0
-            assertTrue(MBIST_PTR->DET_LOGS[2] == MBIST_PTR->INJ_ADDR0); // error address matches
-            assertTrue((MBIST_PTR->DET_LOGS[18] & 0xFF) == inject_idx_port0); // error index matches
+            assertTrue(MBIST_PTR->ERRCNT_PORT0 != 0); // error count > 0
+            assertTrue(MBIST_PTR->FIRST_ERR_PORT0[0] == MBIST_PTR->INJ_ADDR_PORT0); // error address matches
+            assertTrue((MBIST_PTR->FIRST_IDX_PORT0[0] & 0xFF) == inject_idx_port0); // error index matches
+            assertTrue(MBIST_PTR->FIRST_IDX_PORT0[0] & MBIST_ERR_IDX0_SGL); // single error indicator
+            assertFalse(MBIST_PTR->FIRST_IDX_PORT0[0] & MBIST_ERR_IDX0_MPL); // multiple error error indicator
 
             MBIST_PTR->SCRATCH0 = g_failedTests;
             MBIST_PTR->SCRATCH1 = g_totalTests;
 
-            MBIST_PTR->INJ = MBIST_INJ_PORT0_EN | (region+8) << MBIST_INJ_IDX_PORT0_SHIFT;
-            MBIST_PTR->INJ_ADDR0 = (region+1)*3;
+            MBIST_PTR->INJ = MBIST_INJ_PORT0_EN | (region+8) << MBIST_INJ_IDX0_PORT0_SHIFT;
+            MBIST_PTR->INJ_ADDR_PORT0 = (region+1)*3;
             MBIST_PTR->CTRL |= MBIST_CTRL_SINGLE | MBIST_CTRL_SWITCH_PORTS;
             MEMORY_BARRIER();
             MBIST_PTR->RUN = MBIST_RUN_KEY;
@@ -164,23 +178,30 @@ void singleTests(void)
             {
                 //printf("REG0 %d: 0x%08x\n",i,(unsigned)MBIST_PTR->DET_LOGS[i]);
             }
-            assertTrue(MBIST_PTR->DET_LOGS[0] != 0); // error count > 0
-            assertTrue(MBIST_PTR->DET_LOGS[2] == MBIST_PTR->INJ_ADDR0); // error address matches
-            assertTrue((MBIST_PTR->DET_LOGS[18] & 0xFF) == inject_idx_port0); // error index matches
+            assertTrue(MBIST_PTR->ERRCNT_PORT0 != 0); // error count > 0
+            assertTrue(MBIST_PTR->FIRST_ERR_PORT0[0] == MBIST_PTR->INJ_ADDR_PORT0); // error address matches
+            assertTrue((MBIST_PTR->FIRST_IDX_PORT0[0] & 0xFF) == inject_idx_port0); // error index matches
+            assertTrue(MBIST_PTR->FIRST_IDX_PORT0[0] & MBIST_ERR_IDX0_SGL); // single error indicator
+            assertFalse(MBIST_PTR->FIRST_IDX_PORT0[0] & MBIST_ERR_IDX0_MPL); // multiple error error indicator
+
+#ifndef BOARD_CCNV2_B1
 
             MBIST_PTR->SCRATCH0 = g_failedTests;
             MBIST_PTR->SCRATCH1 = g_totalTests;
 
             // port1 does not issue write, so we cant inject error on the test generator side
-            //MBIST_PTR->INJ = MBIST_INJ_PORT1_EN | (region+10) << MBIST_INJ_IDX_PORT1_SHIFT;
-            //MBIST_PTR->INJ_ADDR1 = (region+4)*3;
-            MBIST_PTR->INJ = MBIST_INJ_PORT0_EN | (region+10) << MBIST_INJ_IDX_PORT0_SHIFT;
-            MBIST_PTR->INJ_ADDR0 = (region+4)*3;
+            //MBIST_PTR->INJ = MBIST_INJ_PORT1_EN | (region+10) << MBIST_INJ_IDX0_PORT1_SHIFT;
+            //MBIST_PTR->INJ_ADDR_PORT1 = (region+4)*3;
+            MBIST_PTR->INJ = MBIST_INJ_PORT0_EN | (region+10) << MBIST_INJ_IDX0_PORT0_SHIFT;
+            MBIST_PTR->INJ_ADDR_PORT0 = (region+4)*3;
 
             MBIST_PTR->CTRL = MBIST_ALG_MARCH_D2PF << MBIST_CTRL_ALG_SHIFT | MBIST_CTRL_SINGLE | (region << MBIST_CTRL_REGN_SHIFT);
             MEMORY_BARRIER();
             MBIST_PTR->RUN = MBIST_RUN_KEY;
             for(;;);
+
+#endif
+
         }
         else if ((MBIST_PTR->CTRL&MBIST_CTRL_ALG_MASK)>>MBIST_CTRL_ALG_SHIFT == MBIST_ALG_MARCH_D2PF){
             printf("\nSingle run tests - Data Cache Tags d2PF.\n");
@@ -188,11 +209,13 @@ void singleTests(void)
             {
                 //printf("REG0 %d: 0x%08x\n",i,(unsigned)MBIST_PTR->DET_LOGS[i]);
             }
-            assertTrue(MBIST_PTR->DET_LOGS[1] != 0); // error count > 0
-            //assertTrue(MBIST_PTR->DET_LOGS[10] == MBIST_PTR->INJ_ADDR1); // error address matches
-            //assertTrue((MBIST_PTR->DET_LOGS[22] & 0xFF) == inject_idx_port1); // error index matches
-            assertTrue(MBIST_PTR->DET_LOGS[10] == MBIST_PTR->INJ_ADDR0); // error address matches
-            assertTrue((MBIST_PTR->DET_LOGS[22] & 0xFF) == inject_idx_port0); // error index matches
+            assertTrue(MBIST_PTR->ERRCNT_PORT1 != 0); // error count > 0
+            //assertTrue(MBIST_PTR->FIRST_ERR_PORT1[0] == MBIST_PTR->INJ_ADDR_PORT1); // error address matches
+            //assertTrue((MBIST_PTR->FIRST_IDX_PORT1[0] & 0xFF) == inject_idx_port1); // error index matches
+            assertTrue(MBIST_PTR->FIRST_ERR_PORT1[0] == MBIST_PTR->INJ_ADDR_PORT0); // error address matches
+            assertTrue((MBIST_PTR->FIRST_IDX_PORT1[0] & 0xFF) == inject_idx_port0); // error index matches
+            assertTrue(MBIST_PTR->FIRST_IDX_PORT1[0] & MBIST_ERR_IDX0_SGL); // single error indicator
+            assertFalse(MBIST_PTR->FIRST_IDX_PORT1[0] & MBIST_ERR_IDX0_MPL); // multiple error error indicator
         }
 
     }

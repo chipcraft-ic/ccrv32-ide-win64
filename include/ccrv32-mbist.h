@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2019 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2022-12-12 15:09:34 +0100 (pon, 12 gru 2022) $
-* $Revision: 936 $
+* $Date: 2024-09-04 12:09:10 +0200 (śro, 04 wrz 2024) $
+* $Revision: 1104 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -57,20 +57,29 @@
 /** Power Management Controller Registers */
  typedef struct
 {
-    uint32_t RUN;           /*!< Run Register               */
-    uint32_t CTRL;          /*!< Control Register           */
-    uint32_t INJ;           /*!< Injection Control Register */
-    uint32_t INJ_ADDR0;     /*!< Port0 Address Register     */
-    uint32_t INJ_ADDR1;     /*!< Port1 Address Register     */
+    uint32_t RUN;               /*!< Run Register               */
+    uint32_t CTRL;              /*!< Control Register           */
+    uint32_t INJ;               /*!< Injection Control Register */
+    uint32_t INJ_ADDR_PORT0;    /*!< Port0 Address Register     */
+    uint32_t INJ_ADDR_PORT1;    /*!< Port1 Address Register     */
     uint32_t _reserved0[8];
-    uint32_t SCRATCH0;      /*!< Scratch register 0         */
-    uint32_t SCRATCH1;      /*!< Scratch register 1         */
-    uint32_t EXT_LOGS;      /*!< External Logs Region       */
-    uint32_t INT_LOGS;      /*!< Internal Logs Region       */
+    uint32_t SCRATCH0;          /*!< Scratch register 0         */
+    uint32_t SCRATCH1;          /*!< Scratch register 1         */
+    uint32_t EXT_LOGS;          /*!< External Logs Region       */
+    uint32_t INT_LOGS;          /*!< Internal Logs Region       */
     uint32_t _reserved1[63];
-    uint32_t MSC_LOGS;      /*!< Miscellaneous Logs Region  */
+    uint32_t MSC_LOGS;          /*!< Miscellaneous Logs Region  */
     uint32_t _reserved2[63];
-    uint32_t DET_LOGS[26];  /*!< Detailed Logs Region       */
+    uint32_t ERRCNT_PORT0;      /*!< Detailed Logs Region       */
+    uint32_t ERRCNT_PORT1;
+    uint32_t FIRST_ERR_PORT0[4];
+    uint32_t LAST_ERR_PORT0[4];
+    uint32_t FIRST_ERR_PORT1[4];
+    uint32_t LAST_ERR_PORT1[4];
+    uint32_t FIRST_IDX_PORT0[2];
+    uint32_t LAST_IDX_PORT0[2];
+    uint32_t FIRST_IDX_PORT1[2];
+    uint32_t LAST_IDX_PORT1[2];
 } mbist_regs_t;
 
 static volatile mbist_regs_t * const MBIST_PTR = (mbist_regs_t*)MBIST_BASE;
@@ -113,25 +122,38 @@ enum
     MBIST_ALG_MARCH_D2PF = 0x04, /*!< March d2PF algorithm */
 };
 
+/** MBIST Controller Fault Injection Register bits */
+enum
+{
+    MBIST_ERR_IDX0_SGL  = 0x00000100, /*!< Single error indicator   */
+    MBIST_ERR_IDX0_MPL  = 0x00000200, /*!< Multiple error indicator */
+    MBIST_ERR_IDX1_SGL  = 0x01000000, /*!< Single error indicator   */
+    MBIST_ERR_IDX1_MPL  = 0x02000000, /*!< Multiple error indicator */
+};
+
 /** MBIST Controller Fault Injection Register bit offsets */
 enum
 {
-    MBIST_INJ_IDX_PORT0_SHIFT   = 8,  /*!< Fault injection port0 index shift */
-    MBIST_INJ_IDX_PORT1_SHIFT   = 16, /*!< Fault injection port1 index shift */
+    MBIST_INJ_IDX0_PORT0_SHIFT  = 8,  /*!< Fault injection port0 index0 shift */
+    MBIST_INJ_IDX0_PORT1_SHIFT  = 16, /*!< Fault injection port1 index0 shift */
+    MBIST_INJ_IDX1_PORT0_SHIFT  = 24, /*!< Fault injection port0 index1 shift */
+    MBIST_INJ_IDX1_PORT1_SHIFT  = 28, /*!< Fault injection port1 index1 shift */
 };
 
 /** MBIST Controller Fault Injection Register masks */
 enum
 {
-	MBIST_INJ_IDX_PORT0_MASK    = 0xFF << MBIST_INJ_IDX_PORT0_SHIFT,  /*!< Fault injection port0 index mask */
-	MBIST_INJ_IDX_PORT1_MASK    = 0xFF << MBIST_INJ_IDX_PORT1_SHIFT,  /*!< Fault injection port1 index mask */
+	MBIST_INJ_IDX0_PORT0_MASK   = 0xFF << MBIST_INJ_IDX0_PORT0_SHIFT,  /*!< Fault injection port0 index0 mask */
+	MBIST_INJ_IDX0_PORT1_MASK   = 0xFF << MBIST_INJ_IDX0_PORT1_SHIFT,  /*!< Fault injection port1 index0 mask */
+	MBIST_INJ_IDX1_PORT0_MASK   = 0x0F << MBIST_INJ_IDX1_PORT0_SHIFT,  /*!< Fault injection port0 index1 mask */
+	MBIST_INJ_IDX1_PORT1_MASK   = 0x0F << MBIST_INJ_IDX1_PORT1_SHIFT,  /*!< Fault injection port1 index1 mask */
 };
 
 /** MBIST Controller Fault Injection Register bits */
 enum
 {
     MBIST_INJ_PORT0_EN      = 1 << 0,  /*!< Port0 fault injection enable */
-    MBIST_INJ_PORT1_EN      = 1 << 1,  /*!< Port0 fault injection enable */
+    MBIST_INJ_PORT1_EN      = 1 << 1,  /*!< Port1 fault injection enable */
 };
 
 /** @} */

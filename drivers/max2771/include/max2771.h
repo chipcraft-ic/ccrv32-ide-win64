@@ -32,8 +32,8 @@
 * File Name : max2771.c
 * Author    : Krzysztof Siwiec
 * ******************************************************************************
-* $Date: 2022-01-19 09:38:48 +0100 (śro, 19 sty 2022) $
-* $Revision: 814 $
+* $Date: 2025-01-06 20:45:57 +0100 (pon, 06 sty 2025) $
+* $Revision: 1121 $
 *H*****************************************************************************/
 
 #ifndef MAX2771_H_
@@ -50,7 +50,7 @@ int max2771_gpio_conf();
 int max2771_gpio_unconf();
 int max2771_spi_conf();
 int max2771_spi_unconf();
-uint32_t max2771_spi_write(enum max2771_band band, uint32_t address,uint32_t data);
-uint32_t max2771_conf_band(enum max2771_band band);
+uint32_t max2771_spi_write(enum max2771_band band, uint32_t address, uint32_t data);
+uint32_t max2771_conf_band(enum max2771_band band, uint32_t adc_freq);
 
 #endif /* MAX2771_H_ */

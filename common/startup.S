@@ -32,8 +32,8 @@
 # File Name : startup.S
 # Author    : Rafal Harabien, Krzysztof Marcinek
 # ******************************************************************************
-# $Date: 2024-07-19 09:26:19 +0200 (pią, 19 lip 2024) $
-# $Revision: 1074 $
+# $Date: 2025-03-24 10:59:53 +0100 (Mon, 24 Mar 2025) $
+# $Revision: 1137 $
 #H******************************************************************************
 
 # Useful defines:
@@ -87,7 +87,7 @@ __start:
 .global end_loop
 end_loop:
   li gp, 1
-  sw gp, tohost, t5                     # simulation exit
+  sw gp, tohost, t2                     # simulation exit
 end_jump:
   j end_jump
   nop
@@ -109,7 +109,7 @@ common_start:
   csrw mtvec, t0
 
   li t0, NMI_DIS_MASK
-  csrc mcontrol, t0                     # clear nmi disable
+  #csrc mcontrol, t0                     # clear nmi disable
 
   or sp,   zero, zero                   # clear register file
   or gp,   zero, zero
@@ -125,6 +125,7 @@ common_start:
   or a3,   zero, zero
   or a4,   zero, zero
   or a5,   zero, zero
+#ifndef __riscv_ilp32e_abi
   or a6,   zero, zero
   or a7,   zero, zero
   or s2,   zero, zero
@@ -142,6 +143,7 @@ common_start:
   or t5,   zero, zero
   or t6,   zero, zero
   #or ra, zero, zero                    # saved in jal instruction
+#endif
 
 #ifdef __riscv_float_abi_double
 
@@ -195,8 +197,11 @@ cache_init:
   sw zero, CACHE_FLUSH_OFFSET(t0)       # flush instruction cache
   sw zero, CACHE_FLUSH_OFFSET(t2)       # flush data cache
   or t1, zero, CACHE_EN_MASK            # cache enable mask
+  or t1, t1, CACHE_BM_MASK              # store buffer merging enable mask
   or t1, t1, CACHE_FT_MASK              # cache parity/ecc enable mask
-  or t1, t1, CACHE_HE_MASK              # cache hard error enable mask
+  #or t1, t1, CACHE_HE_MASK              # cache hard error enable mask
+  li t3, CACHE_NM_MASK                  # load NMI mask
+  or t1, t1, t3                         # enable NMI
   sw t1, CACHE_STCR_OFFSET(t0)          # enable instruction cache
   sw t1, CACHE_STCR_OFFSET(t2)          # enable data cache
   .option push
@@ -222,142 +227,13 @@ cache_init:
 
   csrrsi t1, mcontrol, SPROT_EN_MASK    # enable stack protection
 
-check_spram_size:
-  csrr s1, mconfig0                     # get CPU features register
-  srl t0, s1, SPRAM_SIZE_SHIFT
-  and t0, t0, SPRAM_SIZE_MASK           # t0 = log2(SPRAM size)
-  li s2, 1
-  sll s2, s2, t0                        # s2 = SPRAM size
-  lui s3, SPRAM_BASE                    # SPRAM memory base address
-  add s3, s3, s2                        # s3 = SPRAM memory end
-  la t1, _espram_bss                    # SPRAM BSS section end address
-  sub t1, s3, t1                        # compare to end of physical SPRAM
-  blt t1, zero, no_mem                  # branch if there is not enough SPRAM memory
-
-init_spram_data:
-  la t0, _sspram_data                   # data section start address
-  la t1, _espram_data                   # data section end address
-  la t2, _spram_data_load               # address of data in ROM memory
-  beq t0, t1, init_spram_bss            # check if data section is empty
-  addi t1, t1, -4                       # last valid address
-  addi t0, t0, -4
-copy_spram_data:
-  add t0, t0, 4                         # increment destination ptr
-  lw t3, 0(t2)                          # copy word from ROM memory
-  add t2, t2, 4                         # increment source ptr
-  sw t3, 0(t0)                          # save word in SPRAM memory
-  sub t4, t1, t0                        # last ptr - cur ptr
-  bgt t4, zero, copy_spram_data         # loop
-init_spram_bss:
-  la t0, _sspram_bss                    # SPRAM BSS section start address
-  la t1, _espram_bss                    # SPRAM BSS section end address
-  beq t0, t1, common_done               # check if SPRAM BSS section is empty
-  addi t1, t1, -4                       # last valid address
-  add t0, t0, -4
-zero_spram_bss:
-  add t0, t0, 4                         # increment pointer
-  sw zero, 0(t0)                        # zero word in SPRAM BSS
-  sub t4, t1, t0                        # last ptr - cur ptr
-  bgt t4, zero, zero_spram_bss          # loop
-
-common_done:
-
-  csrrsi t1, mstatus, IRQ_EN_MASK       # enable interrupts
-  addi t1, zero, 1
-  slli t1, t1, IRQ_EXT_EN_SHIFT
-  csrw mie, t1                          # enable external interrupts
-
-#ifdef __riscv_float_abi_double
-check_hardfloat:
-  csrr s1, misa                         # get CPU ISA
-  ori t0, zero, FPU_MASK                # load FPU mask
-  and t0, s1, t0                        # check if FPU exists
-  beq t0, zero, no_hardfloat
-#endif
-
-  li s1, FPU_INIT_MASK                  # load FPU initial state mask
-  csrs mstatus, s1                      # enable FPU if present
-
-  jr ra                                 # return
-
-program:
-
-  csrw mscratch, ra                     # save ra
-  jal hardware_init                     # hardware specific initialization
-  csrr ra, mscratch                     # restore ra
-
-  csrr s1, mconfig0                     # get CPU features register
-  srl t0, s1, RAM_SIZE_SHIFT
-  and t0, t0, RAM_SIZE_MASK             # t0 = log2(RAM size)
-#ifndef RAM_SIZE
-  li s2, 1
-  sll s2, s2, t0                        # s2 = RAM size
-#else
-  li s2, RAM_SIZE
-#endif
-  lui s3, RAM_BASE                      # RAM memory base address
-  add s3, s3, s2                        # s3 = RAM memory end
-
-  srl t1, s1, ROM_SIZE_SHIFT
-  and t1, t1, ROM_SIZE_MASK             # t1 = log2(ROM size)
-  li s2, 1
-  sll s2, s2, t1                        # s2 = ROM size
-  lui s1, ROM_BASE                      # ROM memory base address
-  add s2, s1, s2                        # s2 = ROM memory end
-
-check_ram_memory_size:
-  la t2, _sheap                         # start of unused RAM
-  sub t2, s3, t2                        # compare to end of physical RAM
-  beq t0, zero, check_rom_memory_size   # no on-chip memory, proceeed
-  blt t2, zero, no_mem                  # branch if there is not enough RAM memory
-
-check_rom_memory_size:
-  la t2, _sdata                         # data section start address
-  la t0, _edata                         # data section end address
-  sub t2, t0, t2                        # size of data section
-  la t0, _data_load                     # address of data in ROM memory
-  add t2, t2, t0                        # end of data section in ROM
-  sub t2, s2, t2                        # compare to end of physical ROM
-  beq t1, zero, init_data               # no on-chip memory, proceeed
-  blt t2, zero, no_mem                  # branch if there is not enough ROM memory
-
-init_data:
-  la t0, _sdata                         # data section start address
-  la t1, _edata                         # data section end address
-  la t2, _data_load                     # address of data in ROM memory
-  beq t0, t1, init_bss                  # check if data section is empty
-  addi t1, t1, -4                       # last valid address
-  add t0, t0, -4
-copy_data:
-  add t0, t0, 4                         # increment destination ptr
-  lw t3, 0(t2)                          # copy word from ROM memory
-  add t2, t2, 4                         # increment source ptr
-  sw t3, 0(t0)                          # save word in RAM memory
-  sub t4, t1, t0                        # last ptr - cur ptr
-  bgt t4, zero, copy_data               # loop
-
-init_bss:
-  la t0, _sbss                          # BSS section start address
-  la t1, _ebss                          # BSS section end address
-  beq t0, t1, done                      # check if BSS section is empty
-  addi t1, t1, -4                       # last valid address
-  add t0, t0, -4
-zero_bss:
-  add t0, t0, 4                         # increment pointer
-  sw zero, 0(t0)                        # zero word in BSS
-  sub t4, t1, t0                        # last ptr - cur ptr
-  bgt t4, zero, zero_bss                # loop
-
-done:
-  addi sp, sp, -16                      # call arguments area
-
 #ifdef _EXEC_TIMEOUT
-
+wdt_setup:
   li t0, PWD_ADDRESS                    # load power management controller address
   lw t1, RST_RSN_OFFSET(t0)             # read reset reason
   ori t2, zero, WDT_RESET_MASK          # load watchdog reset mask
   beq t1, t2, end_loop                  # end simulation if watchdog reset
-
+wdt_check:
   lui t0, AMBA_BASE                     # load amba base address
   lw t1, AMBA_INFO0_OFFSET(t0)          # load AMBA_INFO_0
   lui t2, WDT_MASK                      # load watchdog mask
@@ -384,14 +260,209 @@ wdt_enable:
   sw t3, WDT_CTRL_OFFSET(t0)            # enable watchdog
   lw t4, WDT_CTRL_OFFSET(t0)            # load control
   bne t3, t4, wdt_enable                # check if watchdog enabled
-
 #endif
+
+check_spram_size:
+  csrr s1, mconfig0                     # get CPU features register
+  srl t0, s1, SPRAM_SIZE_SHIFT
+  and t0, t0, SPRAM_SIZE_MASK           # t0 = log2(SPRAM size)
+  li s0, 1
+  sll s0, s0, t0                        # s0 = SPRAM size
+  lui s1, SPRAM_BASE                    # SPRAM memory base address
+  add s1, s1, s0                        # s1 = SPRAM memory end
+  la t1, _espram_bss                    # SPRAM BSS section end address
+  sub t1, s1, t1                        # compare to end of physical SPRAM
+  blt t1, zero, no_mem                  # branch if there is not enough SPRAM memory
+
+init_spram_data:
+  la t0, _sspram_data                   # data section start address
+  la t1, _espram_data                   # data section end address
+  la t2, _spram_data_load               # address of data in ROM memory
+  beq t0, t1, init_spram_bss            # check if data section is empty
+  addi t1, t1, -4                       # last valid address
+  addi t0, t0, -4
+copy_spram_data:
+  add t0, t0, 4                         # increment destination ptr
+  lw s0, 0(t2)                          # copy word from ROM memory
+  add t2, t2, 4                         # increment source ptr
+  sw s0, 0(t0)                          # save word in SPRAM memory
+  sub s1, t1, t0                        # last ptr - cur ptr
+  bgt s1, zero, copy_spram_data         # loop
+init_spram_bss:
+  la t0, _sspram_bss                    # SPRAM BSS section start address
+  la t1, _espram_bss                    # SPRAM BSS section end address
+  beq t0, t1, common_done               # check if SPRAM BSS section is empty
+  addi t1, t1, -4                       # last valid address
+  add t0, t0, -4
+zero_spram_bss:
+  add t0, t0, 4                         # increment pointer
+  sw zero, 0(t0)                        # zero word in SPRAM BSS
+  sub s1, t1, t0                        # last ptr - cur ptr
+  bgt s1, zero, zero_spram_bss          # loop
+
+common_done:
+
+  csrrsi t1, mstatus, IRQ_EN_MASK       # enable interrupts
+  addi t1, zero, 1
+  slli t1, t1, IRQ_EXT_EN_SHIFT
+  csrw mie, t1                          # enable external interrupts
+
+#ifdef __riscv_float_abi_double
+check_hardfloat:
+  csrr s1, misa                         # get CPU ISA
+  ori t0, zero, FPU_MASK                # load FPU mask
+  and t0, s1, t0                        # check if FPU exists
+  beq t0, zero, no_hardfloat
+#endif
+
+  li s1, FPU_INIT_MASK                  # load FPU initial state mask
+  csrs mstatus, s1                      # enable FPU if present
+
+  jr ra                                 # return
+
+.global pmp_init
+pmp_init:
+
+  csrr t0, mtvec                        # read mtvec
+  la s0, pmp_exc                        # set trap vector
+  csrw mtvec, s0
+
+  la s0, _data_load                     # end of ROM execute
+  srl s0, s0, 2
+  csrw pmpaddr0, s0                     # first region address
+
+  li s0, (SPRAM_BASE<<12)>>2            # SPRAM start address
+  csrw pmpaddr1, s0                     # second region address
+
+  la s1, _expram_data                   # setup for SPRAM
+  srl s1, s1, 2
+
+  beq s0, s1, no_spram_data             # check if section is empty
+  csrw pmpaddr2, s1                     # SPRAM execute region
+
+  li s0, (RAM_BASE<<(12+2))>>2          # rest of emmory map
+  csrw pmpaddr3, s0                     # rest of memory map
+
+  li s0, ((PMP_LOCKED|PMP_TOR|PMP_READ|PMP_WRITE)<<24) | \
+         ((PMP_LOCKED|PMP_TOR|PMP_READ|PMP_EXEC)<<16)  | \
+         ((PMP_LOCKED|PMP_TOR|PMP_READ|PMP_WRITE)<<8)  | \
+         ((PMP_LOCKED|PMP_TOR|PMP_READ|PMP_EXEC)<<0)  
+  csrw pmpcfg0, s0                      # regions setup
+  j pmp_done
+
+no_spram_data:
+  li s0, (RAM_BASE<<(12+2))>>2          # rest of memory map
+  csrw pmpaddr2, s0                     # third region address
+  li s0, ((PMP_LOCKED|PMP_TOR|PMP_READ|PMP_WRITE)<<16) | \
+         ((PMP_LOCKED|PMP_TOR|PMP_READ|PMP_WRITE)<<8)  | \
+         ((PMP_LOCKED|PMP_TOR|PMP_READ|PMP_EXEC)<<0)
+  csrw pmpcfg0, s0                      # regions setup
+  j pmp_done
+
+pmp_exc:                                # pmp register unimplemented
+  la s0, pmp_done                       # set return address
+  csrw mepc, s0                         # write mepc
+  mret                                  # return
+pmp_done:
+  csrw mtvec, t0                        # restore mtvec
+  jr ra
+
+program:
+
+  csrw mscratch, ra                     # save ra
+  jal hardware_init                     # hardware specific initialization
+  csrr ra, mscratch                     # restore ra
+
+  csrr s1, mconfig0                     # get CPU features register
+  srl t0, s1, RAM_SIZE_SHIFT
+  and t0, t0, RAM_SIZE_MASK             # t0 = log2(RAM size)
+#ifndef RAM_SIZE
+  li s0, 1
+  sll s0, s0, t0                        # s0 = RAM size
+#else
+  li s0, RAM_SIZE
+#endif
+  lui tp, RAM_BASE                      # RAM memory base address
+  add tp, tp, s0                        # tp = RAM memory end
+
+  srl t1, s1, ROM_SIZE_SHIFT
+  and t1, t1, ROM_SIZE_MASK             # t1 = log2(ROM size)
+  li s0, 1
+  sll s0, s0, t1                        # s0 = ROM size
+  lui s1, ROM_BASE                      # ROM memory base address
+  add s0, s1, s0                        # s0 = ROM memory end
+
+check_ram_memory_size:
+  la t2, _sheap                         # start of unused RAM
+  sub t2, tp, t2                        # compare to end of physical RAM
+  beq t0, zero, check_rom_memory_size   # no on-chip memory, proceeed
+  blt t2, zero, no_mem                  # branch if there is not enough RAM memory
+
+check_rom_memory_size:
+  la t2, _sdata                         # data section start address
+  la t0, _edata                         # data section end address
+  sub t2, t0, t2                        # size of data section
+  la t0, _data_load                     # address of data in ROM memory
+  add t2, t2, t0                        # end of data section in ROM
+  sub t2, s0, t2                        # compare to end of physical ROM
+  beq t1, zero, init_data               # no on-chip memory, proceeed
+  blt t2, zero, no_mem                  # branch if there is not enough ROM memory
+
+init_data:
+  la t0, _sdata                         # data section start address
+  la t1, _edata                         # data section end address
+  la t2, _data_load                     # address of data in ROM memory
+  beq t0, t1, init_bss                  # check if data section is empty
+  addi t1, t1, -4                       # last valid address
+  add t0, t0, -4
+copy_data:
+  add t0, t0, 4                         # increment destination ptr
+  lw s0, 0(t2)                          # copy word from ROM memory
+  add t2, t2, 4                         # increment source ptr
+  sw s0, 0(t0)                          # save word in RAM memory
+  sub s1, t1, t0                        # last ptr - cur ptr
+  bgt s1, zero, copy_data               # loop
+
+init_bss:
+  la t0, _sbss                          # BSS section start address
+  la t1, _ebss                          # BSS section end address
+  beq t0, t1, done                      # check if BSS section is empty
+  addi t1, t1, -4                       # last valid address
+  add t0, t0, -4
+zero_bss:
+  add t0, t0, 4                         # increment pointer
+  sw zero, 0(t0)                        # zero word in BSS
+  sub s1, t1, t0                        # last ptr - cur ptr
+  bgt s1, zero, zero_bss                # loop
+
+done:
+  addi sp, sp, -16                      # call arguments area
 
 #ifdef _LOCK_ROM
-  li t3, ROM_UNLOCK_KEY                 # load rom unlock key
-  csrw mromunlock, t3                   # lock rom memory
+  li s0, ROM_UNLOCK_KEY                 # load rom unlock key
+  csrw mromunlock, s0                   # lock rom memory
 #endif
 
+iopmp:
+  csrr t0, mtvec                        # read mtvec
+  la s0, iopmp_exc                      # set trap vector
+  csrw mtvec, s0
+  li s0, (RAM_BASE<<12)>>2              # ROM iopmp setup
+  csrw miopmpaddr0, s0                  # first region address
+  li s0, (RAM_BASE<<(12+2))>>2          # RAM iopmp setup
+  csrw miopmpaddr1, s0                  # first region addr
+  li s0, ((PMP_TOR|PMP_READ|PMP_WRITE)<<8) | \
+         ((PMP_TOR|PMP_READ)<<0)        # (TOR, read, write) (TOR, read)
+  csrw miopmpcfg0, s0                   # first region setup
+  j iopmp_done
+iopmp_exc:                              # iopmp register unimplemented
+  la s0, iopmp_done                     # set return address
+  csrw mepc, s0                         # write mepc
+  mret                                  # return
+iopmp_done:
+  csrw mtvec, t0                        # restore mtvec
+
+  jal pmp_init                          # pmp init (startup.S)
   jal board_init                        # board specific initialization
   jal __libc_init_array                 # init libc
   jal _ccrv32_init
@@ -498,6 +569,7 @@ int_enter_stack:
   sw a3, 36+52(sp)
   sw a4, 36+56(sp)
   sw a5, 36+60(sp)
+#ifndef __riscv_ilp32e_abi
   sw a6, 36+64(sp)
   sw a7, 36+68(sp)
   sw s2, 36+72(sp)
@@ -514,6 +586,7 @@ int_enter_stack:
   sw t4, 36+116(sp)
   sw t5, 36+120(sp)
   sw t6, 36+124(sp)
+#endif
 
   addi t0, sp, 36+124+12
   srli t0, t0, 3
@@ -574,6 +647,7 @@ int_ret_stack:
   lw a3, 36+52(sp)
   lw a4, 36+56(sp)
   lw a5, 36+60(sp)
+#ifndef __riscv_ilp32e_abi
   lw a6, 36+64(sp)
   lw a7, 36+68(sp)
   lw s2, 36+72(sp)
@@ -590,6 +664,7 @@ int_ret_stack:
   lw t4, 36+116(sp)
   lw t5, 36+120(sp)
   lw t6, 36+124(sp)
+#endif
 
 int_ret_rest:
   lw t0, 16(sp)                         # read mepc from stack
@@ -620,7 +695,8 @@ incr_four:
 
 incr_common:
 
-  nop                                   # dummy insctructions for lockstep operation
+  nop
+  nop                                   # dummy instructions for lockstep operation
   nop                                   # in corner case where exception occures
   nop                                   # immediately after previous one
   nop                                   # because of presence of signature buffer
@@ -630,6 +706,7 @@ incr_common:
   nop                                   # because of that the number of instructions
   nop                                   # in exception handler should be greater
   nop                                   # than the signature buffer
+  nop
 
   csrw mepc, t0                         # write mepc
   csrr t0, mscratch                     # restore t0
@@ -638,7 +715,6 @@ incr_common:
 
 .weak nmi_handler
 nmi_handler:
-  csrr t0, mscratch
   mret
 
 # IRQ Vectors

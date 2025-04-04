@@ -32,8 +32,8 @@
  * File Name : tsmc40ulpfmc.c
  * Author    : Maciej Plasota
  * ******************************************************************************
- * $Date: 2024-06-04 16:08:03 +0200 (wto, 04 cze 2024) $
- * $Revision: 1058 $
+ * $Date: 2025-03-03 13:31:11 +0100 (pon, 03 mar 2025) $
+ * $Revision: 1131 $
  *H*****************************************************************************/
 
 #include <specialreg.h>
@@ -64,11 +64,7 @@
 
 #define TSMC40ULPFMC_PAGE_SIZE FLASH_PAGE_SIZE
 #define TSMC40ULPFMC_SECTOR_SIZE \
-    ( \
-        sizeof( AMBA_FLASH_PTR->SECTOR_BUFFER ) \
-            / \
-        sizeof( AMBA_FLASH_PTR->SECTOR_BUFFER[ 0U ] ) \
-    )
+    ( sizeof( AMBA_FLASH_PTR->SECTOR_BUFFER ) )
 
 /*
  * We need to get the word that contains given (possibly unaligned) address.
@@ -477,16 +473,21 @@ tsmc40ulpfmc_commit_page_blocking(
     AMBA_FLASH_PTR->ADDRESS = ( uint32_t ) address;
     flash_unlock_command();
     flash_issue_command( FLASH_COMMAND_ERASE_PAGE );
-    result = flash_check_status();
+    result = flash_loop_while_busy();
+    if ( BUSY < result ) {
+        goto failure_erase_page;
+    }
 
     for (
         size_t sector = 0U;
         sector < ( TSMC40ULPFMC_PAGE_SIZE / TSMC40ULPFMC_SECTOR_SIZE );
         ++sector
     ) {
-        flash_loop_while_busy();
         flash_sector_buffer_clear();
-        flash_loop_while_busy();
+        result = flash_loop_while_busy();
+        if ( BUSY < result ) {
+            goto failure_sector_buffer_clear;
+        }
 
         /* fill sector buffer with data */
         ( void ) tsmc40ulpfmc_memcpy_to_flash(
@@ -500,7 +501,7 @@ tsmc40ulpfmc_commit_page_blocking(
             ( uint32_t ) ( address + ( sector * TSMC40ULPFMC_SECTOR_SIZE ));
         flash_unlock_command();
         flash_issue_command( FLASH_COMMAND_WRITE_SECTOR );
-        result = flash_check_status();
+        result = flash_loop_while_busy();
         if ( BUSY < result ) {
             goto failure_sector_buffer_write;
         }
@@ -519,6 +520,8 @@ tsmc40ulpfmc_commit_page_blocking(
     buffer->writes = 0U;
 
 failure_sector_buffer_write:
+failure_sector_buffer_clear:
+failure_erase_page:
 done:
 failure_arguments:
     __libc_lock_release_recursive( &( tsmc40ulpfmc_cache.lock ));
@@ -2331,6 +2334,48 @@ flash_write(
 
 failure_arguments:
     return result;
+}
+
+/*! \brief Check if cache page buffer is allocated.
+ *
+ * \param address Page address.
+ *
+ * The address is allowed to be unaligned.
+ *
+ * \return Status of operation.
+ *   \retval true cache page buffer is allocated.
+ *   \retval false cache page buffer is not allocated.
+ */
+bool
+flash_cache_buffer_allocated(
+    void const * const address
+)
+{
+    return (tsmc40ulpfmc_cache_page_buffer_from_address( address ) != NULL);
+}
+
+/*! \brief Check cache page buffer writes number.
+ *
+ * \param address Page address.
+ *
+ * The address is allowed to be unaligned.
+ *
+ * \return Status of operation.
+ *   \retval -1 cache page buffer is not allocated.
+ *   \retval int16_t allocated cache page buffer writes number.
+ */
+int16_t
+flash_cache_buffer_writes(
+    void const * const address
+)
+{
+    tsmc40ulpfmc_cache_page_buffer_type const * const buffer =
+        tsmc40ulpfmc_cache_page_buffer_from_address( address );
+    if (buffer != NULL)
+    {
+        return buffer->writes;
+    }
+    return -1;
 }
 
 /************** config **************/
