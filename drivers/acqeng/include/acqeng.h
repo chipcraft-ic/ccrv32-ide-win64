@@ -32,8 +32,8 @@
  * File Name : acqeng.h
  * Author    : Sebastian Cieslak
  * ******************************************************************************
- * $Date: 2025-03-26 14:59:44 +0100 (Wed, 26 Mar 2025) $
- * $Revision: 1138 $
+ * $Date: 2025-04-07 13:26:40 +0200 (Mon, 07 Apr 2025) $
+ * $Revision: 1140 $
  *H*****************************************************************************/
 
 #ifndef _ACQENG_H_
@@ -1663,13 +1663,31 @@ static inline void acqeng_enable_glonass_l1_mixer(volatile amba_acqeng_t *acqeng
     acqeng->CONFIG = AEC_CONFIG_GLONA | AEC_CONFIG_L1E1F | AEC_CONFIG_MIXER | ((carr_mode << AEC_CONFIG_CARRM_SHIFT) & AEC_CONFIG_CARRM_MASK);
 }
 
-/* \brief Sets configuration for Beidou with carrier mixer enabled.
+/* \brief Sets configuration for GLONASS L2 with carrier mixer enabled.
+ *
+ * \param acqeng    Base address of the Acquisition Engine instance.
+ * \param carr_mode Carrier mode.
+ */
+static inline void acqeng_enable_glonass_l2_mixer(volatile amba_acqeng_t *acqeng, uint8_t carr_mode) {
+    acqeng->CONFIG = AEC_CONFIG_GLONA | AEC_CONFIG_L2F | AEC_CONFIG_MIXER | ((carr_mode << AEC_CONFIG_CARRM_SHIFT) & AEC_CONFIG_CARRM_MASK);
+}
+
+/* \brief Sets configuration for Beidou B1I with carrier mixer enabled.
  *
  * \param acqeng    Base address of the Acquisition Engine instance.
  * \param carr_mode Carrier mode.
  */
 static inline void acqeng_enable_beidou_b1_mixer(volatile amba_acqeng_t *acqeng, uint8_t carr_mode) {
     acqeng->CONFIG = AEC_CONFIG_BEID | AEC_CONFIG_L1E1F | AEC_CONFIG_MIXER | ((carr_mode << AEC_CONFIG_CARRM_SHIFT) & AEC_CONFIG_CARRM_MASK);
+}
+
+/* \brief Sets configuration for Beidou B3I with carrier mixer enabled.
+ *
+ * \param acqeng    Base address of the Acquisition Engine instance.
+ * \param carr_mode Carrier mode.
+ */
+static inline void acqeng_enable_beidou_b3_mixer(volatile amba_acqeng_t *acqeng, uint8_t carr_mode) {
+    acqeng->CONFIG = AEC_CONFIG_BEID | AEC_CONFIG_E6F | AEC_CONFIG_MIXER | ((carr_mode << AEC_CONFIG_CARRM_SHIFT) & AEC_CONFIG_CARRM_MASK);
 }
 
 /* \brief Sets configuration for Beidou B2a with carrier mixer enabled.
@@ -1789,7 +1807,7 @@ static inline void acqeng_enable_auto_glonass_l1_mixer(volatile amba_acqeng_t *a
                      ((rclb_shift << AEC_CONFIG_RCLB_SHIFT) & AEC_CONFIG_RCLB_MASK) | (is_cyclic ? AEC_CONFIG_CYCLIC : 0) | (always_fine ? AEC_CONFIG_ALWFINE : 0);
 }
 
-/* \brief Sets configuration for auto mode for Beidou with carrier mixer enabled.
+/* \brief Sets configuration for auto mode for Beidou B1I with carrier mixer enabled.
  *
  * \param acqeng    Base address of the Acquisition Engine instance.
  * \param carr_mode Carrier mode.
@@ -1799,6 +1817,31 @@ static inline void acqeng_enable_auto_glonass_l1_mixer(volatile amba_acqeng_t *a
  */
 static inline void acqeng_enable_auto_beidou_b1_mixer(volatile amba_acqeng_t *acqeng, uint8_t carr_mode, uint8_t rclb_shift, bool is_cyclic, bool always_fine) {
     acqeng->CONFIG = AEC_CONFIG_AUTO | AEC_CONFIG_BEID | AEC_CONFIG_L1E1F | AEC_CONFIG_MIXER | ((carr_mode << AEC_CONFIG_CARRM_SHIFT) & AEC_CONFIG_CARRM_MASK) |
+                     ((rclb_shift << AEC_CONFIG_RCLB_SHIFT) & AEC_CONFIG_RCLB_MASK) | (is_cyclic ? AEC_CONFIG_CYCLIC : 0) | (always_fine ? AEC_CONFIG_ALWFINE : 0);
+}
+
+/* \brief Sets configuration for auto mode for Beidou B3I with carrier mixer enabled.
+ *
+ * \param acqeng    Base address of the Acquisition Engine instance.
+ * \param carr_mode Carrier mode.
+ * \param spc_shift Samples per Chip as Shift.
+ * \param rclb_shift Real Code Length Base as Shift.
+ * \param is_cyclic Cyclic Data enable
+ */
+static inline void acqeng_enable_auto_beidou_b3_mixer(volatile amba_acqeng_t *acqeng, uint8_t carr_mode, uint8_t rclb_shift, bool is_cyclic, bool always_fine) {
+    acqeng->CONFIG = AEC_CONFIG_AUTO | AEC_CONFIG_BEID | AEC_CONFIG_E6F | AEC_CONFIG_MIXER | ((carr_mode << AEC_CONFIG_CARRM_SHIFT) & AEC_CONFIG_CARRM_MASK) |
+                     ((rclb_shift << AEC_CONFIG_RCLB_SHIFT) & AEC_CONFIG_RCLB_MASK) | (is_cyclic ? AEC_CONFIG_CYCLIC : 0) | (always_fine ? AEC_CONFIG_ALWFINE : 0);
+}
+
+/* \brief Sets configuration for auto mode for Beidou B2a with carrier mixer enabled.
+ *
+ * \param acqeng    Base address of the Acquisition Engine instance.
+ * \param carr_mode Carrier mode.
+ * \param rclb_shift Real Code Length Base as Shift.
+ * \param is_cyclic Cyclic Data enable.
+ */
+static inline void acqeng_enable_auto_beidou_b2a_mixer(volatile amba_acqeng_t *acqeng, uint8_t carr_mode, uint8_t rclb_shift, bool is_cyclic, bool always_fine) {
+    acqeng->CONFIG = AEC_CONFIG_AUTO | AEC_CONFIG_BEID | AEC_CONFIG_L5E5AF | AEC_CONFIG_MIXER | ((carr_mode << AEC_CONFIG_CARRM_SHIFT) & AEC_CONFIG_CARRM_MASK) |
                      ((rclb_shift << AEC_CONFIG_RCLB_SHIFT) & AEC_CONFIG_RCLB_MASK) | (is_cyclic ? AEC_CONFIG_CYCLIC : 0) | (always_fine ? AEC_CONFIG_ALWFINE : 0);
 }
 
@@ -2554,6 +2597,30 @@ static inline bool acqeng_has_glonass_l1of_prn_gen(volatile amba_acqeng_t *acqen
  *   \retval false GLONASS L1OF PRN generator is not present.
  */
 static inline bool acqeng_has_glonass_l1of_prn_gen_from_info(uint32_t info) {
+    return info & AEC_INFO_GLONA_L1OF;
+}
+
+/*! \brief Tests if the Acquisition Engine has a GLONASS L2OF PRN generator.
+ *
+ * \param acqeng Base address of the Acquisition Engine instance.
+ *
+ * \return Value of the GLONA_L2OF bit.
+ *   \retval true  GLONASS L2OF PRN generator is present.
+ *   \retval false GLONASS L2OF PRN generator is not present.
+ */
+static inline bool acqeng_has_glonass_l2of_prn_gen(volatile amba_acqeng_t *acqeng) {
+    return acqeng->INFO & AEC_INFO_GLONA_L1OF;
+}
+
+/*! \brief Tests if info indicates that the Acquisition Engine has a GLONASS L2OF PRN generator.
+ *
+ * \param info Content of the info register.
+ *
+ * \return Value of the GLONA_L2OF bit.
+ *   \retval true  GLONASS L2OF PRN generator is present.
+ *   \retval false GLONASS L2OF PRN generator is not present.
+ */
+static inline bool acqeng_has_glonass_l2of_prn_gen_from_info(uint32_t info) {
     return info & AEC_INFO_GLONA_L1OF;
 }
 
