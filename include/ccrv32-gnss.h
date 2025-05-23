@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2019 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2024-08-19 09:13:00 +0200 (pon, 19 sie 2024) $
-* $Revision: 1100 $
+* $Date: 2025-05-16 14:07:05 +0200 (Fri, 16 May 2025) $
+* $Revision: 1152 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -76,7 +76,7 @@ typedef struct
     uint32_t ADCVAL;            /*!< Test ADC input (for diagnostics only)                          */
     uint32_t RNG_NCO;           /*!< Range Generation NCO Register                                  */
     uint32_t RNG_PERIOD;        /*!< Range Generation Period Register                               */
-    uint32_t _reserved0[1];
+    uint32_t RNG_NCO2;          /*!< Extenden Range Generation NCO Register                         */
     uint32_t TMSTMP_RNG_LO;     /*!< Range Generation Timestamp LO                                  */
     uint32_t TMSTMP_RNG_HI;     /*!< Range Generation Timestamp HI                                  */
     uint32_t FLAGS;             /*!< Interrupt Flags Register                                       */
@@ -108,6 +108,7 @@ static volatile gnss_regs_t * const GNSS_PTR = (gnss_regs_t*)GNSS_BASE;
 /** GNSS Controller Status Register Flags */
 enum
 {
+    GNSS_STCR_ACQDEC_FIVE = 1 << 7,  /*!< Acquisition Decimator by 5 Mask             */
     GNSS_STCR_MODE        = 1 << 12, /*!< GNSS Sample Mode                            */
     GNSS_STCR_PLAY        = 1 << 13, /*!< GNSS Playback Mode                          */
     GNSS_STCR_BUSY        = 1 << 14, /*!< GNSS Busy                                   */

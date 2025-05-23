@@ -32,8 +32,8 @@
 # File Name : generic.mk
 # Author    : Rafal Harabien
 # ******************************************************************************
-# $Date: 2024-08-19 09:13:00 +0200 (pon, 19 sie 2024) $
-# $Revision: 1100 $
+# $Date: 2025-04-18 14:09:53 +0200 (pią, 18 kwi 2025) $
+# $Revision: 1149 $
 #H******************************************************************************
 
 ifeq ($(OS),Windows_NT)
@@ -146,6 +146,7 @@ CCPROG        := "$(CHIPCRAFT_SDK_TOOLS_PATH)/ccprog$(EXEEXT)"
 CCBTERM       := "$(CHIPCRAFT_SDK_TOOLS_PATH)/ccbterm$(EXEEXT)"
 CCTERM        := "$(CHIPCRAFT_SDK_TOOLS_PATH)/ccterm$(EXEEXT)"
 DBGSERVER_RS  := $(PYTHON) "$(CHIPCRAFT_SDK_TOOLS_PATH)/dbgserver.py"
+DBGSERVER_JTAG    := $(CHIPCRAFT_SDK_TOOLS_PATH)/debugserverjtag$(EXEEXT)
 CCSIM         := "$(CHIPCRAFT_SDK_TOOLS_PATH)/ccsim$(EXEEXT)"
 
 MINITERM      := miniterm.py
@@ -155,6 +156,12 @@ ifeq ($(PLATFORM),linux)
 CD := cd
 else ifeq ($(PLATFORM),windows)
 CD := cd
+endif
+
+ifeq ($(CHIPCRAFT_SDK_USE_JTAG),Yes)
+ DBGSERVER := $(DBGSERVER_JTAG)
+else
+ DBGSERVER := $(DBGSERVER_RS)
 endif
 
 ifeq ($(PLATFORM),windows)
@@ -197,6 +204,17 @@ CHIPCRAFT_SDK_MCU             ?= $(MCU)
 CHIPCRAFT_SDK_DBG_BAUDRATE    ?= $(DBG_BAUDRATE)
 CHIPCRAFT_SDK_UART_BAUDRATE   ?= $(UART_BAUDRATE)
 CHIPCRAFT_SDK_CCPROG_BAUDRATE ?= auto
+
+CCPROG_FLAGS += --mcu $(CHIPCRAFT_SDK_MCU)
+DBGSERVER_FLAGS += --mcu $(CHIPCRAFT_SDK_MCU)
+ifeq ($(CHIPCRAFT_SDK_USE_JTAG),Yes)
+ $(info Using JTAG connection.)
+ CCPROG_FLAGS += $(CHIPCRAFT_SDK_JTAG_FLAG) $(CCPROG_OTHER_FLAGS)
+else
+ CCPROG_FLAGS += -p $(CHIPCRAFT_SDK_DBG_PORT) -b $(CHIPCRAFT_SDK_CCPROG_BAUDRATE) --burst $(CCPROG_OTHER_FLAGS)
+ DBGSERVER_FLAGS += -p $(CHIPCRAFT_SDK_DBG_PORT) -b $(CHIPCRAFT_SDK_DBG_BAUDRATE)
+endif
+
 include $(CHIPCRAFT_SDK_HOME)/boards/$(CHIPCRAFT_SDK_BOARD)/board.mk
 
 ifndef CHIPCRAFT_SDK_MCU
@@ -255,8 +273,6 @@ ifeq ($(PLATFORM),windows)
 else ifeq ($(PLATFORM),linux)
   DEBUGGER_FLAGS  ?= -q -x "$(CHIPCRAFT_SDK_HOME)/common/gdbinit"
 endif
-DBGSERVER_FLAGS += -p $(CHIPCRAFT_SDK_DBG_PORT) -b $(CHIPCRAFT_SDK_DBG_BAUDRATE) --mcu=$(CHIPCRAFT_SDK_MCU)
-CCPROG_FLAGS += -p $(CHIPCRAFT_SDK_DBG_PORT) -b $(CHIPCRAFT_SDK_CCPROG_BAUDRATE) --mcu $(CHIPCRAFT_SDK_MCU) --burst $(CCPROG_OTHER_FLAGS)
 
 GDB_UNIX_SOCK ?= 0
 SIM_DEBUG ?= 1

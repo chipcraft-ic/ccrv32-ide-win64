@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2019 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2024-07-31 10:10:22 +0200 (śro, 31 lip 2024) $
-* $Revision: 1080 $
+* $Date: 2025-05-16 14:07:05 +0200 (Fri, 16 May 2025) $
+* $Revision: 1152 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -45,7 +45,10 @@
 #define __CCRV32_GNSS_ISE_H__
 
 #include <ccrv32-utils.h>
+#include <ccrv32-amba-apb3.h>
+
 #include <stdint.h>
+#include <stdbool.h>
 
 #ifndef __GNUC__
  #error Only GCC is supported by this header! Use your compiler inline assembly feature manually.
@@ -202,38 +205,71 @@ enum gnss_ise_rfafe_enum
  * write status
  * @param status bits[0] = clock
  */
-INLINE void GNSS_STATUS_WR(uint32_t status)
+INLINE void GNSS_STATUS_WR(uint8_t ebb, uint32_t status)
 {
-    CUSTOM_INSTRUCTION_MACRO_1I(status, 1);
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (1 << 2)) + 0x1000);
+        *tmp = status;
+    }
+    else
+    {
+        CUSTOM_INSTRUCTION_MACRO_1I(status, 1);
+    }
 }
 
 /**
  * read status
  * @return bits[0] = clock
  */
-INLINE uint32_t GNSS_STATUS_RD(void)
+INLINE uint32_t GNSS_STATUS_RD(uint8_t ebb)
 {
-    volatile uint32_t res;
-    CUSTOM_INSTRUCTION_MACRO_1O(res, 129);
-    return res;
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (129 << 2)) + 0x1000);
+        return *tmp;
+    }
+    else
+    {
+        uint32_t res;
+        CUSTOM_INSTRUCTION_MACRO_1O(res, 129);
+        return res;
+    }
 }
 
 /**
  * store data in GNSS engine frontend register
  */
-INLINE void GNSS_AFE_WR(uint64_t val)
+INLINE void GNSS_AFE_WR(uint8_t ebb, uint64_t val)
 {
-    CUSTOM_INSTRUCTION_MACRO_2I(val & 0xFFFFFFFF, (val>>32) & 0xFFFFFFFF, 20);
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (20 << 2)) + 0x1000);
+        GNSS_CLUSTER_PTR->OP2 = (val>>32) & 0xFFFFFFFF;
+        *tmp = val & 0xFFFFFFFF;
+    }
+    else
+    {
+        CUSTOM_INSTRUCTION_MACRO_2I(val & 0xFFFFFFFF, (val>>32) & 0xFFFFFFFF, 20);
+    }
 }
 
 /**
  * read selected analog frontend of GNSS channels.
  */
-INLINE int32_t GNSS_AFE_RD(void)
+INLINE int32_t GNSS_AFE_RD(uint8_t ebb)
 {
-    volatile uint32_t res;
-    CUSTOM_INSTRUCTION_MACRO_1O(res, 141);
-    return res;
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (141 << 2)) + 0x1000);
+        return *tmp;
+    }
+    else
+    {
+        uint32_t res;
+        CUSTOM_INSTRUCTION_MACRO_1O(res, 141);
+        return res;
+    }
 }
 
 /**
@@ -241,92 +277,181 @@ INLINE int32_t GNSS_AFE_RD(void)
  * @param val bits[15:0] = accu_loop[15:0]
  * @param trigger start trigger for current channel
  */
-INLINE void GNSS_FREE_ACCU_WR(uint32_t val, uint32_t trigger)
+INLINE void GNSS_FREE_ACCU_WR(uint8_t ebb, uint32_t val, uint32_t trigger)
 {
-    CUSTOM_INSTRUCTION_MACRO_2I(val, trigger, 18);
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (18 << 2)) + 0x1000);
+        GNSS_CLUSTER_PTR->OP2 = trigger;
+        *tmp = val;
+    }
+    else
+    {
+        CUSTOM_INSTRUCTION_MACRO_2I(val, trigger, 18);
+    }
 }
 
 /** write free update
  * @param val bits[15:0] = pll_loop[15:0], bits[31:16] = dll_loop[15:0]
  */
-INLINE void GNSS_FREE_UPDATE_WR(uint32_t val)
+INLINE void GNSS_FREE_UPDATE_WR(uint8_t ebb, uint32_t val)
 {
-    CUSTOM_INSTRUCTION_MACRO_1I(val, 19);
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (19 << 2)) + 0x1000);
+        *tmp = val;
+    }
+    else
+    {
+        CUSTOM_INSTRUCTION_MACRO_1I(val, 19);
+    }
 }
 
 /**
  * read free accu
  * @return val bits[0] = accu_loop[0], bits[1] = accu_loop[1], ...
  */
-INLINE int32_t GNSS_FREE_ACCU_RD(void)
+INLINE int32_t GNSS_FREE_ACCU_RD(uint8_t ebb)
 {
-    volatile uint32_t res;
-    CUSTOM_INSTRUCTION_MACRO_1O(res, 133);
-    return res;
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (133 << 2)) + 0x1000);
+        return *tmp;
+    }
+    else
+    {
+        uint32_t res;
+        CUSTOM_INSTRUCTION_MACRO_1O(res, 133);
+        return res;
+    }
 }
 
 /**
  * read free update
  * @return bits[15:0] = pll_loop[15:0], bits[31:16] = dll_loop[15:0]
  */
-INLINE int32_t GNSS_FREE_UPDATE_RD(void)
+INLINE int32_t GNSS_FREE_UPDATE_RD(uint8_t ebb)
 {
-    volatile uint32_t res;
-    CUSTOM_INSTRUCTION_MACRO_1O(res, 136);
-    return res;
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (136 << 2)) + 0x1000);
+        return *tmp;
+    }
+    else
+    {
+        uint32_t res;
+        CUSTOM_INSTRUCTION_MACRO_1O(res, 136);
+        return res;
+    }
 }
 
 /** write joint configuration
  * @param val bits[15:0] = joint_use[15:0], bits[31:16] = costas_use[15:0]
  */
-INLINE void GNSS_FREE_JOINT_WR(uint32_t val)
+INLINE void GNSS_FREE_JOINT_WR(uint8_t ebb, uint32_t val)
 {
-    CUSTOM_INSTRUCTION_MACRO_1I(val, 25);
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (25 << 2)) + 0x1000);
+        *tmp = val;
+    }
+    else
+    {
+        CUSTOM_INSTRUCTION_MACRO_1I(val, 25);
+    }
 }
 
 /**
  * read joint configuration
  * @return bits[15:0] = joint_use[15:0], bits[31:16] = costas_use[15:0]
  */
-INLINE int32_t GNSS_FREE_JOINT_RD(void)
+INLINE int32_t GNSS_FREE_JOINT_RD(uint8_t ebb)
 {
-    volatile uint32_t res;
-    CUSTOM_INSTRUCTION_MACRO_1O(res, 145);
-    return res;
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (145 << 2)) + 0x1000);
+        return *tmp;
+    }
+    else
+    {
+        uint32_t res;
+        CUSTOM_INSTRUCTION_MACRO_1O(res, 145);
+        return res;
+    }
 }
 
 /// perform single tracking step
-INLINE void GNSS_TRACK_STEP(uint32_t val)
+INLINE void GNSS_TRACK_STEP(uint8_t ebb, uint32_t val)
 {
-    CUSTOM_INSTRUCTION_MACRO_1I(val, 2);
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (2 << 2)) + 0x1000);
+        *tmp = val;
+    }
+    else
+    {
+        CUSTOM_INSTRUCTION_MACRO_1I(val, 2);
+    }
 }
 
 /// set channel index
-INLINE void GNSS_CHANN_SET(uint32_t chanNr)
+INLINE void GNSS_CHANN_SET(uint8_t ebb, uint32_t chanNr)
 {
-    CUSTOM_INSTRUCTION_MACRO_1I(chanNr, 137);
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (137 << 2)) + 0x1000);
+        *tmp = chanNr;
+    }
+    else
+    {
+        CUSTOM_INSTRUCTION_MACRO_1I(chanNr, 137);
+    }
 }
 
 /// get channel index
-INLINE uint32_t GNSS_CHANN_GET(void)
+INLINE uint32_t GNSS_CHANN_GET(uint8_t ebb)
 {
-    volatile uint32_t res;
-    CUSTOM_INSTRUCTION_MACRO_1O(res, 134);
-    return res;
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (134 << 2)) + 0x1000);
+        return *tmp;
+    }
+    else
+    {
+        uint32_t res;
+        CUSTOM_INSTRUCTION_MACRO_1O(res, 134);
+        return res;
+    }
 }
 
 /// set bank index
-INLINE void GNSS_BANK_SET(uint32_t bankNr)
+INLINE void GNSS_BANK_SET(uint8_t ebb, uint32_t bankNr)
 {
-    CUSTOM_INSTRUCTION_MACRO_1I(bankNr, 143);
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (143 << 2)) + 0x1000);
+        *tmp = bankNr;
+    }
+    else
+    {
+        CUSTOM_INSTRUCTION_MACRO_1I(bankNr, 143);
+    }
 }
 
 /// get bank index
-INLINE uint32_t GNSS_BANK_GET(void)
+INLINE uint32_t GNSS_BANK_GET(uint8_t ebb)
 {
-    volatile uint32_t res;
-    CUSTOM_INSTRUCTION_MACRO_1O(res, 144);
-    return res;
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (144 << 2)) + 0x1000);
+        return *tmp;
+    }
+    else
+    {
+        uint32_t res;
+        CUSTOM_INSTRUCTION_MACRO_1O(res, 144);
+        return res;
+    }
 }
 
 /**
@@ -337,31 +462,66 @@ INLINE uint32_t GNSS_BANK_GET(void)
  */
 
 /// set carrier frequency
-INLINE void GNSS_CARR_FREQ(uint32_t freq)
+INLINE void GNSS_CARR_FREQ(uint8_t ebb, uint32_t freq)
 {
-    CUSTOM_INSTRUCTION_MACRO_1I(freq, 135);
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (135 << 2)) + 0x1000);
+        *tmp = freq;
+    }
+    else
+    {
+        CUSTOM_INSTRUCTION_MACRO_1I(freq, 135);
+    }
 }
 
 /// execute carrier discriminator
-INLINE int32_t GNSS_CARR_DISC(int32_t disc)
+INLINE int32_t GNSS_CARR_DISC(uint8_t ebb, int32_t disc)
 {
-    volatile uint32_t res;
-    CUSTOM_INSTRUCTION_MACRO_1I1O(res, disc, 130);
-    return res;
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (130 << 2)) + 0x1000);
+        GNSS_CLUSTER_PTR->OP1 = disc;
+        return *tmp;
+    }
+    else
+    {
+        uint32_t res;
+        CUSTOM_INSTRUCTION_MACRO_1I1O(res, disc, 130);
+        return res;
+    }
 }
 
 /// get carrier sample
-INLINE uint32_t GNSS_CARR_REM(uint32_t val)
+INLINE uint32_t GNSS_CARR_REM(uint8_t ebb, uint32_t val)
 {
-    volatile uint32_t res;
-    CUSTOM_INSTRUCTION_MACRO_2I1O(res, val, 0, 131);
-    return res;
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (131 << 2)) + 0x1000);
+        GNSS_CLUSTER_PTR->OP1 = val;
+        return *tmp;
+    }
+    else
+    {
+        uint32_t res;
+        CUSTOM_INSTRUCTION_MACRO_2I1O(res, val, 0, 131);
+        return res;
+    }
 }
 
 /// set carrier register
-INLINE void GNSS_CARR_SET(uint32_t val, uint32_t conf)
+INLINE void GNSS_CARR_SET(uint8_t ebb, uint32_t val, uint32_t conf)
 {
-    CUSTOM_INSTRUCTION_MACRO_2I(val, conf, 3);
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (3 << 2)) + 0x1000);
+        GNSS_CLUSTER_PTR->OP2 = conf;
+        *tmp = val;
+    }
+    else
+    {
+        CUSTOM_INSTRUCTION_MACRO_2I(val, conf, 3);
+    }
 }
 
 /**
@@ -372,17 +532,34 @@ INLINE void GNSS_CARR_SET(uint32_t val, uint32_t conf)
  */
 
 /// accumulator add
-INLINE void GNSS_ACCU_ADD(uint32_t vIn, uint32_t codes)
+INLINE void GNSS_ACCU_ADD(uint8_t ebb, uint32_t vIn, uint32_t codes)
 {
-    CUSTOM_INSTRUCTION_MACRO_2I(vIn, codes, 4);
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (4 << 2)) + 0x1000);
+        GNSS_CLUSTER_PTR->OP2 = codes;
+        *tmp = vIn;
+    }
+    else
+    {
+        CUSTOM_INSTRUCTION_MACRO_2I(vIn, codes, 4);
+    }
 }
 
 /// accumulator get
-INLINE int32_t GNSS_ACCU_GET(void)
+INLINE int32_t GNSS_ACCU_GET(uint8_t ebb)
 {
-    volatile uint32_t res;
-    CUSTOM_INSTRUCTION_MACRO_1O(res, 132);
-    return res;
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (132 << 2)) + 0x1000);
+        return *tmp;
+    }
+    else
+    {
+        uint32_t res;
+        CUSTOM_INSTRUCTION_MACRO_1O(res, 132);
+        return res;
+    }
 }
 
 /**
@@ -393,30 +570,66 @@ INLINE int32_t GNSS_ACCU_GET(void)
  */
 
 /// compute PLL discriminator
-INLINE int32_t GNSS_PLL_DISC(int32_t I, int32_t Q)
+INLINE int32_t GNSS_PLL_DISC(uint8_t ebb, int32_t I, int32_t Q)
 {
-    volatile int32_t res;
-    CUSTOM_INSTRUCTION_MACRO_2I1O(res,I,Q,256);
-    return res;
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (256 << 2)) + 0x1000);
+        GNSS_CLUSTER_PTR->OP1 = I;
+        GNSS_CLUSTER_PTR->OP2 = Q;
+        return *tmp;
+    }
+    else
+    {
+        int32_t res;
+        CUSTOM_INSTRUCTION_MACRO_2I1O(res,I,Q,256);
+        return res;
+    }
 }
 
 /// define costas discriminator
 #define GNSS_COST_DISC GNSS_PLL_COST
 /// compute costas discriminator
-INLINE int32_t GNSS_PLL_COST(int32_t I, int32_t Q)
+INLINE int32_t GNSS_PLL_COST(uint8_t ebb, int32_t I, int32_t Q)
 {
-    volatile int32_t res;
-    CUSTOM_INSTRUCTION_MACRO_2I1O(res,I,Q,257);
-    return res;
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (257 << 2)) + 0x1000);
+        GNSS_CLUSTER_PTR->OP1 = I;
+        GNSS_CLUSTER_PTR->OP2 = Q;
+        return *tmp;
+    }
+    else
+    {
+        int32_t res;
+        CUSTOM_INSTRUCTION_MACRO_2I1O(res,I,Q,257);
+        return res;
+    }
 }
 
 /// compute DLL discriminator
-INLINE int32_t GNSS_DLL_DISC(int32_t I0, int32_t Q0, int32_t I2, int32_t Q2)
+INLINE int32_t GNSS_DLL_DISC(uint8_t ebb, int32_t I0, int32_t Q0, int32_t I2, int32_t Q2)
 {
-    volatile int32_t res;
-    CUSTOM_INSTRUCTION_MACRO_2I(I0,Q0,5);
-    CUSTOM_INSTRUCTION_MACRO_2I1O(res,I2,Q2,261);
-    return res;
+    if (ebb == 1)
+    {
+
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (5 << 2)) + 0x1000);
+        GNSS_CLUSTER_PTR->OP1 = Q0;
+        *tmp = I0;
+
+        tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (261 << 2)) + 0x1000);
+        GNSS_CLUSTER_PTR->OP1 = I2;
+        GNSS_CLUSTER_PTR->OP2 = Q2;
+        return *tmp;
+
+    }
+    else
+    {
+        int32_t res;
+        CUSTOM_INSTRUCTION_MACRO_2I(I0,Q0,5);
+        CUSTOM_INSTRUCTION_MACRO_2I1O(res,I2,Q2,261);
+        return res;
+    }
 }
 
 /**
@@ -424,9 +637,18 @@ INLINE int32_t GNSS_DLL_DISC(int32_t I0, int32_t Q0, int32_t I2, int32_t Q2)
  * @param alpha Alpha parameter for variance calculation, signed Q15.16
  * @param weight Discriminator weight in joint tracking, signed Q15.16
  */
-INLINE void GNSS_PLL_JOINT_WR(uint32_t alpha, uint32_t weight)
+INLINE void GNSS_PLL_JOINT_WR(uint8_t ebb, uint32_t alpha, uint32_t weight)
 {
-    CUSTOM_INSTRUCTION_MACRO_2I(alpha, weight, 26);
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (26 << 2)) + 0x1000);
+        GNSS_CLUSTER_PTR->OP2 = weight;
+        *tmp = alpha;
+    }
+    else
+    {
+        CUSTOM_INSTRUCTION_MACRO_2I(alpha, weight, 26);
+    }
 }
 
 /**
@@ -434,25 +656,50 @@ INLINE void GNSS_PLL_JOINT_WR(uint32_t alpha, uint32_t weight)
  * @param alpha Alpha parameter for variance calculation, signed Q15.16
  * @param weight Discriminator weight in joint tracking, signed Q15.16
  */
-INLINE void GNSS_DLL_JOINT_WR(uint32_t alpha, uint32_t weight)
+INLINE void GNSS_DLL_JOINT_WR(uint8_t ebb, uint32_t alpha, uint32_t weight)
 {
-    CUSTOM_INSTRUCTION_MACRO_2I(alpha, weight, 27);
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (27 << 2)) + 0x1000);
+        GNSS_CLUSTER_PTR->OP2 = weight;
+        *tmp = alpha;
+    }
+    else
+    {
+        CUSTOM_INSTRUCTION_MACRO_2I(alpha, weight, 27);
+    }
 }
 
 /// readout PLL discriminator variance
-INLINE int32_t GNSS_PLL_VARI(void)
+INLINE int32_t GNSS_PLL_VARI(uint8_t ebb)
 {
-    volatile int32_t res;
-    CUSTOM_INSTRUCTION_MACRO_1O(res, 146);
-    return res;
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (146 << 2)) + 0x1000);
+        return *tmp;
+    }
+    else
+    {
+        int32_t res;
+        CUSTOM_INSTRUCTION_MACRO_1O(res, 146);
+        return res;
+    }
 }
 
 /// readout DLL discriminator variance
-INLINE int32_t GNSS_DLL_VARI(void)
+INLINE int32_t GNSS_DLL_VARI(uint8_t ebb)
 {
-    volatile int32_t res;
-    CUSTOM_INSTRUCTION_MACRO_1O(res, 147);
-    return res;
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (147 << 2)) + 0x1000);
+        return *tmp;
+    }
+    else
+    {
+        int32_t res;
+        CUSTOM_INSTRUCTION_MACRO_1O(res, 147);
+        return res;
+    }
 }
 
 /**
@@ -463,68 +710,153 @@ INLINE int32_t GNSS_DLL_VARI(void)
  */
 
 /// PLL filter reset
-INLINE void GNSS_PLL_FLT_RST(void)
+INLINE void GNSS_PLL_FLT_RST(uint8_t ebb)
 {
-    CUSTOM_INSTRUCTION_MACRO(7);
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (7 << 2)) + 0x1000);
+        *tmp = 0;
+    }
+    else
+    {
+        CUSTOM_INSTRUCTION_MACRO(7);
+    }
 }
 
 /// DLL filter reset
-INLINE void GNSS_DLL_FLT_RST(void)
+INLINE void GNSS_DLL_FLT_RST(uint8_t ebb)
 {
-    CUSTOM_INSTRUCTION_MACRO(9);
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (9 << 2)) + 0x1000);
+        *tmp = 0;
+    }
+    else
+    {
+        CUSTOM_INSTRUCTION_MACRO(9);
+    }
 }
 
 /// PLL filter set coefficients (second order)
-INLINE void GNSS_PLL_FLT_COEF(uint32_t c1, uint32_t c2)
+INLINE void GNSS_PLL_FLT_COEF(uint8_t ebb, uint32_t c1, uint32_t c2)
 {
-    CUSTOM_INSTRUCTION_MACRO_2I(c1, c2, 6);
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (6 << 2)) + 0x1000);
+        GNSS_CLUSTER_PTR->OP2 = c2;
+        *tmp = c1;
+    }
+    else
+    {
+        CUSTOM_INSTRUCTION_MACRO_2I(c1, c2, 6);
+    }
 }
 
 /// PLL filter set coefficients (third order c1 and c2)
-INLINE void GNSS_PLL_FLT_COEF_A(uint32_t c1, uint32_t c2)
+INLINE void GNSS_PLL_FLT_COEF_A(uint8_t ebb, uint32_t c1, uint32_t c2)
 {
-    CUSTOM_INSTRUCTION_MACRO_2I(c1, c2, 21);
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (21 << 2)) + 0x1000);
+        GNSS_CLUSTER_PTR->OP2 = c2;
+        *tmp = c1;
+    }
+    else
+    {
+        CUSTOM_INSTRUCTION_MACRO_2I(c1, c2, 21);
+    }
 }
 
 /// PLL filter set coefficients (third order c3)
-INLINE void GNSS_PLL_FLT_COEF_B(uint32_t c3)
+INLINE void GNSS_PLL_FLT_COEF_B(uint8_t ebb, uint32_t c3)
 {
-    CUSTOM_INSTRUCTION_MACRO_1I(c3, 22);
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (22 << 2)) + 0x1000);
+        *tmp = c3;
+    }
+    else
+    {
+        CUSTOM_INSTRUCTION_MACRO_1I(c3, 22);
+    }
 }
 
 /// PLL filter set aiding
-INLINE void GNSS_PLL_FLT_AID(uint32_t aid)
+INLINE void GNSS_PLL_FLT_AID(uint8_t ebb, uint32_t aid)
 {
-    CUSTOM_INSTRUCTION_MACRO_1I(aid, 23);
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (23 << 2)) + 0x1000);
+        *tmp = aid;
+    }
+    else
+    {
+        CUSTOM_INSTRUCTION_MACRO_1I(aid, 23);
+    }
 }
 
 /// DLL filter set coefficients
-INLINE void GNSS_DLL_FLT_COEF(uint32_t c1, uint32_t c2)
+INLINE void GNSS_DLL_FLT_COEF(uint8_t ebb, uint32_t c1, uint32_t c2)
 {
-    CUSTOM_INSTRUCTION_MACRO_2I(c1, c2, 8);
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (8 << 2)) + 0x1000);
+        GNSS_CLUSTER_PTR->OP2 = c2;
+        *tmp = c1;
+    }
+    else
+    {
+        CUSTOM_INSTRUCTION_MACRO_2I(c1, c2, 8);
+    }
 }
 
 /// DLL filter set aiding
-INLINE void GNSS_DLL_FLT_AID(uint32_t aid)
+INLINE void GNSS_DLL_FLT_AID(uint8_t ebb, uint32_t aid)
 {
-    CUSTOM_INSTRUCTION_MACRO_1I(aid, 24);
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (24 << 2)) + 0x1000);
+        *tmp = aid;
+    }
+    else
+    {
+        CUSTOM_INSTRUCTION_MACRO_1I(aid, 24);
+    }
 }
 
 
 /// PLL filter get
-INLINE int32_t GNSS_PLL_FLT(int32_t disc)
+INLINE int32_t GNSS_PLL_FLT(uint8_t ebb, int32_t disc)
 {
-    volatile uint32_t res;
-    CUSTOM_INSTRUCTION_MACRO_1I1O(res, disc, 262);
-    return res;
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (262 << 2)) + 0x1000);
+        GNSS_CLUSTER_PTR->OP1 = disc;
+        return *tmp;
+    }
+    else
+    {
+        uint32_t res;
+        CUSTOM_INSTRUCTION_MACRO_1I1O(res, disc, 262);
+        return res;
+    }
 }
 
 /// DLL filter get
-INLINE int32_t GNSS_DLL_FLT(int32_t disc)
+INLINE int32_t GNSS_DLL_FLT(uint8_t ebb, int32_t disc)
 {
-    volatile uint32_t res;
-    CUSTOM_INSTRUCTION_MACRO_1I1O(res, disc, 264);
-    return res;
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (264 << 2)) + 0x1000);
+        GNSS_CLUSTER_PTR->OP1 = disc;
+        return *tmp;
+    }
+    else
+    {
+        uint32_t res;
+        CUSTOM_INSTRUCTION_MACRO_1I1O(res, disc, 264);
+        return res;
+    }
 }
 
 /**
@@ -535,136 +867,295 @@ INLINE int32_t GNSS_DLL_FLT(int32_t disc)
  */
 
 /// get code sample
-INLINE uint32_t GNSS_CODE_GET(void)
+INLINE uint32_t GNSS_CODE_GET(uint8_t ebb)
 {
-    volatile uint32_t res;
-    CUSTOM_INSTRUCTION_MACRO_1O(res, 138);
-    return res;
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (138 << 2)) + 0x1000);
+        return *tmp;
+    }
+    else
+    {
+        uint32_t res;
+        CUSTOM_INSTRUCTION_MACRO_1O(res, 138);
+        return res;
+    }
 }
 
 /// set code generator address
-INLINE void GNSS_PCODE_ADDR_SET(uint32_t addr, uint32_t nco)
+INLINE void GNSS_PCODE_ADDR_SET(uint8_t ebb, uint32_t addr, uint32_t nco)
 {
-    CUSTOM_INSTRUCTION_MACRO_2I(addr, nco, 10);
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (10 << 2)) + 0x1000);
+        GNSS_CLUSTER_PTR->OP2 = nco;
+        *tmp = addr;
+    }
+    else
+    {
+        CUSTOM_INSTRUCTION_MACRO_2I(addr, nco, 10);
+    }
 }
 
 /// write data
-INLINE void GNSS_PCODE_WR(uint32_t val)
+INLINE void GNSS_PCODE_WR(uint8_t ebb, uint32_t val)
 {
-    CUSTOM_INSTRUCTION_MACRO_1I(val, 11);
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (11 << 2)) + 0x1000);
+        *tmp = val;
+    }
+    else
+    {
+        CUSTOM_INSTRUCTION_MACRO_1I(val, 11);
+    }
 }
 
 /// diagnostic read data
-INLINE uint32_t GNSS_PCODE_DIAG_RD(uint32_t addr)
+INLINE uint32_t GNSS_PCODE_DIAG_RD(uint8_t ebb, uint32_t addr)
 {
-    volatile uint32_t res;
-    CUSTOM_INSTRUCTION_MACRO_1I1O(res, addr, 258);
-    return res;
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (258 << 2)) + 0x1000);
+        GNSS_CLUSTER_PTR->OP1 = addr;
+        return *tmp;
+    }
+    else
+    {
+        uint32_t res;
+        CUSTOM_INSTRUCTION_MACRO_1I1O(res, addr, 258);
+        return res;
+    }
 }
 
 /// diagnostic write data
-INLINE void GNSS_PCODE_DIAG_WR(uint32_t addr, uint32_t data)
+INLINE void GNSS_PCODE_DIAG_WR(uint8_t ebb, uint32_t addr, uint32_t data)
 {
-    CUSTOM_INSTRUCTION_MACRO_2I(addr, data, 28);
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (28 << 2)) + 0x1000);
+        GNSS_CLUSTER_PTR->OP2 = data;
+        *tmp = addr;
+    }
+    else
+    {
+        CUSTOM_INSTRUCTION_MACRO_2I(addr, data, 28);
+    }
 }
 
 /// set code length
-INLINE void GNSS_PCODE_LEN(uint32_t len, uint32_t integr_mult, uint32_t coef, uint32_t scale)
+INLINE void GNSS_PCODE_LEN(uint8_t ebb, uint32_t len, uint32_t integr_mult, uint32_t coef, uint32_t scale)
 {
     uint32_t val = (((integr_mult&255)<<16)|(scale&7)<<4)|(coef&15);
-    CUSTOM_INSTRUCTION_MACRO_2I(len, val, 12);
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (12 << 2)) + 0x1000);
+        GNSS_CLUSTER_PTR->OP2 = val;
+        *tmp = len;
+    }
+    else
+    {
+        CUSTOM_INSTRUCTION_MACRO_2I(len, val, 12);
+    }
 }
 
 /// set main ,boc and time multiplex
-INLINE void GNSS_CODE_NCO_FREQ(uint32_t freq, uint32_t mod)
+INLINE void GNSS_CODE_NCO_FREQ(uint8_t ebb, uint32_t freq, uint32_t mod)
 {
-    CUSTOM_INSTRUCTION_MACRO_2I(freq, mod, 13);
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (13 << 2)) + 0x1000);
+        GNSS_CLUSTER_PTR->OP2 = mod;
+        *tmp = freq;
+    }
+    else
+    {
+        CUSTOM_INSTRUCTION_MACRO_2I(freq, mod, 13);
+    }
 }
 
 /// set epl and code frequency
-INLINE void GNSS_CODE_EPL_FREQ(uint32_t epl, uint32_t code)
+INLINE void GNSS_CODE_EPL_FREQ(uint8_t ebb, uint32_t epl, uint32_t code)
 {
-    CUSTOM_INSTRUCTION_MACRO_2I(epl, code, 14);
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (14 << 2)) + 0x1000);
+        GNSS_CLUSTER_PTR->OP2 = code;
+        *tmp = epl;
+    }
+    else
+    {
+        CUSTOM_INSTRUCTION_MACRO_2I(epl, code, 14);
+    }
 }
 
 /// set code generator address
-INLINE void GNSS_SCODE_ADDR_SET(uint32_t addr)
+INLINE void GNSS_SCODE_ADDR_SET(uint8_t ebb, uint32_t addr)
 {
-    CUSTOM_INSTRUCTION_MACRO_1I(addr, 15);
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (15 << 2)) + 0x1000);
+        *tmp = addr;
+    }
+    else
+    {
+        CUSTOM_INSTRUCTION_MACRO_1I(addr, 15);
+    }
 }
 
 /// write data
-INLINE void GNSS_SCODE_WR(uint32_t val)
+INLINE void GNSS_SCODE_WR(uint8_t ebb, uint32_t val)
 {
-    CUSTOM_INSTRUCTION_MACRO_1I(val, 16);
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (16 << 2)) + 0x1000);
+        *tmp = val;
+    }
+    else
+    {
+        CUSTOM_INSTRUCTION_MACRO_1I(val, 16);
+    }
 }
 
 /// set code length
-INLINE void GNSS_SCODE_LEN(uint32_t len)
+INLINE void GNSS_SCODE_LEN(uint8_t ebb, uint32_t len)
 {
-    CUSTOM_INSTRUCTION_MACRO_1I(len, 17);
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (17 << 2)) + 0x1000);
+        *tmp = len;
+    }
+    else
+    {
+        CUSTOM_INSTRUCTION_MACRO_1I(len, 17);
+    }
 }
 
 /// execute code discriminator
-INLINE int32_t GNSS_CODE_DISC(int32_t disc)
+INLINE int32_t GNSS_CODE_DISC(uint8_t ebb, int32_t disc)
 {
-    volatile uint32_t res;
-    CUSTOM_INSTRUCTION_MACRO_1I1O(res, disc, 139);
-    return res;
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (139 << 2)) + 0x1000);
+        GNSS_CLUSTER_PTR->OP1 = disc;
+        return *tmp;
+    }
+    else
+    {
+        uint32_t res;
+        CUSTOM_INSTRUCTION_MACRO_1I1O(res, disc, 139);
+        return res;
+    }
 }
 
 /// get pseudorange parameters of currently selected channel
-INLINE uint32_t GNSS_CODE_RNG(int32_t channel)
+INLINE uint32_t GNSS_CODE_RNG(uint8_t ebb, int32_t channel)
 {
-    volatile uint32_t res;
-    CUSTOM_INSTRUCTION_MACRO_1I1O(res, channel, 140);
-    return res;
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (140 << 2)) + 0x1000);
+        return *tmp;
+    }
+    else
+    {
+        uint32_t res;
+        CUSTOM_INSTRUCTION_MACRO_1I1O(res, channel, 140);
+        return res;
+    }
 }
 
 // set bits recovery
-INLINE void GNSS_BITS_CFG(uint32_t status)
+INLINE void GNSS_BITS_CFG(uint8_t ebb, uint32_t status)
 {
-    CUSTOM_INSTRUCTION_MACRO_1I(status, 29);
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (29 << 2)) + 0x1000);
+        *tmp = status;
+    }
+    else
+    {
+        CUSTOM_INSTRUCTION_MACRO_1I(status, 29);
+    }
 }
 
 // read bits recovery
-INLINE uint32_t GNSS_BITS_GET(void)
+INLINE uint32_t GNSS_BITS_GET(uint8_t ebb)
 {
-    volatile uint32_t res;
-    CUSTOM_INSTRUCTION_MACRO_1O(res, 148);
-    return res;
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (148 << 2)) + 0x1000);
+        return *tmp;
+    }
+    else
+    {
+        uint32_t res;
+        CUSTOM_INSTRUCTION_MACRO_1O(res, 148);
+        return res;
+    }
 }
 
 // read I2 value
-INLINE uint32_t GNSS_I2_VAL_GET(void)
+INLINE uint32_t GNSS_I2_VAL_GET(uint8_t ebb)
 {
-    volatile uint32_t res;
-    CUSTOM_INSTRUCTION_MACRO_1O(res, 149);
-    return res;
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (149 << 2)) + 0x1000);
+        return *tmp;
+    }
+    else
+    {
+        uint32_t res;
+        CUSTOM_INSTRUCTION_MACRO_1O(res, 149);
+        return res;
+    }
 }
 
 // read Q2 value
-INLINE uint32_t GNSS_Q2_VAL_GET(void)
+INLINE uint32_t GNSS_Q2_VAL_GET(uint8_t ebb)
 {
-    volatile uint32_t res;
-    CUSTOM_INSTRUCTION_MACRO_1O(res, 152);
-    return res;
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (152 << 2)) + 0x1000);
+        return *tmp;
+    }
+    else
+    {
+        uint32_t res;
+        CUSTOM_INSTRUCTION_MACRO_1O(res, 152);
+        return res;
+    }
 }
 
 // read m4 value
-INLINE uint32_t GNSS_M4_VAL_GET(void)
+INLINE uint32_t GNSS_M4_VAL_GET(uint8_t ebb)
 {
-    volatile uint32_t res;
-    CUSTOM_INSTRUCTION_MACRO_1O(res, 150);
-    return res;
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (150 << 2)) + 0x1000);
+        return *tmp;
+    }
+    else
+    {
+        uint32_t res;
+        CUSTOM_INSTRUCTION_MACRO_1O(res, 150);
+        return res;
+    }
 }
 
 // read m2 scale value
-INLINE uint32_t GNSS_M2_SCL_GET(void)
+INLINE uint32_t GNSS_M2_SCL_GET(uint8_t ebb)
 {
-    volatile uint32_t res;
-    CUSTOM_INSTRUCTION_MACRO_1O(res, 151);
-    return res;
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (151 << 2)) + 0x1000);
+        return *tmp;
+    }
+    else
+    {
+        uint32_t res;
+        CUSTOM_INSTRUCTION_MACRO_1O(res, 151);
+        return res;
+    }
 }
 
 /** @} */

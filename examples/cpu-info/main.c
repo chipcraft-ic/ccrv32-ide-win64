@@ -32,8 +32,8 @@
 * File Name : main.c
 * Author    : Krzysztof Marcinek
 * ******************************************************************************
-* $Date: 2024-04-08 13:38:29 +0200 (pon, 08 kwi 2024) $
-* $Revision: 1047 $
+* $Date: 2025-05-16 14:07:05 +0200 (Fri, 16 May 2025) $
+* $Revision: 1152 $
 *H*****************************************************************************/
 
 #include "board.h"
@@ -225,6 +225,7 @@ int main(void)
         printf("INFO: Data cache:               absent");
     }
 
+    printf("INFO: Bus width:                %d-bit\n",32<<((cpu_info_2 & CPU_SYSBUS_MASK) >> CPU_SYSBUS_SHIFT));
     printf("INFO: ROM size:                 %d kbytes\n",((int)1<<((cpu_info_0 & CPU_IMSIZE_MASK) >> CPU_IMSIZE_SHIFT))/1024);
     printf("INFO: RAM size:                 %d kbytes\n",((int)1<<((cpu_info_0 & CPU_DMSIZE_MASK) >> CPU_DMSIZE_SHIFT))/1024);
     if (cpu_info_0 & CPU_SPRAM) {
