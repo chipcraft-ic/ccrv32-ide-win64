@@ -8,6 +8,8 @@ COMMON_SOURCES := syscalls.c uart.c
 # Bigger stack is needed
 CPPFLAGS += -D_STARTUP_STACK_SIZE=8192
 
+CPPFLAGS += -D_DONT_BREAK_ON_BREAK
+
 TEST_STL ?= 1
 
 ifneq ($(TEST_STL),)

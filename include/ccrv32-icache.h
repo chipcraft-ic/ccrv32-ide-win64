@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2019 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2024-09-17 20:06:05 +0200 (wto, 17 wrz 2024) $
-* $Revision: 1107 $
+* $Date: 2025-03-24 10:59:53 +0100 (pon, 24 mar 2025) $
+* $Revision: 1137 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -85,6 +85,7 @@ enum
     ICACHE_STCR_TAG_ERR_INJECT  = 1 << 7,  /*!< Tag Error Injection Enable (FT-only)     */
     ICACHE_STCR_HARD_ERR_EN     = 1 << 8,  /*!< Hard error enable (FT-only)              */
     ICACHE_STCR_HARD_ERR_FLAG   = 1 << 9,  /*!< Hard error flag (FT-only)                */
+    ICACHE_STCR_NMI_EN          = 1 << 11, /*!< NMI Enable (FT-only)                     */
 
     ICACHE_STCR_PERF_EN         = 1 << 24, /*!< Enable Performance Counters              */
     ICACHE_STCR_PERF_UPDATE     = 1 << 25, /*!< Update Performance Counters              */

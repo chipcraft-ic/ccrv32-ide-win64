@@ -32,8 +32,8 @@
  * File Name : tsmc40ulpfmc.c
  * Author    : Maciej Plasota
  * ******************************************************************************
- * $Date: 2025-04-16 19:11:48 +0200 (śro, 16 kwi 2025) $
- * $Revision: 1145 $
+ * $Date: 2025-04-24 10:44:41 +0200 (czw, 24 kwi 2025) $
+ * $Revision: 1151 $
  *H*****************************************************************************/
 
 #include <specialreg.h>
@@ -201,6 +201,7 @@ typedef struct {
 
 static tsmc40ulpfmc_cache_page_buffer_type tsmc40ulpfmc_cache_page_buffer[ TSMC40ULPFMC_RAM_BUFFERS ];
 static tsmc40ulpfmc_cache_type tsmc40ulpfmc_cache = {
+    /* lock is properly initialized with zeroes */
     .last = &( tsmc40ulpfmc_cache_page_buffer[ 0U ] ),
     .most = &( tsmc40ulpfmc_cache_page_buffer[ 0U ] ),
     .unused = &( tsmc40ulpfmc_cache_page_buffer[ 0U ] ),
@@ -212,20 +213,31 @@ static tsmc40ulpfmc_cache_type tsmc40ulpfmc_cache = {
 };
 
 #if TSMC40ULPFMC_RAM_BUFFERS_DEBUG
+static unsigned
+tsmc40ulpfmc_cache_get_core( void )
+{
+    volatile unsigned core;
+    __asm__ __volatile__ ("csrr %0, mhartid" : "=r" (core));
+    return core;
+}
+
 static void
 tsmc40ulpfmc_cache_print_state( void )
 {
-        printf(
-            "[FLASH] cache: last: %u, most: %u, unused: %u\n",
-            ( (uintptr_t) tsmc40ulpfmc_cache.last - (uintptr_t) tsmc40ulpfmc_cache.cache ) / sizeof( tsmc40ulpfmc_cache_page_buffer_type ),
-            ( (uintptr_t) tsmc40ulpfmc_cache.most - (uintptr_t) tsmc40ulpfmc_cache.cache ) / sizeof( tsmc40ulpfmc_cache_page_buffer_type ),
-            ( (uintptr_t) tsmc40ulpfmc_cache.unused - (uintptr_t) tsmc40ulpfmc_cache.cache ) / sizeof( tsmc40ulpfmc_cache_page_buffer_type )
-        );
+    __libc_lock_acquire_recursive( &( tsmc40ulpfmc_cache.lock ));
+    printf(
+        "[FLASH](%u) cache: last: %u, most: %u, unused: %u\n",
+        tsmc40ulpfmc_cache_get_core(),
+        ( (uintptr_t) tsmc40ulpfmc_cache.last - (uintptr_t) tsmc40ulpfmc_cache.cache ) / sizeof( tsmc40ulpfmc_cache_page_buffer_type ),
+        ( (uintptr_t) tsmc40ulpfmc_cache.most - (uintptr_t) tsmc40ulpfmc_cache.cache ) / sizeof( tsmc40ulpfmc_cache_page_buffer_type ),
+        ( (uintptr_t) tsmc40ulpfmc_cache.unused - (uintptr_t) tsmc40ulpfmc_cache.cache ) / sizeof( tsmc40ulpfmc_cache_page_buffer_type )
+    );
     for ( size_t i = 0U; i < TSMC40ULPFMC_RAM_BUFFERS; ++i ) {
         tsmc40ulpfmc_cache_page_buffer_type * const buffer =
             &( tsmc40ulpfmc_cache.cache[ i ] );
-        printf( "[FLASH] [%u]: %c, 0x%x, %u\n", (unsigned) i, buffer->used ? 'Y' : 'N', (unsigned) buffer->address, (unsigned) buffer->writes );
+        printf( "[FLASH](%u) [%u]: %c, 0x%x, %u\n", tsmc40ulpfmc_cache_get_core(), (unsigned) i, buffer->used ? 'Y' : 'N', (unsigned) buffer->address, (unsigned) buffer->writes );
     }
+    __libc_lock_release_recursive( &( tsmc40ulpfmc_cache.lock ));
 }
 #else
 # define tsmc40ulpfmc_cache_print_state() ( void ) 0
@@ -238,7 +250,7 @@ static size_t
 tsmc40ulpfmc_memcpy_to_flash(
     uint8_t * const dst, /* has to be word-aligned */
     uint8_t const * const src, /* has to be word-aligned */
-    size_t bytes /* has to be multiple fo word */
+    size_t bytes /* has to be multiple of word */
 ) {
     size_t index = 0U;
 
@@ -334,25 +346,27 @@ tsmc40ulpfmc_cache_page_buffer_free(
     tsmc40ulpfmc_cache_page_buffer_type * const buffer
 )
 {
-#if TSMC40ULPFMC_RAM_BUFFERS_DEBUG
-    printf( "[FLASH] free cache for address %p\n", ( uint8_t const * ) buffer->address );
-#endif /* TSMC40ULPFMC_RAM_BUFFERS_DEBUG */
     __libc_lock_acquire_recursive( &( tsmc40ulpfmc_cache.lock ));
-    buffer->used = false;
-    buffer->address = 0U;
-    buffer->writes = 0U;
-    ( void ) memset( buffer->buffer.data, 0, TSMC40ULPFMC_PAGE_SIZE );
+    if ( buffer->used ) {
+#if TSMC40ULPFMC_RAM_BUFFERS_DEBUG
+        printf( "[FLASH](%u) free cache for address %p\n", tsmc40ulpfmc_cache_get_core(), ( uint8_t const * ) buffer->address );
+#endif /* TSMC40ULPFMC_RAM_BUFFERS_DEBUG */
+        buffer->used = false;
+        buffer->address = 0U;
+        buffer->writes = 0U;
+        ( void ) memset( buffer->buffer.data, 0, TSMC40ULPFMC_PAGE_SIZE );
 
-    /* update most */
-    tsmc40ulpfmc_cache.most = tsmc40ulpfmc_cache.last;
-    for ( size_t i = 0U; i < TSMC40ULPFMC_RAM_BUFFERS; ++i ) {
-        tsmc40ulpfmc_cache_page_buffer_type * const buffer_ =
-            &( tsmc40ulpfmc_cache.cache[ i ] );
-        if ( ! buffer->used ) {
-            continue;
-        }
-        if ( tsmc40ulpfmc_cache.most->writes < buffer_->writes ) {
-            tsmc40ulpfmc_cache.most = buffer_;
+        /* update most */
+        tsmc40ulpfmc_cache.most = tsmc40ulpfmc_cache.last;
+        for ( size_t i = 0U; i < TSMC40ULPFMC_RAM_BUFFERS; ++i ) {
+            tsmc40ulpfmc_cache_page_buffer_type * const buffer_ =
+                &( tsmc40ulpfmc_cache.cache[ i ] );
+            if ( ! buffer->used ) {
+                continue;
+            }
+            if ( tsmc40ulpfmc_cache.most->writes < buffer_->writes ) {
+                tsmc40ulpfmc_cache.most = buffer_;
+            }
         }
     }
 
@@ -373,15 +387,18 @@ tsmc40ulpfmc_cache_page_buffer_allocate(
     void const * const address
 )
 {
-#if TSMC40ULPFMC_RAM_BUFFERS_DEBUG
-    printf( "[FLASH] allocate cache for address %p\n", address );
-#endif /* TSMC40ULPFMC_RAM_BUFFERS_DEBUG */
     tsmc40ulpfmc_cache_page_buffer_type * result = NULL;
 
     uintptr_t const address_ = ( uintptr_t ) address;
     uintptr_t const page = PAGE_ALIGN( address_ );
 
     __libc_lock_acquire_recursive( &( tsmc40ulpfmc_cache.lock ));
+    if ( NULL != tsmc40ulpfmc_cache_page_buffer_from_address( address )) {
+        goto already;
+    }
+#if TSMC40ULPFMC_RAM_BUFFERS_DEBUG
+    printf( "[FLASH](%u) allocate cache for address %p\n", tsmc40ulpfmc_cache_get_core(), address );
+#endif /* TSMC40ULPFMC_RAM_BUFFERS_DEBUG */
 
     /* find next unused */
     for ( size_t i = 0U; i < TSMC40ULPFMC_RAM_BUFFERS; ++i ) {
@@ -441,6 +458,7 @@ done:
         TSMC40ULPFMC_PAGE_SIZE
     );
 failure_io:
+already:
     __libc_lock_release_recursive( &( tsmc40ulpfmc_cache.lock ));
     return result;
 }
@@ -485,7 +503,7 @@ tsmc40ulpfmc_commit_page_blocking(
     }
 
 #if TSMC40ULPFMC_RAM_BUFFERS_DEBUG
-    printf( "[FLASH] commit page 0x%x with %u writes from buffer to flash\n", ( unsigned ) buffer->address, ( unsigned ) buffer->writes );
+    printf( "[FLASH](%u) commit page 0x%x with %u writes from buffer to flash\n", tsmc40ulpfmc_cache_get_core(), ( unsigned ) buffer->address, ( unsigned ) buffer->writes );
 #endif /* TSMC40ULPFMC_RAM_BUFFERS_DEBUG */
 
     AMBA_FLASH_PTR->ADDRESS = ( uint32_t ) address;
@@ -502,7 +520,7 @@ tsmc40ulpfmc_commit_page_blocking(
         ++sector
     ) {
 #if TSMC40ULPFMC_RAM_BUFFERS_DEBUG
-        printf( "[FLASH] write sector %p\n", ( uint8_t * ) ( address + ( sector * TSMC40ULPFMC_SECTOR_SIZE )));
+        printf( "[FLASH](%u) write sector %p\n", tsmc40ulpfmc_cache_get_core(), ( uint8_t * ) ( address + ( sector * TSMC40ULPFMC_SECTOR_SIZE )));
 #endif /* TSMC40ULPFMC_RAM_BUFFERS_DEBUG */
 
         /*
@@ -552,7 +570,7 @@ tsmc40ulpfmc_commit_page_blocking(
             }
 
 #if TSMC40ULPFMC_RAM_BUFFERS_DEBUG
-            printf( "[FLASH] validate sector %p\n", ( uint8_t * ) ( address + ( sector * TSMC40ULPFMC_SECTOR_SIZE )));
+            printf( "[FLASH](%u) validate sector %p\n", tsmc40ulpfmc_cache_get_core(), ( uint8_t * ) ( address + ( sector * TSMC40ULPFMC_SECTOR_SIZE )));
 #endif /* TSMC40ULPFMC_RAM_BUFFERS_DEBUG */
 
             /*
@@ -579,7 +597,7 @@ tsmc40ulpfmc_commit_page_blocking(
                 );
                 if ( flashwordbuffer != srcwordbuffer ) {
 #if TSMC40ULPFMC_RAM_BUFFERS_DEBUG
-                    printf( "[FLASH] validation mismatch @ %p: expected %x, have %x\n", ( uint8_t * ) (( address + ( sector * TSMC40ULPFMC_SECTOR_SIZE )) + i ), ( unsigned ) srcwordbuffer, ( unsigned ) flashwordbuffer );
+                    printf( "[FLASH](%u) validation mismatch @ %p: expected %x, have %x\n", tsmc40ulpfmc_cache_get_core(), ( uint8_t * ) (( address + ( sector * TSMC40ULPFMC_SECTOR_SIZE )) + i ), ( unsigned ) srcwordbuffer, ( unsigned ) flashwordbuffer );
 #endif /* TSMC40ULPFMC_RAM_BUFFERS_DEBUG */
                     validated = false;
                     break;
@@ -591,12 +609,12 @@ tsmc40ulpfmc_commit_page_blocking(
             }
 
 #if TSMC40ULPFMC_RAM_BUFFERS_DEBUG
-            printf( "[FLASH] sector %p written with errors, retry\n", ( uint8_t * ) ( address + ( sector * TSMC40ULPFMC_SECTOR_SIZE )));
+            printf( "[FLASH](%u) sector %p written with errors, retry\n", tsmc40ulpfmc_cache_get_core(), ( uint8_t * ) ( address + ( sector * TSMC40ULPFMC_SECTOR_SIZE )));
 #endif /* TSMC40ULPFMC_RAM_BUFFERS_DEBUG */
         }
         if ( TSMC40ULPFMC_SECTOR_WRITE_RETRIES == retries ) {
 #if TSMC40ULPFMC_RAM_BUFFERS_DEBUG
-            printf( "[FLASH] unable to correctly write sector %p to flash\n", ( uint8_t * ) ( address + ( sector * TSMC40ULPFMC_SECTOR_SIZE )));
+            printf( "[FLASH](%u) unable to correctly write sector %p to flash\n", tsmc40ulpfmc_cache_get_core(), ( uint8_t * ) ( address + ( sector * TSMC40ULPFMC_SECTOR_SIZE )));
 #endif /* TSMC40ULPFMC_RAM_BUFFERS_DEBUG */
             result = PROGRAMMING_ERROR;
             goto failure_sector_buffer_write;
@@ -604,6 +622,9 @@ tsmc40ulpfmc_commit_page_blocking(
 
     }
 
+#if TSMC40ULPFMC_RAM_BUFFERS_DEBUG
+    printf( "[FLASH](%u) page 0x%x committed to flash\n", tsmc40ulpfmc_cache_get_core(), ( unsigned ) buffer->address );
+#endif /* TSMC40ULPFMC_RAM_BUFFERS_DEBUG */
     /* just set writes to zero, buffer may be rewritten shortly */
     buffer->writes = 0U;
 
@@ -623,9 +644,6 @@ tsmc40ulpfmc_cache_aware_read(
     size_t const bytes
 )
 {
-#if TSMC40ULPFMC_RAM_BUFFERS_DEBUG
-    printf( "[FLASH] read %u bytes from address %p\n",( unsigned ) bytes, address );
-#endif /* TSMC40ULPFMC_RAM_BUFFERS_DEBUG */
     flash_access_status_t result = ARGUMENT_ERROR;
 
     /*
@@ -701,6 +719,9 @@ tsmc40ulpfmc_cache_aware_read(
      {
         src = ( uint8_t const * ) uintptr_start_page;
         __libc_lock_acquire_recursive( &( tsmc40ulpfmc_cache.lock ));
+#if TSMC40ULPFMC_RAM_BUFFERS_DEBUG
+        printf( "[FLASH](%u) read %u bytes from address %p\n", tsmc40ulpfmc_cache_get_core(), ( unsigned ) bytes, address );
+#endif /* TSMC40ULPFMC_RAM_BUFFERS_DEBUG */
         buffer =
             tsmc40ulpfmc_cache_page_buffer_from_address(
                 ( void const * ) uintptr_start_page
@@ -708,11 +729,11 @@ tsmc40ulpfmc_cache_aware_read(
         if ( NULL != buffer ) {
             src = buffer->buffer.data;
 #if TSMC40ULPFMC_RAM_BUFFERS_DEBUG
-            printf( "[FLASH] page %p read via cache\n", ( uint8_t const * ) uintptr_start_page );
+            printf( "[FLASH](%u) page %p read via cache\n", tsmc40ulpfmc_cache_get_core(), ( uint8_t const * ) uintptr_start_page );
 #endif /* TSMC40ULPFMC_RAM_BUFFERS_DEBUG */
         } else {
 #if TSMC40ULPFMC_RAM_BUFFERS_DEBUG
-            printf( "[FLASH] page %p read via AHB\n", ( uint8_t const * ) uintptr_start_page );
+            printf( "[FLASH](%u) page %p read via AHB\n", tsmc40ulpfmc_cache_get_core(), ( uint8_t const * ) uintptr_start_page );
 #endif /* TSMC40ULPFMC_RAM_BUFFERS_DEBUG */
         }
 
@@ -811,11 +832,11 @@ tsmc40ulpfmc_cache_aware_read(
         if ( NULL != buffer ) {
             src = buffer->buffer.data;
 #if TSMC40ULPFMC_RAM_BUFFERS_DEBUG
-            printf( "[FLASH] page %p read via cache\n", ( uint8_t const * ) page_to_handle );
+            printf( "[FLASH](%u) page %p read via cache\n", tsmc40ulpfmc_cache_get_core(), ( uint8_t const * ) page_to_handle );
 #endif /* TSMC40ULPFMC_RAM_BUFFERS_DEBUG */
         } else {
 #if TSMC40ULPFMC_RAM_BUFFERS_DEBUG
-            printf( "[FLASH] page %p read via AHB\n", ( uint8_t const * ) page_to_handle );
+            printf( "[FLASH](%u) page %p read via AHB\n", tsmc40ulpfmc_cache_get_core(), ( uint8_t const * ) page_to_handle );
 #endif /* TSMC40ULPFMC_RAM_BUFFERS_DEBUG */
         }
 
@@ -851,11 +872,11 @@ tsmc40ulpfmc_cache_aware_read(
         if ( NULL != buffer ) {
             src = buffer->buffer.data;
 #if TSMC40ULPFMC_RAM_BUFFERS_DEBUG
-            printf( "[FLASH] page %p read via cache\n", ( uint8_t const * ) uintptr_end_page );
+            printf( "[FLASH](%u) page %p read via cache\n", tsmc40ulpfmc_cache_get_core(), ( uint8_t const * ) uintptr_end_page );
 #endif /* TSMC40ULPFMC_RAM_BUFFERS_DEBUG */
         } else {
 #if TSMC40ULPFMC_RAM_BUFFERS_DEBUG
-            printf( "[FLASH] page %p read via AHB\n", ( uint8_t const * ) uintptr_end_page );
+            printf( "[FLASH](%u) page %p read via AHB\n", tsmc40ulpfmc_cache_get_core(), ( uint8_t const * ) uintptr_end_page );
 #endif /* TSMC40ULPFMC_RAM_BUFFERS_DEBUG */
         }
 
@@ -905,10 +926,10 @@ tsmc40ulpfmc_cache_page_buffer_write_notify(
     tsmc40ulpfmc_cache_page_buffer_type * const buffer
 )
 {
-#if TSMC40ULPFMC_RAM_BUFFERS_DEBUG
-    printf( "[FLASH] update writes for cached address %p\n", ( uint8_t const * ) buffer->address );
-#endif /* TSMC40ULPFMC_RAM_BUFFERS_DEBUG */
     __libc_lock_acquire_recursive( &( tsmc40ulpfmc_cache.lock ));
+#if TSMC40ULPFMC_RAM_BUFFERS_DEBUG
+    printf( "[FLASH](%u) update writes for cached address %p\n", tsmc40ulpfmc_cache_get_core(), ( uint8_t const * ) buffer->address );
+#endif /* TSMC40ULPFMC_RAM_BUFFERS_DEBUG */
     ++( buffer->writes );
 
     tsmc40ulpfmc_cache.last = buffer;
@@ -918,13 +939,14 @@ tsmc40ulpfmc_cache_page_buffer_write_notify(
     __libc_lock_release_recursive( &( tsmc40ulpfmc_cache.lock ));
 }
 
-static void
+static flash_access_status_t
 tsmc40ulpfmc_cache_maintainance( void )
 {
-#if TSMC40ULPFMC_RAM_BUFFERS_DEBUG
-    printf( "[FLASH] perform cache maintainance\n" );
-#endif /* TSMC40ULPFMC_RAM_BUFFERS_DEBUG */
+    flash_access_status_t result = READY;
     __libc_lock_acquire_recursive( &( tsmc40ulpfmc_cache.lock ));
+#if TSMC40ULPFMC_RAM_BUFFERS_DEBUG
+    printf( "[FLASH](%u) perform cache maintainance\n", tsmc40ulpfmc_cache_get_core() );
+#endif /* TSMC40ULPFMC_RAM_BUFFERS_DEBUG */
     for ( size_t i = 0U; i < TSMC40ULPFMC_RAM_BUFFERS; ++i ) {
         tsmc40ulpfmc_cache_page_buffer_type * const buffer =
             &( tsmc40ulpfmc_cache.cache[ i ] );
@@ -933,15 +955,23 @@ tsmc40ulpfmc_cache_maintainance( void )
         }
         if ( tsmc40ulpfmc_cache.threshold.max <= buffer->writes ) {
             /* commit will also fix most if it succeeds */
-            tsmc40ulpfmc_commit_page_blocking( buffer );
+            result = tsmc40ulpfmc_commit_page_blocking( buffer );
+            if ( BUSY < result ) {
+                goto failure_io;
+            }
         }
         /* successful blocking commit shall reset writes to zero */
         if ( tsmc40ulpfmc_cache.threshold.min <= buffer->writes ) {
             /* commit will also fix most if it succeeds */
-            tsmc40ulpfmc_commit_page_nonblocking( buffer );
+            result = tsmc40ulpfmc_commit_page_nonblocking( buffer );
+            if ( BUSY < result ) {
+                goto failure_io;
+            }
         }
     }
+failure_io:
     __libc_lock_release_recursive( &( tsmc40ulpfmc_cache.lock ));
+    return result;
 }
 
 static flash_access_status_t
@@ -951,9 +981,6 @@ tsmc40ulpfmc_cache_aware_write(
     size_t const bytes
 )
 {
-#if TSMC40ULPFMC_RAM_BUFFERS_DEBUG
-    printf( "[FLASH] write %u bytes to address %p\n",( unsigned ) bytes, address );
-#endif /* TSMC40ULPFMC_RAM_BUFFERS_DEBUG */
     flash_access_status_t result = ARGUMENT_ERROR;
 
     /*
@@ -1023,6 +1050,9 @@ tsmc40ulpfmc_cache_aware_write(
      */
      {
         __libc_lock_acquire_recursive( &( tsmc40ulpfmc_cache.lock ));
+#if TSMC40ULPFMC_RAM_BUFFERS_DEBUG
+    printf( "[FLASH](%u) write %u bytes to address %p\n", tsmc40ulpfmc_cache_get_core(), ( unsigned ) bytes, address );
+#endif /* TSMC40ULPFMC_RAM_BUFFERS_DEBUG */
         buffer =
             tsmc40ulpfmc_cache_page_buffer_from_address(
                 ( void const * ) uintptr_start_page
@@ -1215,8 +1245,12 @@ done:
      }
 
     tsmc40ulpfmc_cache_print_state();
-    tsmc40ulpfmc_cache_maintainance();
+    result = tsmc40ulpfmc_cache_maintainance();
+    if ( BUSY < result ) {
+        goto failure_io;
+    }
     result = flash_check_status();
+failure_io:
 failure_buffer:
     return result;
 }
@@ -2946,7 +2980,7 @@ flash_sync( void )
     __libc_lock_acquire_recursive( &( tsmc40ulpfmc_cache.lock ));
 
 #if TSMC40ULPFMC_RAM_BUFFERS_DEBUG
-    printf( "[FLASH] dump changed page buffers to flash and invalidate cache\n" );
+    printf( "[FLASH](%u) dump changed page buffers to flash and invalidate cache\n", tsmc40ulpfmc_cache_get_core() );
 #endif /* TSMC40ULPFMC_RAM_BUFFERS_DEBUG */
 
     for ( size_t i = 0U; i < TSMC40ULPFMC_RAM_BUFFERS; ++i ) {

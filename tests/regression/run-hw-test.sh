@@ -20,7 +20,7 @@ if [ "x$CCRV32_BOARD" != "x" ]; then
     fi
 fi
 
-if [ "$CHIPCRAFT_SDK_BOARD" == "vcu108" ]; then
+if [ "$CHIPCRAFT_SDK_BOARD" == "vcu108" ] || [ "$CHIPCRAFT_SDK_BOARD" == "zcu104" ]; then
     make -s ram-write
 else
     make -s flash-write
