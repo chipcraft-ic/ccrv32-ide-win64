@@ -8,8 +8,8 @@
 #
 # Author: Rafal Harabien
 #
-# $Date: 2023-01-09 16:03:25 +0100 (pon, 09 sty 2023) $
-# $Revision: 946 $
+# $Date: 2025-06-05 16:23:49 +0200 (czw, 05 cze 2025) $
+# $Revision: 1155 $
 #
 
 # TODO: the script contains a lot of harcoded magic values
@@ -1448,7 +1448,7 @@ class Options:
             elif opt in ('--debug-proto-log'):
                 self.debug_proto_log_path = arg
             elif opt in ('--mcu'):
-                if arg not in ('vcu108', 'ccnv2', 'sim'):
+                if arg not in ('vcu108', 'ccnv2', 'sim', 'fpga'):
                     raise ValueError('Invalid mcu name: %s' % arg)
                 self.mcu_name = arg
 
