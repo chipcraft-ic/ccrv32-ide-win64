@@ -32,8 +32,8 @@
 * File Name : max2771.c
 * Author    : Krzysztof Siwiec
 * ******************************************************************************
-* $Date: 2025-05-16 14:07:05 +0200 (Fri, 16 May 2025) $
-* $Revision: 1152 $
+* $Date: 2025-08-20 19:48:33 +0200 (śro, 20 sie 2025) $
+* $Revision: 1158 $
 *H*****************************************************************************/
 
 #include <stdio.h>
@@ -47,20 +47,36 @@
 #include "max2771.h"
 
 //Configure GPIOs for MAX2771 programming
-int max2771_gpio_conf()
+int max2771_gpio_conf(uint8_t cs)
 {
     //set GPIOs as output
-    AMBA_GPIO_PTR->OUTSET |= (1 << MAX2771_L1E1_CS) | (1 << MAX2771_L5E5_CS) | (1 << MAX2771_L2E6_CS);
-    AMBA_GPIO_PTR->DIRSET |= (1 << MAX2771_L1E1_CS) | (1 << MAX2771_L5E5_CS) | (1 << MAX2771_L2E6_CS);
+    AMBA_GPIO_PTR->OUTSET |= (1 << cs);
+    AMBA_GPIO_PTR->DIRSET |= (1 << cs);
+#ifdef MAX2771_NREAD
+    AMBA_GPIO_PTR->OUTSET |= (1 << MAX2771_NREAD);
+    AMBA_GPIO_PTR->DIRSET |= (1 << MAX2771_NREAD);
+#endif
+#ifdef MAX2771_NWRITE
+    AMBA_GPIO_PTR->OUTSET |= (1 << MAX2771_NWRITE);
+    AMBA_GPIO_PTR->DIRSET |= (1 << MAX2771_NWRITE);
+#endif
     return 1;
 }
 
 //Return to default GPIOs settings
-int max2771_gpio_unconf()
+int max2771_gpio_unconf(uint8_t cs)
 {
     //reset GPIOs
-    AMBA_GPIO_PTR->OUTCLR |= (1 << MAX2771_L1E1_CS) | (1 << MAX2771_L5E5_CS) | (1 << MAX2771_L2E6_CS);
-    AMBA_GPIO_PTR->DIRCLR |= (1 << MAX2771_L1E1_CS) | (1 << MAX2771_L5E5_CS) | (1 << MAX2771_L2E6_CS);
+    AMBA_GPIO_PTR->DIRCLR |= (1 << cs);
+    AMBA_GPIO_PTR->OUTCLR |= (1 << cs);
+#ifdef MAX2771_NREAD
+    AMBA_GPIO_PTR->DIRCLR |= (1 << MAX2771_NREAD);
+    AMBA_GPIO_PTR->OUTCLR |= (1 << MAX2771_NREAD);
+#endif
+#ifdef MAX2771_NWRITE
+    AMBA_GPIO_PTR->DIRCLR |= (1 << MAX2771_NWRITE);
+    AMBA_GPIO_PTR->OUTCLR |= (1 << MAX2771_NWRITE);
+#endif
     return 1;
 }
 
@@ -86,7 +102,7 @@ int max2771_spi_unconf()
 }
 
 //Perform write operation
-uint32_t max2771_spi_write(enum max2771_band band, uint32_t address,uint32_t data)
+uint32_t max2771_spi_write(enum max2771_band band, uint8_t cs, uint32_t address,uint32_t data)
 {
 
     uint32_t watchdog_spi = (10000 / (1000000000 / PERIPH0_FREQ)) + 1;
@@ -94,27 +110,12 @@ uint32_t max2771_spi_write(enum max2771_band band, uint32_t address,uint32_t dat
     {
         watchdog_spi -= 1;
     }
-    
-    //chip select gpio number for proper band
-    uint8_t max_gpio_cs;
-    switch(band)
-    {
-        case L1E1:
-            max_gpio_cs = MAX2771_L1E1_CS;
-            break;
-        case L5E5:
-            max_gpio_cs = MAX2771_L5E5_CS;
-            break;
-        case L2E6:
-            max_gpio_cs = MAX2771_L2E6_CS;
-            break;
-        default:
-            max_gpio_cs = 0;
-            return 0;
-    }
 
     //Disable SPI at MAX2771
-    AMBA_GPIO_PTR->OUTSET = 1 << max_gpio_cs;
+    AMBA_GPIO_PTR->OUTSET = 1 << cs;
+#ifdef MAX2771_NWRITE
+    AMBA_GPIO_PTR->OUTSET = 1 << MAX2771_NWRITE;
+#endif
 
     //Wait more than 100 ns
     watchdog_spi = (100 / (1000000000 / PERIPH0_FREQ)) + 1;
@@ -124,7 +125,10 @@ uint32_t max2771_spi_write(enum max2771_band band, uint32_t address,uint32_t dat
     }
 
     //Enable SPI at MAX2771
-    AMBA_GPIO_PTR->OUTCLR = 1 << max_gpio_cs;
+    AMBA_GPIO_PTR->OUTCLR = 1 << cs;
+#ifdef MAX2771_NWRITE
+    AMBA_GPIO_PTR->OUTCLR = 1 << MAX2771_NWRITE;
+#endif
 
     //Send frame
     //send address
@@ -152,19 +156,24 @@ uint32_t max2771_spi_write(enum max2771_band band, uint32_t address,uint32_t dat
 
     //wait for transmission end
     watchdog_spi = (100000 / (1000000000 / PERIPH0_FREQ)) + 1;
-    while(((AMBA_SPI_PTR(MAX2771_SPI_NUM)->STATUS & SPI_STAT_TDRE) == 0 || (AMBA_SPI_PTR(MAX2771_SPI_NUM)->STATUS & SPI_STAT_TXC) == 0) && watchdog_spi > 0 )
+    uint32_t status = AMBA_SPI_PTR(MAX2771_SPI_NUM)->STATUS;
+    while(((status & SPI_STAT_TDRE) == 0 || (status & SPI_STAT_TXC) == 0) && watchdog_spi > 0 )
     {
+        status = AMBA_SPI_PTR(MAX2771_SPI_NUM)->STATUS;
         watchdog_spi -= 1;
     }
 
     //Disable SPI at MAX2771
-    AMBA_GPIO_PTR->OUTSET = 1 << max_gpio_cs;
+    AMBA_GPIO_PTR->OUTSET = 1 << cs;
+#ifdef MAX2771_NWRITE
+    AMBA_GPIO_PTR->OUTSET = 1 << MAX2771_NWRITE;
+#endif
 
     return 1;
 }
 
 //Perform read operation
-uint32_t max2771_spi_read(enum max2771_band band, uint32_t address)
+uint32_t max2771_spi_read(enum max2771_band band, uint8_t cs, uint32_t address)
 {
 
     uint32_t data = 0;
@@ -174,27 +183,12 @@ uint32_t max2771_spi_read(enum max2771_band band, uint32_t address)
     {
         watchdog_spi -= 1;
     }
-    
-    //chip select gpio number for proper band
-    uint8_t max_gpio_cs;
-    switch(band)
-    {
-        case L1E1:
-            max_gpio_cs = MAX2771_L1E1_CS;
-            break;
-        case L5E5:
-            max_gpio_cs = MAX2771_L5E5_CS;
-            break;
-        case L2E6:
-            max_gpio_cs = MAX2771_L2E6_CS;
-            break;
-        default:
-            max_gpio_cs = 0;
-            return 0;
-    }
 
     //Disable SPI at MAX2771
-    AMBA_GPIO_PTR->OUTSET = 1 << max_gpio_cs;
+    AMBA_GPIO_PTR->OUTSET = 1 << cs;
+#ifdef MAX2771_NREAD
+    AMBA_GPIO_PTR->OUTSET = 1 << MAX2771_NREAD;
+#endif
 
     //Wait more than 200 ns
     watchdog_spi = (200 / (1000000000 / PERIPH0_FREQ)) + 1;
@@ -204,7 +198,10 @@ uint32_t max2771_spi_read(enum max2771_band band, uint32_t address)
     }
 
     //Enable SPI at MAX2771
-    AMBA_GPIO_PTR->OUTCLR = 1 << max_gpio_cs;
+    AMBA_GPIO_PTR->OUTCLR = 1 << cs;
+#ifdef MAX2771_NREAD
+    AMBA_GPIO_PTR->OUTCLR = 1 << MAX2771_NREAD;
+#endif
 
     //Send frame
     //send address
@@ -245,13 +242,16 @@ uint32_t max2771_spi_read(enum max2771_band band, uint32_t address)
     data |= AMBA_SPI_PTR(MAX2771_SPI_NUM)->RDR & 0x0000FFFF;
 
     //Disable SPI at MAX2771
-    AMBA_GPIO_PTR->OUTSET = 1 << max_gpio_cs;
+    AMBA_GPIO_PTR->OUTSET = 1 << cs;
+#ifdef MAX2771_NREAD
+    AMBA_GPIO_PTR->OUTSET = 1 << MAX2771_NREAD;
+#endif
 
     return data;
 }
 
 //configure band
-uint32_t max2771_conf_band(enum max2771_band band, uint32_t adc_freq)
+uint32_t max2771_conf_band(enum max2771_band band, uint8_t cs, uint32_t adc_freq)
 {
 
     bool beidou = false;
@@ -263,7 +263,7 @@ uint32_t max2771_conf_band(enum max2771_band band, uint32_t adc_freq)
         return -1;
     }
 
-    max2771_gpio_conf();
+    max2771_gpio_conf(cs);
     max2771_spi_conf();
     switch(band)
     {
@@ -275,40 +275,40 @@ uint32_t max2771_conf_band(enum max2771_band band, uint32_t adc_freq)
                 data = CONF1_FGAIN | CONF1_F2OR5 | (CONF1_FBW_MASK_36 << CONF1_FBW_SHIFT) | (24 << CONF1_FCEN_SHIFT) | CONF1_MIXPOLE |
                     (CONF1_RSVD1_VAL << CONF1_RSVD1_SHIFT) | (CONF1_RSVD2_VAL << CONF1_RSVD2_SHIFT) | (CONF1_RSVD3_VAL << CONF1_RSVD3_SHIFT) |
                     (CONF1_RSVD4_VAL << CONF1_RSVD4_SHIFT) | CONF1_CHIPEN;
-                max2771_spi_write(band,CONF1,data);
+                max2771_spi_write(band,cs,CONF1,data);
 
                 //write register 1
                 data = CONF2_RSVD2 | (CONF2_BITS_MASK_2 << CONF2_BITS_SHIFT) | (CONF2_FORMAT_MASK_1 << CONF2_FORMAT_SHIFT) |
                     (170 << CONF2_GAINREF_SHIFT) | CONF2_IQEN | (1 << CONF2_RSVD4_SHIFT);
-                max2771_spi_write(band,CONF2,data);
+                max2771_spi_write(band,cs,CONF2,data);
 
                 //write register 2
                 data = CONF3_TIMESYNCEN | CONF3_STAMPEN | (CONF3_STRMBITS_MASK_1 << CONF3_STRMBITS_SHIFT) | CONF3_RSVD1_MASK | CONF3_PGAQEN |
                     CONF3_PGAIEN | CONF3_FHIPEN | CONF3_RSVD3 | CONF3_RSVD4 | CONF3_RSVD5 | CONF3_RSVD6 | CONF3_HILOADEN | CONF3_RSVD7 | (0x3A << CONF3_GAININ_SHIFT);
-                max2771_spi_write(band,CONF3,data);
+                max2771_spi_write(band,cs,CONF3,data);
 
                 //write register 3
                 data = (0x10 << PLL_CONF_RSVD8_SHIFT) | (PLL_CONF_IXTAL_MASK_1 << PLL_CONF_IXTAL_SHIFT) | PLL_CONF_RSVD10 | PLL_CONF_REFOUTEN | PLL_CONF_RSVD13;
-				if (adc_freq == 16368000) data |= (PLL_CONF_REFDIV_MASK_3 << PLL_CONF_REFDIV_SHIFT);
+                if (adc_freq == 16368000) data |= (PLL_CONF_REFDIV_MASK_3 << PLL_CONF_REFDIV_SHIFT);
                 if (adc_freq == 32736000) data |= (PLL_CONF_REFDIV_MASK_0 << PLL_CONF_REFDIV_SHIFT);
                 if (adc_freq == 65472000) data |= (PLL_CONF_REFDIV_MASK_4 << PLL_CONF_REFDIV_SHIFT);
-                max2771_spi_write(band,PLL_CONF,data);
+                max2771_spi_write(band,cs,PLL_CONF,data);
 
                 //write register 4
                 data = (1 << PLL_INT_RDIV_SHIFT) | (95 << PLL_INT_NDIV_SHIFT);
-                max2771_spi_write(band,PLL_INT,data);
+                max2771_spi_write(band,cs,PLL_INT,data);
 
                 //write register 5
                 data = (7 << PLL_FRAC_RSVD5_SHIFT) | (0x0A6E9B << PLL_FRAC_FDIV_SHIFT);
-                max2771_spi_write(band,PLL_FRAC,data);
+                max2771_spi_write(band,cs,PLL_FRAC,data);
 
                 //write register 7
                 data = (0x61B << CLK1_CONF_REFCLK_M_CNT_SHIFT) | (0x100 << CLK1_CONF_REFCLK_L_CNT_SHIFT) | CLK1_CONF_RSVD1;
-                max2771_spi_write(band,CLK1_CONF,data);
+                max2771_spi_write(band,cs,CLK1_CONF,data);
 
                 //write register 10
                 data = (0x61B << CLK2_CONF_ADCCLK_M_CNT_SHIFT) | (0x100 << CLK2_CONF_ADCCLK_L_CNT_SHIFT);
-                max2771_spi_write(band,CLK2_CONF,data);
+                max2771_spi_write(band,cs,CLK2_CONF,data);
 
             }
             else if (glonass)
@@ -318,40 +318,40 @@ uint32_t max2771_conf_band(enum max2771_band band, uint32_t adc_freq)
                 data = CONF1_FGAIN | CONF1_F2OR5 | (CONF1_FBW_MASK_36 << CONF1_FBW_SHIFT) | (24 << CONF1_FCEN_SHIFT) | CONF1_MIXPOLE |
                     (CONF1_RSVD1_VAL << CONF1_RSVD1_SHIFT) | (CONF1_RSVD2_VAL << CONF1_RSVD2_SHIFT) | (CONF1_RSVD3_VAL << CONF1_RSVD3_SHIFT) |
                     (CONF1_RSVD4_VAL << CONF1_RSVD4_SHIFT) | CONF1_CHIPEN;
-                max2771_spi_write(band,CONF1,data);
+                max2771_spi_write(band,cs,CONF1,data);
 
                 //write register 1
                 data = CONF2_RSVD2 | (CONF2_BITS_MASK_2 << CONF2_BITS_SHIFT) | (CONF2_FORMAT_MASK_1 << CONF2_FORMAT_SHIFT) |
                     (170 << CONF2_GAINREF_SHIFT) | CONF2_IQEN | (1 << CONF2_RSVD4_SHIFT);
-                max2771_spi_write(band,CONF2,data);
+                max2771_spi_write(band,cs,CONF2,data);
 
                 //write register 2
                 data = CONF3_TIMESYNCEN | CONF3_STAMPEN | (CONF3_STRMBITS_MASK_1 << CONF3_STRMBITS_SHIFT) | CONF3_RSVD1_MASK | CONF3_PGAQEN |
                     CONF3_PGAIEN | CONF3_FHIPEN | CONF3_RSVD3 | CONF3_RSVD4 | CONF3_RSVD5 | CONF3_RSVD6 | CONF3_HILOADEN | CONF3_RSVD7 | (0x3A << CONF3_GAININ_SHIFT);
-                max2771_spi_write(band,CONF3,data);
+                max2771_spi_write(band,cs,CONF3,data);
 
                 //write register 3
-				data = (0x10 << PLL_CONF_RSVD8_SHIFT) | (PLL_CONF_IXTAL_MASK_1 << PLL_CONF_IXTAL_SHIFT) | PLL_CONF_RSVD10 | PLL_CONF_REFOUTEN | PLL_CONF_RSVD13;
-				if (adc_freq == 16368000) data |= (PLL_CONF_REFDIV_MASK_3 << PLL_CONF_REFDIV_SHIFT);
+                data = (0x10 << PLL_CONF_RSVD8_SHIFT) | (PLL_CONF_IXTAL_MASK_1 << PLL_CONF_IXTAL_SHIFT) | PLL_CONF_RSVD10 | PLL_CONF_REFOUTEN | PLL_CONF_RSVD13;
+                if (adc_freq == 16368000) data |= (PLL_CONF_REFDIV_MASK_3 << PLL_CONF_REFDIV_SHIFT);
                 if (adc_freq == 32736000) data |= (PLL_CONF_REFDIV_MASK_0 << PLL_CONF_REFDIV_SHIFT);
                 if (adc_freq == 65472000) data |= (PLL_CONF_REFDIV_MASK_4 << PLL_CONF_REFDIV_SHIFT);
-                max2771_spi_write(band,PLL_CONF,data);
+                max2771_spi_write(band,cs,PLL_CONF,data);
 
                 //write register 4
                 data = (1 << PLL_INT_RDIV_SHIFT) | (97 << PLL_INT_NDIV_SHIFT);
-                max2771_spi_write(band,PLL_INT,data);
+                max2771_spi_write(band,cs,PLL_INT,data);
 
                 //write register 5
                 data = (7 << PLL_FRAC_RSVD5_SHIFT) | (0x0A6E9B << PLL_FRAC_FDIV_SHIFT);
-                max2771_spi_write(band,PLL_FRAC,data);
+                max2771_spi_write(band,cs,PLL_FRAC,data);
 
                 //write register 7
                 data = (0x61B << CLK1_CONF_REFCLK_M_CNT_SHIFT) | (0x100 << CLK1_CONF_REFCLK_L_CNT_SHIFT) | CLK1_CONF_RSVD1;
-                max2771_spi_write(band,CLK1_CONF,data);
+                max2771_spi_write(band,cs,CLK1_CONF,data);
 
                 //write register 10
                 data = (0x61B << CLK2_CONF_ADCCLK_M_CNT_SHIFT) | (0x100 << CLK2_CONF_ADCCLK_L_CNT_SHIFT);
-                max2771_spi_write(band,CLK2_CONF,data);
+                max2771_spi_write(band,cs,CLK2_CONF,data);
 
             }
             else
@@ -361,40 +361,40 @@ uint32_t max2771_conf_band(enum max2771_band band, uint32_t adc_freq)
                 data = CONF1_FGAIN | CONF1_F2OR5 | (CONF1_FBW_MASK_36 << CONF1_FBW_SHIFT) | (24 << CONF1_FCEN_SHIFT) | CONF1_MIXPOLE |
                     (CONF1_RSVD1_VAL << CONF1_RSVD1_SHIFT) | (CONF1_RSVD2_VAL << CONF1_RSVD2_SHIFT) | (CONF1_RSVD3_VAL << CONF1_RSVD3_SHIFT) |
                     (CONF1_RSVD4_VAL << CONF1_RSVD4_SHIFT) | CONF1_CHIPEN;
-                max2771_spi_write(band,CONF1,data);
+                max2771_spi_write(band,cs,CONF1,data);
 
                 //write register 1
                 data = CONF2_RSVD2 | (CONF2_BITS_MASK_2 << CONF2_BITS_SHIFT) | (CONF2_FORMAT_MASK_1 << CONF2_FORMAT_SHIFT) |
                     (170 << CONF2_GAINREF_SHIFT) | CONF2_IQEN | (1 << CONF2_RSVD4_SHIFT);
-                max2771_spi_write(band,CONF2,data);
+                max2771_spi_write(band,cs,CONF2,data);
 
                 //write register 2
                 data = CONF3_TIMESYNCEN | CONF3_STAMPEN | (CONF3_STRMBITS_MASK_1 << CONF3_STRMBITS_SHIFT) | CONF3_RSVD1_MASK | CONF3_PGAQEN |
                     CONF3_PGAIEN | CONF3_FHIPEN | CONF3_RSVD3 | CONF3_RSVD4 | CONF3_RSVD5 | CONF3_RSVD6 | CONF3_HILOADEN | CONF3_RSVD7 | (0x3A << CONF3_GAININ_SHIFT);
-                max2771_spi_write(band,CONF3,data);
+                max2771_spi_write(band,cs,CONF3,data);
 
                 //write register 3
-				data = (0x10 << PLL_CONF_RSVD8_SHIFT) | (PLL_CONF_IXTAL_MASK_1 << PLL_CONF_IXTAL_SHIFT) | PLL_CONF_RSVD10 | PLL_CONF_REFOUTEN | PLL_CONF_RSVD13;
-				if (adc_freq == 16368000) data |= (PLL_CONF_REFDIV_MASK_3 << PLL_CONF_REFDIV_SHIFT);
+                data = (0x10 << PLL_CONF_RSVD8_SHIFT) | (PLL_CONF_IXTAL_MASK_1 << PLL_CONF_IXTAL_SHIFT) | PLL_CONF_RSVD10 | PLL_CONF_REFOUTEN | PLL_CONF_RSVD13;
+                if (adc_freq == 16368000) data |= (PLL_CONF_REFDIV_MASK_3 << PLL_CONF_REFDIV_SHIFT);
                 if (adc_freq == 32736000) data |= (PLL_CONF_REFDIV_MASK_0 << PLL_CONF_REFDIV_SHIFT);
                 if (adc_freq == 65472000) data |= (PLL_CONF_REFDIV_MASK_4 << PLL_CONF_REFDIV_SHIFT);
-                max2771_spi_write(band,PLL_CONF,data);
+                max2771_spi_write(band,cs,PLL_CONF,data);
 
                 //write register 4
                 data = (1 << PLL_INT_RDIV_SHIFT) | (96 << PLL_INT_NDIV_SHIFT);
-                max2771_spi_write(band,PLL_INT,data);
+                max2771_spi_write(band,cs,PLL_INT,data);
 
                 //write register 5
                 data = (7 << PLL_FRAC_RSVD5_SHIFT) | (0x0A6E9B << PLL_FRAC_FDIV_SHIFT);
-                max2771_spi_write(band,PLL_FRAC,data);
+                max2771_spi_write(band,cs,PLL_FRAC,data);
 
                 //write register 7
                 data = (0x61B << CLK1_CONF_REFCLK_M_CNT_SHIFT) | (0x100 << CLK1_CONF_REFCLK_L_CNT_SHIFT) | CLK1_CONF_RSVD1;
-                max2771_spi_write(band,CLK1_CONF,data);
+                max2771_spi_write(band,cs,CLK1_CONF,data);
 
                 //write register 10
                 data = (0x61B << CLK2_CONF_ADCCLK_M_CNT_SHIFT) | (0x100 << CLK2_CONF_ADCCLK_L_CNT_SHIFT);
-                max2771_spi_write(band,CLK2_CONF,data);
+                max2771_spi_write(band,cs,CLK2_CONF,data);
 
             }
             break;
@@ -404,38 +404,38 @@ uint32_t max2771_conf_band(enum max2771_band band, uint32_t adc_freq)
             data = CONF1_FGAIN | CONF1_F2OR5 | (CONF1_FBW_MASK_164 << CONF1_FBW_SHIFT) | (88 << CONF1_FCEN_SHIFT) | (CONF1_MIXERMODE_MASK_LB << CONF1_MIXERMODE_SHIFT) |
                 (CONF1_LNAMODE_MASK_LB << CONF1_LNAMODE_SHIFT) | (CONF1_RSVD1_VAL << CONF1_RSVD1_SHIFT) | (CONF1_RSVD2_VAL << CONF1_RSVD2_SHIFT) |
                 (CONF1_RSVD3_VAL << CONF1_RSVD3_SHIFT) | (CONF1_RSVD4_VAL << CONF1_RSVD4_SHIFT) | CONF1_CHIPEN;
-            max2771_spi_write(band,CONF1,data);
+            max2771_spi_write(band,cs,CONF1,data);
 
             //write register 1
             data = CONF2_RSVD2 | (CONF2_BITS_MASK_2 << CONF2_BITS_SHIFT) | (CONF2_FORMAT_MASK_1 << CONF2_FORMAT_SHIFT) |
                 (170 << CONF2_GAINREF_SHIFT) | CONF2_IQEN | (1 << CONF2_RSVD4_SHIFT);
-            max2771_spi_write(band,CONF2,data);
+            max2771_spi_write(band,cs,CONF2,data);
 
             //write register 2
             data = CONF3_TIMESYNCEN | CONF3_STAMPEN | (CONF3_STRMBITS_MASK_1 << CONF3_STRMBITS_SHIFT) | CONF3_RSVD1_MASK | CONF3_PGAQEN |
                 CONF3_PGAIEN | CONF3_RSVD3 | CONF3_RSVD4 | CONF3_RSVD5 | CONF3_RSVD6 | CONF3_RSVD7 | (0x3A << CONF3_GAININ_SHIFT);
-            max2771_spi_write(band,CONF3,data);
+            max2771_spi_write(band,cs,CONF3,data);
 
             //write register 3
             data = PLL_CONF_INT_PLL | (0x10 << PLL_CONF_RSVD8_SHIFT) | (PLL_CONF_IXTAL_MASK_1 << PLL_CONF_IXTAL_SHIFT) | PLL_CONF_RSVD10 |
                 PLL_CONF_REFOUTEN | PLL_CONF_RSVD13 | PLL_CONF_LOBAND | (PLL_CONF_REFDIV_MASK_4 << PLL_CONF_REFDIV_SHIFT);
-            max2771_spi_write(band,PLL_CONF,data);
+            max2771_spi_write(band,cs,PLL_CONF,data);
 
             //write register 4
             data = (8 << PLL_INT_RDIV_SHIFT) | (575 << PLL_INT_NDIV_SHIFT);
-            max2771_spi_write(band,PLL_INT,data);
+            max2771_spi_write(band,cs,PLL_INT,data);
 
             //write register 5
             data = (7 << PLL_FRAC_RSVD5_SHIFT) | (0x0F5655 << PLL_FRAC_FDIV_SHIFT);
-            max2771_spi_write(band,PLL_FRAC,data);
+            max2771_spi_write(band,cs,PLL_FRAC,data);
 
             //write register 7
             data = CLK1_CONF_EXTADCCLK | (0x61B << CLK1_CONF_REFCLK_M_CNT_SHIFT) | (0x100 << CLK1_CONF_REFCLK_L_CNT_SHIFT) | CLK1_CONF_RSVD1;
-            max2771_spi_write(band,CLK1_CONF,data);
+            max2771_spi_write(band,cs,CLK1_CONF,data);
 
             //write register 10
             data = (0x61B << CLK2_CONF_ADCCLK_M_CNT_SHIFT) | (0x100 << CLK2_CONF_ADCCLK_L_CNT_SHIFT);
-            max2771_spi_write(band,CLK2_CONF,data);
+            max2771_spi_write(band,cs,CLK2_CONF,data);
 
             break;
         case L2E6:
@@ -444,48 +444,47 @@ uint32_t max2771_conf_band(enum max2771_band band, uint32_t adc_freq)
             data = CONF1_FGAIN | CONF1_F2OR5 | (CONF1_FBW_MASK_36 << CONF1_FBW_SHIFT) | (88 << CONF1_FCEN_SHIFT) | (CONF1_MIXERMODE_MASK_LB << CONF1_MIXERMODE_SHIFT) |
                 (CONF1_LNAMODE_MASK_LB << CONF1_LNAMODE_SHIFT) | CONF1_MIXPOLE | (CONF1_RSVD1_VAL << CONF1_RSVD1_SHIFT) | (CONF1_RSVD2_VAL << CONF1_RSVD2_SHIFT) |
                 (CONF1_RSVD3_VAL << CONF1_RSVD3_SHIFT) | (CONF1_RSVD4_VAL << CONF1_RSVD4_SHIFT) | CONF1_CHIPEN;
-            max2771_spi_write(band,CONF1,data);
+            max2771_spi_write(band,cs,CONF1,data);
 
             //write register 1
             data = CONF2_RSVD2 | (CONF2_BITS_MASK_2 << CONF2_BITS_SHIFT) | (CONF2_FORMAT_MASK_1 << CONF2_FORMAT_SHIFT) |
                 (170 << CONF2_GAINREF_SHIFT) | CONF2_IQEN | (1 << CONF2_RSVD4_SHIFT);
-            max2771_spi_write(band,CONF2,data);
+            max2771_spi_write(band,cs,CONF2,data);
 
             //write register 2
             data = CONF3_TIMESYNCEN | CONF3_STAMPEN | (CONF3_STRMBITS_MASK_1 << CONF3_STRMBITS_SHIFT) | CONF3_RSVD1_MASK | CONF3_PGAQEN |
                 CONF3_PGAIEN | CONF3_RSVD3 | CONF3_RSVD4 | CONF3_RSVD5 | CONF3_RSVD6 | CONF3_RSVD7 | (0x3A << CONF3_GAININ_SHIFT);
-            max2771_spi_write(band,CONF3,data);
+            max2771_spi_write(band,cs,CONF3,data);
 
             //write register 3
             data = (0x10 << PLL_CONF_RSVD8_SHIFT) | (PLL_CONF_IXTAL_MASK_1 << PLL_CONF_IXTAL_SHIFT) | PLL_CONF_RSVD10 |
                 PLL_CONF_REFOUTEN | PLL_CONF_RSVD13 | PLL_CONF_LOBAND | (PLL_CONF_REFDIV_MASK_4 << PLL_CONF_REFDIV_SHIFT);
-            max2771_spi_write(band,PLL_CONF,data);
+            max2771_spi_write(band,cs,PLL_CONF,data);
 
             //write register 4
             data = (1 << PLL_INT_RDIV_SHIFT) | (76 << PLL_INT_NDIV_SHIFT);
-            max2771_spi_write(band,PLL_INT,data);
+            max2771_spi_write(band,cs,PLL_INT,data);
 
             //write register 5
             data = (7 << PLL_FRAC_RSVD5_SHIFT) | (0x090000 << PLL_FRAC_FDIV_SHIFT);
-            max2771_spi_write(band,PLL_FRAC,data);
+            max2771_spi_write(band,cs,PLL_FRAC,data);
 
             //write register 7
             data = CLK1_CONF_EXTADCCLK | (0x61B << CLK1_CONF_REFCLK_M_CNT_SHIFT) | (0x100 << CLK1_CONF_REFCLK_L_CNT_SHIFT) | CLK1_CONF_RSVD1;
-            max2771_spi_write(band,CLK1_CONF,data);
+            max2771_spi_write(band,cs,CLK1_CONF,data);
 
             //write register 10
             data = (0x61B << CLK2_CONF_ADCCLK_M_CNT_SHIFT) | (0x100 << CLK2_CONF_ADCCLK_L_CNT_SHIFT);
-            max2771_spi_write(band,CLK2_CONF,data);
+            max2771_spi_write(band,cs,CLK2_CONF,data);
 
             break;
         default:
-            max2771_gpio_unconf();
+            max2771_gpio_unconf(cs);
             max2771_spi_unconf();
             return 0;
 
     }
-    max2771_gpio_unconf();
+    max2771_gpio_unconf(cs);
     max2771_spi_unconf();
     return 1;
 }
-

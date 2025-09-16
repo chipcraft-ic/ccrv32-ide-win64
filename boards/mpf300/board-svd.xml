@@ -5,7 +5,7 @@
   <!-- device vendor short name -->
   <vendorID>chipcraft</vendorID>
   <!-- name of part-->
-  <name>mpf300_eval</name>
+  <name>mpf300</name>
   <!-- version of this description -->
   <version>1.0</version>
   <description>ChipCraft microcontroller</description>
@@ -2309,6 +2309,11 @@
           <!-- GNSS Controller Status and Control Register Flags -->
           <fields>
             <field>
+              <name>ACQDEC5</name>
+              <description>Acquisition Decimator by 5</description>
+              <bitRange>[7:7]</bitRange>
+            </field>
+            <field>
               <name>RFAFE</name>
               <description>GNSS RF AFE</description>
               <bitRange>[11:8]</bitRange>
@@ -2814,6 +2819,11 @@
               <bitRange>[9:9]</bitRange>
             </field>
             <field>
+              <name>NMI_EN</name>
+              <description>NMI Enable</description>
+              <bitRange>[11:11]</bitRange>
+            </field>
+            <field>
               <name>RETRY_COUNT</name>
               <description>Retry Count (FT-only)</description>
               <bitRange>[15:12]</bitRange>
@@ -3022,6 +3032,11 @@
               <name>MERGE_EN</name>
               <description>Store Buffer Merging Enable</description>
               <bitRange>[10:10]</bitRange>
+            </field>
+            <field>
+              <name>NMI_EN</name>
+              <description>NMI Enable</description>
+              <bitRange>[11:11]</bitRange>
             </field>
             <field>
               <name>PERF_EN</name>
@@ -6622,31 +6637,31 @@
         </register>
         <register>
           <name>PER</name>
-          <description>Period Register</description>
+          <description>Period Register (32 bit)</description>
           <addressOffset>0x4</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>PERBUF</name>
-          <description>Period Buffer Register</description>
+          <description>Period Buffer Register (32 bit)</description>
           <addressOffset>0x8</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>PRES</name>
-          <description>Prescaler Register</description>
+          <description>Prescaler Register (16 bit)</description>
           <addressOffset>0xC</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>PRESBUF</name>
-          <description>Prescaler Buffer Register</description>
+          <description>Prescaler Buffer Register (16 bit)</description>
           <addressOffset>0x10</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>COUNT</name>
-          <description>Count Register</description>
+          <description>Count Register (32 bit)</description>
           <addressOffset>0x14</addressOffset>
           <access>read-write</access>
         </register>
@@ -6941,31 +6956,31 @@
         </register>
         <register>
           <name>PER</name>
-          <description>Period Register</description>
+          <description>Period Register (32 bit)</description>
           <addressOffset>0x4</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>PERBUF</name>
-          <description>Period Buffer Register</description>
+          <description>Period Buffer Register (32 bit)</description>
           <addressOffset>0x8</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>PRES</name>
-          <description>Prescaler Register</description>
+          <description>Prescaler Register (16 bit)</description>
           <addressOffset>0xC</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>PRESBUF</name>
-          <description>Prescaler Buffer Register</description>
+          <description>Prescaler Buffer Register (16 bit)</description>
           <addressOffset>0x10</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>COUNT</name>
-          <description>Count Register</description>
+          <description>Count Register (32 bit)</description>
           <addressOffset>0x14</addressOffset>
           <access>read-write</access>
         </register>
@@ -7261,31 +7276,31 @@
         </register>
         <register>
           <name>PER</name>
-          <description>Period Register</description>
+          <description>Period Register (16 bit)</description>
           <addressOffset>0x4</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>PERBUF</name>
-          <description>Period Buffer Register</description>
+          <description>Period Buffer Register (16 bit)</description>
           <addressOffset>0x8</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>PRES</name>
-          <description>Prescaler Register</description>
+          <description>Prescaler Register (8 bit)</description>
           <addressOffset>0xC</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>PRESBUF</name>
-          <description>Prescaler Buffer Register</description>
+          <description>Prescaler Buffer Register (8 bit)</description>
           <addressOffset>0x10</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>COUNT</name>
-          <description>Count Register</description>
+          <description>Count Register (16 bit)</description>
           <addressOffset>0x14</addressOffset>
           <access>read-write</access>
         </register>
@@ -7580,31 +7595,31 @@
         </register>
         <register>
           <name>PER</name>
-          <description>Period Register</description>
+          <description>Period Register (16 bit)</description>
           <addressOffset>0x4</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>PERBUF</name>
-          <description>Period Buffer Register</description>
+          <description>Period Buffer Register (16 bit)</description>
           <addressOffset>0x8</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>PRES</name>
-          <description>Prescaler Register</description>
+          <description>Prescaler Register (8 bit)</description>
           <addressOffset>0xC</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>PRESBUF</name>
-          <description>Prescaler Buffer Register</description>
+          <description>Prescaler Buffer Register (8 bit)</description>
           <addressOffset>0x10</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>COUNT</name>
-          <description>Count Register</description>
+          <description>Count Register (16 bit)</description>
           <addressOffset>0x14</addressOffset>
           <access>read-write</access>
         </register>
@@ -7794,19 +7809,19 @@
         </register>
         <register>
           <name>COUNT</name>
-          <description>Count Register (16 bit)</description>
+          <description>Count Register (24 bit)</description>
           <addressOffset>0x4</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>PER</name>
-          <description>Period Register (16 bit)</description>
+          <description>Period Register (24 bit)</description>
           <addressOffset>0x8</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>PRES</name>
-          <description>Prescaler Register (8 bit)</description>
+          <description>Prescaler Register (16 bit)</description>
           <addressOffset>0xC</addressOffset>
           <access>read-write</access>
         </register>
@@ -9437,8 +9452,8 @@
               <bitRange>[18:18]</bitRange>
             </field>
             <field>
-              <name>SPCS</name>
-              <description>Samples Per Chip as Shift</description>
+              <name>RCLB</name>
+              <description>Real Code Length Base as Shift</description>
               <bitRange>[22:19]</bitRange>
             </field>
             <field>
@@ -9584,6 +9599,26 @@
               <name>CORRWD</name>
               <description>Correlation Width</description>
               <bitRange>[13:9]</bitRange>
+            </field>
+            <field>
+              <name>BEID_B2b</name>
+              <description>BeiDou B2b PRN Generator Info</description>
+              <bitRange>[15:15]</bitRange>
+            </field>
+            <field>
+              <name>BEID_B2a</name>
+              <description>BeiDou B2a PRN Generator Info</description>
+              <bitRange>[16:16]</bitRange>
+            </field>
+            <field>
+              <name>BEID_B3I</name>
+              <description>BeiDou B3I PRN Generator Info</description>
+              <bitRange>[17:17]</bitRange>
+            </field>
+            <field>
+              <name>QZSS_L5</name>
+              <description>AZSS L5 PRN Generator Info</description>
+              <bitRange>[18:18]</bitRange>
             </field>
             <field>
               <name>SBAS_L1CA</name>

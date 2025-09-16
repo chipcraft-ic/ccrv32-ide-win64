@@ -2165,18 +2165,24 @@
       <fields>
         <field>
           <name>NC</name>
-          <bitRange>[31:18]</bitRange>
+          <bitRange>[31:19]</bitRange>
           <access>read-only</access>
         </field>
         <field>
           <name>FLASH_POR_EN</name>
           <description>Flash Brown-out detector power-on reset enable</description>
-          <bitRange>[17:17]</bitRange>
+          <bitRange>[18:18]</bitRange>
           <access>read-write</access>
         </field>
         <field>
           <name>FLASH_BOD_EN</name>
           <description>Flash Brown-out detector enable</description>
+          <bitRange>[17:17]</bitRange>
+          <access>read-write</access>
+        </field>
+        <field>
+          <name>DCDC_VOUT_LOW</name>
+          <description>DCDC output voltage select, ‘0’ - 1.1 V, ‘1’ - 0.9 V</description>
           <bitRange>[16:16]</bitRange>
           <access>read-write</access>
         </field>

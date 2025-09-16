@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2020 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2025-01-06 20:45:57 +0100 (pon, 06 sty 2025) $
-* $Revision: 1121 $
+* $Date: 2025-08-10 17:22:10 +0200 (nie, 10 sie 2025) $
+* $Revision: 1157 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -53,8 +53,8 @@ void hardware_init(void){}
  */
 int gnss_afe_init(void)
 {
-    max2771_conf_band(L1E1,65472000);
-    max2771_conf_band(L5E5,65472000);
-    max2771_conf_band(L2E6,65472000);
+    max2771_conf_band(L1E1,MAX2771_L1E1_CS,65472000);
+    max2771_conf_band(L5E5,MAX2771_L5E5_CS,65472000);
+    max2771_conf_band(L2E6,MAX2771_L2E6_CS,65472000);
     return 0;
 }

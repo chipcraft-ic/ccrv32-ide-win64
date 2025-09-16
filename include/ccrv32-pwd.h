@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2019 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2020-08-30 22:54:21 +0200 (nie, 30 sie 2020) $
-* $Revision: 632 $
+* $Date: 2025-08-20 19:48:33 +0200 (śro, 20 sie 2025) $
+* $Revision: 1158 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -63,6 +63,7 @@
     uint32_t DPRST;    /*!< Deep Reset             */
     uint32_t STAT;     /*!< Status Register        */
     uint32_t INFO;     /*!< Info Register          */
+    uint32_t RSTCNT;   /*!< Reset Count Register   */
 } pwd_regs_t;
 
 static volatile pwd_regs_t * const PWD_PTR = (pwd_regs_t*)PWD_BASE;

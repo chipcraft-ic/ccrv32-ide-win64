@@ -32,8 +32,8 @@
 * File Name : main.c
 * Author    : Krzysztof Marcinek
 * ******************************************************************************
-* $Date: 2021-06-07 17:56:02 +0200 (pon, 07 cze 2021) $
-* $Revision: 704 $
+* $Date: 2025-08-20 19:48:33 +0200 (śro, 20 sie 2025) $
+* $Revision: 1158 $
 *H*****************************************************************************/
 
 #include "board.h"
@@ -125,7 +125,7 @@ int main(void)
             //*reset_count = 0;
             RTCwrite((uint32_t*)&AMBA_RTC_PTR->BACKUP0, 0);
         }
-        assertEq(RTCread((uint32_t*)&AMBA_RTC_PTR->BACKUP0), 1);                          // power on reset or debug reset
+        assertEq(RTCread((uint32_t*)&AMBA_RTC_PTR->BACKUP0), 1); // power on reset or debug reset
         testWDT();
     }
     else if (reset_guard == 1){
@@ -147,6 +147,14 @@ int main(void)
     }
 
     assertTrue(g_totalTests>4);
+
+    if (PWD_PTR->RSTCNT != 0){
+        assertEq(PWD_PTR->RSTCNT,2);
+        PWD_PTR->RSTCNT = 15;
+        assertEq(PWD_PTR->RSTCNT,15);
+        PWD_PTR->RSTCNT = 0;
+        assertEq(PWD_PTR->RSTCNT,0);
+    }
 
     printTestSummary();
 

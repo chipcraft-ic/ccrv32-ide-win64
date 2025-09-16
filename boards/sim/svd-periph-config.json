@@ -21,7 +21,7 @@
     "dma_up_offset": 128,
     "acqeng_num": 0,
     "dma_total_num": 6,
-    "fft_en": true,
+    "fft_en": false,
     "timer16_cc_num": 4,
     "irq_en": true,
     "apb2_en": false,

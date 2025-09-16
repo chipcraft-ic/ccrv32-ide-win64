@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2021 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2024-11-06 21:54:21 +0100 (śro, 06 lis 2024) $
-* $Revision: 1115 $
+* $Date: 2025-08-20 19:48:33 +0200 (śro, 20 sie 2025) $
+* $Revision: 1158 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -102,10 +102,10 @@ void configure_edac(void)
  */
 void configure_pll(void)
 {
-	//Clear clock scaling
+    //Clear clock scaling
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
     CFG_REGS_PTR->CFGREG_COREFREQ_CLK = CFG_REGS_PTR->CFGREG_COREFREQ_CLK & ~CFGREG_COREFREQ_CLK_CORE_XTAL_SCALE_MASK & ~CFGREG_COREFREQ_CLK_GNSSAFE_XTAL_SCALE_MASK;
-	//Set XTAL prescaler for MCU
+    //Set XTAL prescaler for MCU
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
     CFG_REGS_PTR->CFGREG_COREFREQ_CLK |= (1 << CFGREG_COREFREQ_CLK_CORE_XTAL_SCALE_SHIFT);
 
@@ -123,14 +123,14 @@ void configure_pll(void)
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF; 
     CFG_REGS_PTR->CFGREG_SPARE_CONF = 0x8;
 
-   CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
-   CFG_REGS_PTR->CFGREG_PM_CONF |= CFGREG_PM_CONF_CAL_EN_MASK;
+    CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
+    CFG_REGS_PTR->CFGREG_PM_CONF |= CFGREG_PM_CONF_CAL_EN_MASK;
 
     //CCNV2B1 RTC fix
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
     CFG_REGS_PTR->CFGREG_RTCCONF |= CFGREG_RTCCONF_XTAL_RTC_TEST_MASK;
 
-	//Fix reset
+    //Fix reset
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
     CFG_REGS_PTR->CFGREG_COREFREQ_CLK |= CFGREG_COREFREQ_CLK_XTAL_LOCK_OV_MASK;
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
@@ -372,7 +372,7 @@ void gnss_afe_regs(void)
     /* Configure GNSSAFE1 */
 
     /* Configure PLL1 */
-	// Set the prescaler to 2 and multipliaction factor to 0x51d70a (81.84 * 38.4M/2 ~= 1536*1.023e6, the error is 70 Hz, which is negligable) - hex 0x51d70a, gives ADC freq of 254*1.023e6 when divided by 6
+    // Set the prescaler to 2 and multipliaction factor to 0x51d70a (81.84 * 38.4M/2 ~= 1536*1.023e6, the error is 70 Hz, which is negligable) - hex 0x51d70a, gives ADC freq of 254*1.023e6 when divided by 6
     CFG_REGS_PTR->CFGREG_UNLOCK = CFGREG_UNLOCK_DEF;
     CFG_REGS_PTR->CFGREG_PLL1_CONF  = CFGREG_PLL1_CONF_EN_MASK | (1 << CFGREG_PLL1_CONF_PRESC_SHIFT) | (0x51d70a << CFGREG_PLL1_CONF_FCW_SHIFT);
     // fif_L1 = 1540*1.023 MHz-flo_l1 = 4*1.023e6
@@ -399,7 +399,7 @@ void gnss_afe_regs(void)
     CFG_REGS_PTR->CFGREG_ADC1_CONF = CFGREG_ADC1_CONF_DEF | CFGREG_ADC1_CONF_ADC_EN_MASK | CFGREG_ADC1_CONF_SAH_EN_MASK | (0 << CFGREG_ADC1_CONF_CLK_SEL_SHIFT) | (2 << CFGREG_ADC1_CONF_CLK_CONF_SHIFT);
 
     /* Configure GNSSAFE25 */
-	
+
     /* Configure PLL25 */
     // Set the prescaler to 2 and multipliaction factor to 4176240 (ftcxo resulted from L1 PLL1 is 1536/0x51d70a*2=19200000.859145932), flo_l25 = 1223507867.2485292
     // fif_L5 = 1176450000.0-flo_l25 = -47057867.248529196

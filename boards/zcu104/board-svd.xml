@@ -5,7 +5,7 @@
   <!-- device vendor short name -->
   <vendorID>chipcraft</vendorID>
   <!-- name of part-->
-  <name>vcu108</name>
+  <name>zcu104</name>
   <!-- version of this description -->
   <version>1.0</version>
   <description>ChipCraft microcontroller</description>
@@ -482,6 +482,12 @@
               <bitRange>[5:5]</bitRange>
             </field>
           </fields>
+        </register>
+        <register>
+          <name>RSTCNT</name>
+          <description>Reset Count Register</description>
+          <addressOffset>0x18</addressOffset>
+          <access>read-write</access>
         </register>
       </registers>
     </peripheral>
@@ -2033,6 +2039,12 @@
           <access>read-only</access>
         </register>
         <register>
+          <name>EXC_COUNT</name>
+          <description>Exception Counter</description>
+          <addressOffset>0x1F3C</addressOffset>
+          <access>read-write</access>
+        </register>
+        <register>
           <dim>32</dim>
           <dimIncrement>4</dimIncrement>
           <name>BUS_PERF[%s]</name>
@@ -3194,84 +3206,6 @@
           <name>MISS_CNT_BUF</name>
           <description>Miss Counter Buffer</description>
           <addressOffset>0x3C</addressOffset>
-          <access>read-only</access>
-        </register>
-      </registers>
-    </peripheral>
-    <!-- Viterbi Decoder Controller Registers -->
-    <peripheral>
-      <name>VITERBI</name>
-      <description>Viterbi Decoder Controller</description>
-      <baseAddress>0xF00A0000</baseAddress>
-      <addressBlock>
-        <offset>0</offset>
-        <size>0x100</size>
-        <usage>registers</usage>
-      </addressBlock>
-      <registers>
-        <register>
-          <name>STATUS</name>
-          <description>Status Register</description>
-          <addressOffset>0x0</addressOffset>
-          <access>read-only</access>
-          <!-- Viterbi Controller Status Register Flags -->
-          <fields>
-            <field>
-              <name>BUSY</name>
-              <description>Viterbi Busy</description>
-              <bitRange>[0:0]</bitRange>
-            </field>
-            <field>
-              <name>MAX_LEN</name>
-              <description>Maximum Mesage Lendth</description>
-              <bitRange>[31:16]</bitRange>
-            </field>
-          </fields>
-        </register>
-        <register>
-          <name>CTRL</name>
-          <description>Control Register</description>
-          <addressOffset>0x4</addressOffset>
-          <access>read-write</access>
-          <!-- Viterbi Controller Control Register Flags -->
-          <fields>
-            <field>
-              <name>MSG_LEN</name>
-              <description>Message Length</description>
-              <bitRange>[11:0]</bitRange>
-            </field>
-            <field>
-              <name>INIT_STATE</name>
-              <description>Viterbi Initial State</description>
-              <bitRange>[17:12]</bitRange>
-            </field>
-            <field>
-              <name>INV_G2</name>
-              <description>Invert G2 Branch</description>
-              <bitRange>[18:18]</bitRange>
-            </field>
-            <field>
-              <name>CFG_EN</name>
-              <description>Configuration Enable</description>
-              <bitRange>[19:19]</bitRange>
-            </field>
-            <field>
-              <name>START</name>
-              <description>Start Operation</description>
-              <bitRange>[31:31]</bitRange>
-            </field>
-          </fields>
-        </register>
-        <register>
-          <name>DATA_IN</name>
-          <description>Data Input Register</description>
-          <addressOffset>0x08</addressOffset>
-          <access>write-only</access>
-        </register>
-        <register>
-          <name>DATA_OUT</name>
-          <description>Data Output Register</description>
-          <addressOffset>0x0C</addressOffset>
           <access>read-only</access>
         </register>
       </registers>
@@ -8076,25 +8010,25 @@
         </register>
         <register>
           <name>COUNT</name>
-          <description>Count Register</description>
+          <description>Count Register (20 bit)</description>
           <addressOffset>0x8</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>PER</name>
-          <description>Period Register</description>
+          <description>Period Register (20 bit)</description>
           <addressOffset>0xC</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>PERCL</name>
-          <description>Period Closed Register</description>
+          <description>Period Closed Register (20 bit)</description>
           <addressOffset>0x10</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>PRES</name>
-          <description>Prescaler Register</description>
+          <description>Prescaler Register (16 bit)</description>
           <addressOffset>0x14</addressOffset>
           <access>read-write</access>
         </register>

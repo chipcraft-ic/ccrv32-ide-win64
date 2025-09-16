@@ -32,8 +32,8 @@
 * File Name : main.c
 * Author    : Krzysztof Marcinek
 * ******************************************************************************
-* $Date: 2025-05-16 14:07:05 +0200 (Fri, 16 May 2025) $
-* $Revision: 1152 $
+* $Date: 2025-09-16 15:32:05 +0200 (wto, 16 wrz 2025) $
+* $Revision: 1160 $
 *H*****************************************************************************/
 
 #include "board.h"
@@ -194,7 +194,7 @@ int main(void)
     }
     printf("INFO: FPU units:                %d (double-precision)\n",(int)fpu_num);
     if (cpu_info_0 & CPU_ICACHE) {
-        printf("INFO: Instruction cache:        %d ways * %f kbytes\n",(unsigned)(cpu_info_0 & CPU_ICWAY_MASK)>>CPU_ICWAY_SHIFT,(float)(((int)1 << ((cpu_info_0 & CPU_ICSIZE_MASK) >> CPU_ICSIZE_SHIFT))/1024.0));
+        printf("INFO: Instruction cache:        %d ways * %f Kbytes\n",(unsigned)(cpu_info_0 & CPU_ICWAY_MASK)>>CPU_ICWAY_SHIFT,(float)(((int)1 << ((cpu_info_0 & CPU_ICSIZE_MASK) >> CPU_ICSIZE_SHIFT))/1024.0));
         printf("INFO: Instruction cache arch.:  ");
         switch ((ICACHE_PTR->INFO & ICACHE_IMPL_MASK) >> ICACHE_IMPL_SHIFT) {
             case ICACHE_IMPL_HP:
@@ -208,7 +208,7 @@ int main(void)
     }
 
     if (cpu_info_1 & CPU_DCACHE) {
-        printf("INFO: Data cache:               %d ways * %f kbytes\n",(unsigned)(cpu_info_1 & CPU_DCWAY_MASK)>>CPU_DCWAY_SHIFT,(float)(((int)1 << ((cpu_info_1 & CPU_DCSIZE_MASK) >> CPU_DCSIZE_SHIFT))/1024.0));
+        printf("INFO: Data cache:               %d ways * %f Kbytes\n",(unsigned)(cpu_info_1 & CPU_DCWAY_MASK)>>CPU_DCWAY_SHIFT,(float)(((int)1 << ((cpu_info_1 & CPU_DCSIZE_MASK) >> CPU_DCSIZE_SHIFT))/1024.0));
         printf("INFO: Data cache arch.:         ");
         switch ((DCACHE_PTR->INFO & DCACHE_IMPL_MASK) >> DCACHE_IMPL_SHIFT) {
             case DCACHE_IMPL_HP:
@@ -226,10 +226,10 @@ int main(void)
     }
 
     printf("INFO: Bus width:                %d-bit\n",32<<((cpu_info_2 & CPU_SYSBUS_MASK) >> CPU_SYSBUS_SHIFT));
-    printf("INFO: ROM size:                 %d kbytes\n",((int)1<<((cpu_info_0 & CPU_IMSIZE_MASK) >> CPU_IMSIZE_SHIFT))/1024);
-    printf("INFO: RAM size:                 %d kbytes\n",((int)1<<((cpu_info_0 & CPU_DMSIZE_MASK) >> CPU_DMSIZE_SHIFT))/1024);
+    printf("INFO: ROM size:                 %d Kbytes\n",((int)1<<((cpu_info_0 & CPU_IMSIZE_MASK) >> CPU_IMSIZE_SHIFT))/1024);
+    printf("INFO: RAM size:                 %d Kbytes\n",((int)1<<((cpu_info_0 & CPU_DMSIZE_MASK) >> CPU_DMSIZE_SHIFT))/1024);
     if (cpu_info_0 & CPU_SPRAM) {
-        printf("INFO: SP-RAM size:              %d kbytes\n",((int)1<<((cpu_info_0 & CPU_SPRSIZE_MASK) >> CPU_SPRSIZE_SHIFT))/1024);
+        printf("INFO: SP-RAM size:              %d Kbytes\n",((int)1<<((cpu_info_0 & CPU_SPRSIZE_MASK) >> CPU_SPRSIZE_SHIFT))/1024);
     }
 
     return 0;

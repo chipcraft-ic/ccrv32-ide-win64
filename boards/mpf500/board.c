@@ -1,9 +1,9 @@
 /* ----------------------------------------------------------------------
 *
-* Copyright (c) 2019 ChipCraft Sp. z o.o. All rights reserved
+* Copyright (c) 2025 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2025-08-20 19:48:33 +0200 (śro, 20 sie 2025) $
-* $Revision: 1158 $
+* $Date: 2025-09-16 15:32:05 +0200 (wto, 16 wrz 2025) $
+* $Revision: 1160 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -33,35 +33,29 @@
 * POSSIBILITY OF SUCH DAMAGE.
  * -------------------------------------------------------------------- */
 
-#ifndef _BOARD_DEFINES_H
-#define _BOARD_DEFINES_H
+#include <ccrv32.h>
+#include <ccrv32-csr.h>
 
-/* DO NOT MODIFY */
-#define IDCODE_PART_NUM         0
-#define IDCODE_PART_VER         0
+#include "board.h"
+#include "max2771.h"
 
-/* EXTERNAL W25Q32 MEMORY */
-#define FLASH_SIZE              (-1)//(1024*1024*4)
-#define FLASH_PAGE_SIZE         256
+/**
+ * @brief Initialize the MPF500-EVAL-KIT board
+ */
+void board_init(void){}
 
-#define PERIPH0_FREQ            40000000UL
-#define PERIPH2_FREQ            40000000UL
-#define CORE_FREQ               80000000UL
+/**
+ * @brief Initialize the MPF500-EVAL-KIT hardware
+ */
+void hardware_init(void){}
 
-#define STDIO_UART              0
-#define STDIO_BAUDRATE          921600
-#define STDIO_RTSCTS            0
-
-#define TIME_SOURCE             TIMER32
-#define TIME_SOURCE_TIMER_ID    0
-#define TIME_SOURCE_PRSC        ((PERIPH0_FREQ/1000000)-1)
-
-#define MAX2771_SPI_NUM         0
-#define MAX2771_L1E1_CS         2
-#define MAX2771_L5E5_CS         1
-#define MAX2771_L2E6_CS         0
-
-#define FLASH_SPI_CS            4
-
-#endif //* _BOARD_DEFINES_H */
-
+/**
+ * @brief Initialize GNSS AFE for MPF500-EVAL-KIT board
+ */
+int gnss_afe_init(void)
+{
+    max2771_conf_band(L1E1,MAX2771_L1E1_CS,32736000);
+    max2771_conf_band(L5E5,MAX2771_L5E5_CS,32736000);
+    max2771_conf_band(L2E6,MAX2771_L2E6_CS,32736000);
+    return 0;
+}

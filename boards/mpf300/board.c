@@ -1,9 +1,9 @@
 /* ----------------------------------------------------------------------
 *
-* Copyright (c) 2019 ChipCraft Sp. z o.o. All rights reserved
+* Copyright (c) 2020 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2025-01-11 22:33:12 +0100 (sob, 11 sty 2025) $
-* $Revision: 1126 $
+* $Date: 2025-08-10 17:22:10 +0200 (nie, 10 sie 2025) $
+* $Revision: 1157 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -33,35 +33,29 @@
 * POSSIBILITY OF SUCH DAMAGE.
  * -------------------------------------------------------------------- */
 
-#ifndef _BOARD_DEFINES_H
-#define _BOARD_DEFINES_H
+#include <ccrv32.h>
+#include <ccrv32-csr.h>
 
-/* DO NOT MODIFY */
-#define IDCODE_PART_NUM         0
-#define IDCODE_PART_VER         0
+#include "board.h"
+#include "max2771.h"
 
-/* EXTERNAL MT25QU01 MEMORY */
-#define FLASH_SIZE              (-1)//(1024*1024*128)
-#define FLASH_PAGE_SIZE         256
+/**
+ * @brief Initialize the MPF300-EVAL-KIT board
+ */
+void board_init(void){}
 
-#define RAM_SIZE                655360 // must be specified if not power of 2
+/**
+ * @brief Initialize the MPF300-EVAL-KIT hardware
+ */
+void hardware_init(void){}
 
-#define PERIPH0_FREQ            50000000UL
-#define PERIPH2_FREQ            50000000UL
-#define CORE_FREQ               50000000UL
-
-#define STDIO_UART              0
-#define STDIO_BAUDRATE          921600
-#define STDIO_RTSCTS            0
-
-#define TIME_SOURCE             TIMER32
-#define TIME_SOURCE_TIMER_ID    0
-#define TIME_SOURCE_PRSC        ((PERIPH0_FREQ/1000000)-1)
-
-#define MAX2771_SPI_NUM         1
-#define MAX2771_L1E1_CS         1
-#define MAX2771_L5E5_CS         2
-#define MAX2771_L2E6_CS         3
-
-#endif //* _BOARD_DEFINES_H */
-
+/**
+ * @brief Initialize GNSS AFE for MPF300-EVAL-KIT board
+ */
+int gnss_afe_init(void)
+{
+    max2771_conf_band(L1E1,MAX2771_L1E1_CS,32736000);
+    max2771_conf_band(L5E5,MAX2771_L5E5_CS,32736000);
+    max2771_conf_band(L2E6,MAX2771_L2E6_CS,32736000);
+    return 0;
+}

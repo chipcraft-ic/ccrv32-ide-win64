@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2019 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2022-08-25 14:11:28 +0200 (czw, 25 sie 2022) $
-* $Revision: 885 $
+* $Date: 2025-08-20 19:48:33 +0200 (śro, 20 sie 2025) $
+* $Revision: 1158 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -33,39 +33,37 @@
 * POSSIBILITY OF SUCH DAMAGE.
  * -------------------------------------------------------------------- */
 
-#include <ccrv32.h>
-#include <ccrv32-csr.h>
+#ifndef _BOARD_DEFINES_H
+#define _BOARD_DEFINES_H
 
-#include "max2771.h"
+/* DO NOT MODIFY */
+#define IDCODE_PART_NUM         0
+#define IDCODE_PART_VER         0
 
-/**
- * @brief Initialize the ML605 board
- */
-void board_init(void)
-{
-    /* check if external DDR3 instruction memory is used, if yes, overwrite to 256MB */
-    if (CPU_INFO_GET_IMSIZE_LOG(csr_read(mconfig0)) == 0){
-        csr_write(mconfig0,csr_read(mconfig0) | 28);
-    }
-    /* check if external DDR3 data memory is used, if yes, overwrite to 256MB        */
-    if (CPU_INFO_GET_DMSIZE_LOG(csr_read(mconfig0)) == 0){
-        csr_write(mconfig0,csr_read(mconfig0) | (28 << CPU_DMSIZE_SHIFT));
-    }
-}
+/* EXTERNAL MT25QU01 MEMORY */
+#define FLASH_SIZE              (-1)//(1024*1024*128)
+#define FLASH_PAGE_SIZE         256
 
-/**
- * @brief Initialize the VCU108 hardware
- */
-void hardware_init(void){}
+#define RAM_SIZE                655360 // must be specified if not power of 2
 
-/**
- * @brief Initialize GNSS AFE for ML605 board
- */
-int gnss_afe_init(void)
-{
-    max2771_conf_band(L1E1);
-	max2771_conf_band(L5E5);
-	max2771_conf_band(L2E6);
-    return 0;
-}
+#define PERIPH0_FREQ            50000000UL
+#define PERIPH2_FREQ            50000000UL
+#define CORE_FREQ               50000000UL
+
+#define STDIO_UART              0
+#define STDIO_BAUDRATE          921600
+#define STDIO_RTSCTS            0
+
+#define TIME_SOURCE             TIMER32
+#define TIME_SOURCE_TIMER_ID    0
+#define TIME_SOURCE_PRSC        ((PERIPH0_FREQ/1000000)-1)
+
+#define MAX2771_SPI_NUM         1
+#define MAX2771_L1E1_CS         1
+#define MAX2771_L5E5_CS         2
+#define MAX2771_L2E6_CS         3
+
+#define FLASH_SPI_CS            0
+
+#endif //* _BOARD_DEFINES_H */
 

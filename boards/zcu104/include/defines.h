@@ -1,9 +1,9 @@
 /* ----------------------------------------------------------------------
 *
-* Copyright (c) 2019 ChipCraft Sp. z o.o. All rights reserved
+* Copyright (c) 2025 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2024-01-14 21:55:43 +0100 (nie, 14 sty 2024) $
-* $Revision: 1038 $
+* $Date: 2025-08-20 19:48:33 +0200 (śro, 20 sie 2025) $
+* $Revision: 1158 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -44,22 +44,24 @@
 #define FLASH_SIZE              (-1)//(1024*1024*4)
 #define FLASH_PAGE_SIZE         256
 
-#define PERIPH0_FREQ             25000000UL
-#define PERIPH2_FREQ             50000000UL
+#define PERIPH0_FREQ            50000000UL
+#define PERIPH2_FREQ            50000000UL
 #define CORE_FREQ               100000000UL
 
 #define STDIO_UART              0
-#define STDIO_BAUDRATE          115200
+#define STDIO_BAUDRATE          921600
 #define STDIO_RTSCTS            0
 
 #define TIME_SOURCE             TIMER32
 #define TIME_SOURCE_TIMER_ID    0
 #define TIME_SOURCE_PRSC        ((PERIPH0_FREQ/1000000)-1)
 
-#define MAX2771_SPI_NUM         2
-#define MAX2771_L1E1_CS         12
-#define MAX2771_L5E5_CS         11
-#define MAX2771_L2E6_CS         10
+#define MAX2771_SPI_NUM         0
+#define MAX2771_L1E1_CS         2
+#define MAX2771_L5E5_CS         1
+#define MAX2771_L2E6_CS         0
+
+#define FLASH_SPI_CS            4
 
 #endif //* _BOARD_DEFINES_H */
 

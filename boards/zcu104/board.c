@@ -1,9 +1,9 @@
 /* ----------------------------------------------------------------------
 *
-* Copyright (c) 2020 ChipCraft Sp. z o.o. All rights reserved
+* Copyright (c) 2025 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2025-01-08 14:28:29 +0100 (śro, 08 sty 2025) $
-* $Revision: 1123 $
+* $Date: 2025-08-10 17:22:10 +0200 (nie, 10 sie 2025) $
+* $Revision: 1157 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -36,25 +36,26 @@
 #include <ccrv32.h>
 #include <ccrv32-csr.h>
 
+#include "board.h"
 #include "max2771.h"
 
 /**
- * @brief Initialize the MPF300-EVAL-KIT board
+ * @brief Initialize the ZCU104 board
  */
 void board_init(void){}
 
 /**
- * @brief Initialize the MPF300-EVAL-KIT hardware
+ * @brief Initialize the ZCU104 hardware
  */
 void hardware_init(void){}
 
 /**
- * @brief Initialize GNSS AFE for MPF300-EVAL-KIT board
+ * @brief Initialize GNSS AFE for ZCU104 board
  */
 int gnss_afe_init(void)
 {
-    max2771_conf_band(L1E1,32736000);
-    max2771_conf_band(L5E5,32736000);
-    max2771_conf_band(L2E6,32736000);
+    max2771_conf_band(L1E1,MAX2771_L1E1_CS,65472000);
+    max2771_conf_band(L5E5,MAX2771_L5E5_CS,65472000);
+    max2771_conf_band(L2E6,MAX2771_L2E6_CS,65472000);
     return 0;
 }

@@ -32,8 +32,8 @@
 * File Name : main.c
 * Author    : Rafal Harabien
 * ******************************************************************************
-* $Date: 2023-02-20 20:18:12 +0100 (pon, 20 lut 2023) $
-* $Revision: 952 $
+* $Date: 2025-08-10 17:22:10 +0200 (nie, 10 sie 2025) $
+* $Revision: 1157 $
 *H*****************************************************************************/
 
 #include "board.h"
@@ -235,7 +235,7 @@ static void testDmaUartTx(void)
 
     for (i = 0; i < 10000; ++i);
     do {
-        status = uart->STATUS;
+        status = chnl->STATUS;
     } while (status & DMA_STAT_MAR);
     assertFalse(status & UART_STAT_RXC);
     assertEq(status, DMA_STAT_TCZ|DMA_STAT_RCZ);
@@ -258,7 +258,7 @@ static void testDmaUartTx(void)
     assertEq(uartReadBlocking(uart), 0x78);
     for (i = 0; i < 10000; ++i);
     do {
-        status = uart->STATUS;
+        status = chnl->STATUS;
     } while (status & DMA_STAT_MAR);
     assertFalse(status & UART_STAT_RXC);
     assertEq(status, DMA_STAT_TCZ|DMA_STAT_RCZ);
@@ -376,7 +376,7 @@ static void testDmaUartRx(void)
     // Transfer ended
     assertFalse(g_expectedIrq);
     do {
-        status = uart->STATUS;
+        status = chnl->STATUS;
     } while (status & DMA_STAT_MAR);
     assertEq(status, DMA_STAT_TCZ|DMA_STAT_RCZ);
     assertEq(chnl->ADDRESSREL, ((uint32_t)g_buf) + 2);
@@ -397,7 +397,7 @@ static void testDmaUartRx(void)
     uartWriteBlockingSingle(uart, 0x78);
     for (i = 0; i < 100; ++i);
     do {
-        status = uart->STATUS;
+        status = chnl->STATUS;
     } while (status & DMA_STAT_MAR);
     assertEq(status, DMA_STAT_TCZ|DMA_STAT_RCZ);
     assertEq(chnl->COUNTER, 0);

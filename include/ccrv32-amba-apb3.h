@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2025 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2025-05-16 14:07:05 +0200 (Fri, 16 May 2025) $
-* $Revision: 1152 $
+* $Date: 2025-09-06 20:55:50 +0200 (sob, 06 wrz 2025) $
+* $Revision: 1159 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -81,6 +81,7 @@ enum
     AMBA_APB3_VITERBI    = AMBA_APB3_BASE + 0x00100000,     /*!< APB 3 Viterbi Decodeer base address        */
     AMBA_APB3_ACQENG0    = AMBA_APB3_BASE + 0x00200000,     /*!< APB 3 ACQENG0 base address                 */
     AMBA_APB3_ACQENG1    = AMBA_APB3_BASE + 0x00300000,     /*!< APB 3 ACQENG1 base address                 */
+    AMBA_APB3_RAM        = AMBA_APB3_BASE + 0x00400000,     /*!< APB 3 RAM base address                     */
 };
 
 /** cluster registers */
@@ -91,7 +92,7 @@ typedef struct
     uint32_t OP1;           /*!< op1 Register                   */
     uint32_t OP2;           /*!< op2 Register                   */
     uint32_t RDATA;         /*!< Read Data Register             */
-    uint32_t MBIST;         /*!< Mbist Register                 */
+    uint32_t MBIST;         /*!< MBIST Register                 */
 } gnss_cluster_t;
 
 static volatile gnss_cluster_t * const GNSS_CLUSTER_PTR = (gnss_cluster_t*)AMBA_APB3_CLUSTER; /*!< GNSS Cluster pointer */

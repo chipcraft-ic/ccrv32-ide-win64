@@ -1,9 +1,9 @@
 /* ----------------------------------------------------------------------
 *
-* Copyright (c) 2019 ChipCraft Sp. z o.o. All rights reserved
+* Copyright (c) 2025 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2024-01-14 21:55:43 +0100 (nie, 14 sty 2024) $
-* $Revision: 1038 $
+* $Date: 2025-09-16 15:32:05 +0200 (wto, 16 wrz 2025) $
+* $Revision: 1160 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -33,12 +33,35 @@
 * POSSIBILITY OF SUCH DAMAGE.
  * -------------------------------------------------------------------- */
 
-#ifndef _BOARD_H
-#define _BOARD_H
+#ifndef _BOARD_DEFINES_H
+#define _BOARD_DEFINES_H
 
-#include "defines.h"
+/* DO NOT MODIFY */
+#define IDCODE_PART_NUM         0
+#define IDCODE_PART_VER         0
 
-/* Initialize GNSS AFE */
-int gnss_afe_init(void);
+/* EXTERNAL MT25QU01 MEMORY */
+#define FLASH_SIZE              (-1)//(1024*1024*128)
+#define FLASH_PAGE_SIZE         256
 
-#endif /* _BOARD_H */
+#define PERIPH0_FREQ            50000000UL
+#define PERIPH2_FREQ            50000000UL
+#define CORE_FREQ               50000000UL
+
+#define STDIO_UART              0
+#define STDIO_BAUDRATE          921600
+#define STDIO_RTSCTS            0
+
+#define TIME_SOURCE             TIMER32
+#define TIME_SOURCE_TIMER_ID    0
+#define TIME_SOURCE_PRSC        ((PERIPH0_FREQ/1000000)-1)
+
+#define MAX2771_SPI_NUM         1
+#define MAX2771_L1E1_CS         1
+#define MAX2771_L5E5_CS         2
+#define MAX2771_L2E6_CS         3
+
+#define FLASH_SPI_CS            0
+
+#endif //* _BOARD_DEFINES_H */
+

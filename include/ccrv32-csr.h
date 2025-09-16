@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2019 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2024-10-15 20:09:44 +0200 (wto, 15 paź 2024) $
-* $Revision: 1112 $
+* $Date: 2025-08-20 19:48:33 +0200 (śro, 20 sie 2025) $
+* $Revision: 1158 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -69,6 +69,7 @@
 #define mremap          0x07CC   /* Memory remap                                        */
 #define mromunlock      0x07CD   /* ROM unlock                                          */
 #define mfterror        0x07CE   /* Error Statistics (FT-only)                          */
+#define mexcount        0x07CF   /* Exception Count Register                            */
 
 #define mbusperf0       0x0810   /* Main Bus Perf. Counter Register (counter  window)   */
 #define mbusperf1       0x0811   /* Main Bus Perf. Counter Register (icache   util.)    */

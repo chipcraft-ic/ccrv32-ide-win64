@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2021 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2025-03-26 14:59:44 +0100 (Wed, 26 Mar 2025) $
-* $Revision: 1138 $
+* $Date: 2025-09-06 20:55:50 +0200 (sob, 06 wrz 2025) $
+* $Revision: 1159 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -216,9 +216,10 @@ enum
 enum
 {
     AEC_INFO_HAS_AUTO      = 1 << 8,   /*!< Has Automatic Mode Flag                */
-    AEC_INFO_BEID_B2B      = 1 << 15,  /*!< Has Beidou B2B PRN Generator Flag      */
-    AEC_INFO_BEID_B2A      = 1 << 16,  /*!< Has Beidou B2A PRN Generator Flag      */
-    AEC_INFO_BEID_B3I      = 1 << 17,  /*!< Has Beidou B3I PRN Generator Flag      */
+    AEC_INFO_BEID_B2B      = 1 << 14,  /*!< Has Beidou B2B PRN Generator Flag      */
+    AEC_INFO_BEID_B2A      = 1 << 15,  /*!< Has Beidou B2A PRN Generator Flag      */
+    AEC_INFO_BEID_B3I      = 1 << 16,  /*!< Has Beidou B3I PRN Generator Flag      */
+    AEC_INFO_QZSS_L2       = 1 << 17,  /*!< Has QZSS L2 PRN Generator Flag         */
     AEC_INFO_QZSS_L5       = 1 << 18,  /*!< Has QZSS L5 PRN Generator Flag         */
     AEC_INFO_SBAS_L1CA     = 1 << 19,  /*!< Has SBAS L1CA PRN Generator Flag       */
     AEC_INFO_NAVIC_L5SPS   = 1 << 20,  /*!< Has NAVIC L5SPS PRN Generator Flag     */

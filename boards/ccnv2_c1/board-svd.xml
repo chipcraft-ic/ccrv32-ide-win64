@@ -2898,6 +2898,11 @@
           <!-- GNSS Controller Status and Control Register Flags -->
           <fields>
             <field>
+              <name>ACQDEC5</name>
+              <description>Acquisition Decimator by 5</description>
+              <bitRange>[7:7]</bitRange>
+            </field>
+            <field>
               <name>RFAFE</name>
               <description>GNSS RF AFE</description>
               <bitRange>[11:8]</bitRange>
@@ -3403,6 +3408,11 @@
               <bitRange>[9:9]</bitRange>
             </field>
             <field>
+              <name>NMI_EN</name>
+              <description>NMI Enable</description>
+              <bitRange>[11:11]</bitRange>
+            </field>
+            <field>
               <name>RETRY_COUNT</name>
               <description>Retry Count (FT-only)</description>
               <bitRange>[15:12]</bitRange>
@@ -3611,6 +3621,11 @@
               <name>MERGE_EN</name>
               <description>Store Buffer Merging Enable</description>
               <bitRange>[10:10]</bitRange>
+            </field>
+            <field>
+              <name>NMI_EN</name>
+              <description>NMI Enable</description>
+              <bitRange>[11:11]</bitRange>
             </field>
             <field>
               <name>PERF_EN</name>
@@ -8238,31 +8253,31 @@
         </register>
         <register>
           <name>PER</name>
-          <description>Period Register</description>
+          <description>Period Register (32 bit)</description>
           <addressOffset>0x4</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>PERBUF</name>
-          <description>Period Buffer Register</description>
+          <description>Period Buffer Register (32 bit)</description>
           <addressOffset>0x8</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>PRES</name>
-          <description>Prescaler Register</description>
+          <description>Prescaler Register (16 bit)</description>
           <addressOffset>0xC</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>PRESBUF</name>
-          <description>Prescaler Buffer Register</description>
+          <description>Prescaler Buffer Register (16 bit)</description>
           <addressOffset>0x10</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>COUNT</name>
-          <description>Count Register</description>
+          <description>Count Register (32 bit)</description>
           <addressOffset>0x14</addressOffset>
           <access>read-write</access>
         </register>
@@ -8651,31 +8666,31 @@
         </register>
         <register>
           <name>PER</name>
-          <description>Period Register</description>
+          <description>Period Register (32 bit)</description>
           <addressOffset>0x4</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>PERBUF</name>
-          <description>Period Buffer Register</description>
+          <description>Period Buffer Register (32 bit)</description>
           <addressOffset>0x8</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>PRES</name>
-          <description>Prescaler Register</description>
+          <description>Prescaler Register (16 bit)</description>
           <addressOffset>0xC</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>PRESBUF</name>
-          <description>Prescaler Buffer Register</description>
+          <description>Prescaler Buffer Register (16 bit)</description>
           <addressOffset>0x10</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>COUNT</name>
-          <description>Count Register</description>
+          <description>Count Register (32 bit)</description>
           <addressOffset>0x14</addressOffset>
           <access>read-write</access>
         </register>
@@ -9065,31 +9080,31 @@
         </register>
         <register>
           <name>PER</name>
-          <description>Period Register</description>
+          <description>Period Register (16 bit)</description>
           <addressOffset>0x4</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>PERBUF</name>
-          <description>Period Buffer Register</description>
+          <description>Period Buffer Register (16 bit)</description>
           <addressOffset>0x8</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>PRES</name>
-          <description>Prescaler Register</description>
+          <description>Prescaler Register (8 bit)</description>
           <addressOffset>0xC</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>PRESBUF</name>
-          <description>Prescaler Buffer Register</description>
+          <description>Prescaler Buffer Register (8 bit)</description>
           <addressOffset>0x10</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>COUNT</name>
-          <description>Count Register</description>
+          <description>Count Register (16 bit)</description>
           <addressOffset>0x14</addressOffset>
           <access>read-write</access>
         </register>
@@ -9478,31 +9493,31 @@
         </register>
         <register>
           <name>PER</name>
-          <description>Period Register</description>
+          <description>Period Register (16 bit)</description>
           <addressOffset>0x4</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>PERBUF</name>
-          <description>Period Buffer Register</description>
+          <description>Period Buffer Register (16 bit)</description>
           <addressOffset>0x8</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>PRES</name>
-          <description>Prescaler Register</description>
+          <description>Prescaler Register (8 bit)</description>
           <addressOffset>0xC</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>PRESBUF</name>
-          <description>Prescaler Buffer Register</description>
+          <description>Prescaler Buffer Register (8 bit)</description>
           <addressOffset>0x10</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>COUNT</name>
-          <description>Count Register</description>
+          <description>Count Register (16 bit)</description>
           <addressOffset>0x14</addressOffset>
           <access>read-write</access>
         </register>
@@ -9786,19 +9801,19 @@
         </register>
         <register>
           <name>COUNT</name>
-          <description>Count Register (16 bit)</description>
+          <description>Count Register (24 bit)</description>
           <addressOffset>0x4</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>PER</name>
-          <description>Period Register (16 bit)</description>
+          <description>Period Register (24 bit)</description>
           <addressOffset>0x8</addressOffset>
           <access>read-write</access>
         </register>
         <register>
           <name>PRES</name>
-          <description>Prescaler Register (8 bit)</description>
+          <description>Prescaler Register (16 bit)</description>
           <addressOffset>0xC</addressOffset>
           <access>read-write</access>
         </register>
@@ -15489,8 +15504,8 @@
               <bitRange>[18:18]</bitRange>
             </field>
             <field>
-              <name>SPCS</name>
-              <description>Samples Per Chip as Shift</description>
+              <name>RCLB</name>
+              <description>Real Code Length Base as Shift</description>
               <bitRange>[22:19]</bitRange>
             </field>
             <field>
@@ -15636,6 +15651,26 @@
               <name>CORRWD</name>
               <description>Correlation Width</description>
               <bitRange>[13:9]</bitRange>
+            </field>
+            <field>
+              <name>BEID_B2b</name>
+              <description>BeiDou B2b PRN Generator Info</description>
+              <bitRange>[15:15]</bitRange>
+            </field>
+            <field>
+              <name>BEID_B2a</name>
+              <description>BeiDou B2a PRN Generator Info</description>
+              <bitRange>[16:16]</bitRange>
+            </field>
+            <field>
+              <name>BEID_B3I</name>
+              <description>BeiDou B3I PRN Generator Info</description>
+              <bitRange>[17:17]</bitRange>
+            </field>
+            <field>
+              <name>QZSS_L5</name>
+              <description>AZSS L5 PRN Generator Info</description>
+              <bitRange>[18:18]</bitRange>
             </field>
             <field>
               <name>SBAS_L1CA</name>
@@ -16296,8 +16331,8 @@
               <bitRange>[18:18]</bitRange>
             </field>
             <field>
-              <name>SPCS</name>
-              <description>Samples Per Chip as Shift</description>
+              <name>RCLB</name>
+              <description>Real Code Length Base as Shift</description>
               <bitRange>[22:19]</bitRange>
             </field>
             <field>
@@ -16443,6 +16478,26 @@
               <name>CORRWD</name>
               <description>Correlation Width</description>
               <bitRange>[13:9]</bitRange>
+            </field>
+            <field>
+              <name>BEID_B2b</name>
+              <description>BeiDou B2b PRN Generator Info</description>
+              <bitRange>[15:15]</bitRange>
+            </field>
+            <field>
+              <name>BEID_B2a</name>
+              <description>BeiDou B2a PRN Generator Info</description>
+              <bitRange>[16:16]</bitRange>
+            </field>
+            <field>
+              <name>BEID_B3I</name>
+              <description>BeiDou B3I PRN Generator Info</description>
+              <bitRange>[17:17]</bitRange>
+            </field>
+            <field>
+              <name>QZSS_L5</name>
+              <description>AZSS L5 PRN Generator Info</description>
+              <bitRange>[18:18]</bitRange>
             </field>
             <field>
               <name>SBAS_L1CA</name>
@@ -106612,18 +106667,24 @@
           <fields>
             <field>
               <name>NC</name>
-              <bitRange>[31:18]</bitRange>
+              <bitRange>[31:19]</bitRange>
               <access>read-only</access>
             </field>
             <field>
               <name>FLASH_POR_EN</name>
               <description>Flash Brown-out detector power-on reset enable</description>
-              <bitRange>[17:17]</bitRange>
+              <bitRange>[18:18]</bitRange>
               <access>read-write</access>
             </field>
             <field>
               <name>FLASH_BOD_EN</name>
               <description>Flash Brown-out detector enable</description>
+              <bitRange>[17:17]</bitRange>
+              <access>read-write</access>
+            </field>
+            <field>
+              <name>DCDC_VOUT_LOW</name>
+              <description>DCDC output voltage select, &#x2018;0&#x2019; - 1.1 V, &#x2018;1&#x2019; - 0.9 V</description>
               <bitRange>[16:16]</bitRange>
               <access>read-write</access>
             </field>

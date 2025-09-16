@@ -32,8 +32,8 @@
 * File Name : main.c
 * Author    : Krzysztof Marcinek
 * ******************************************************************************
-* $Date: 2023-08-01 12:38:13 +0200 (wto, 01 sie 2023) $
-* $Revision: 976 $
+* $Date: 2025-08-20 19:48:33 +0200 (śro, 20 sie 2025) $
+* $Revision: 1158 $
 *H*****************************************************************************/
 
 #include "board.h"
@@ -209,7 +209,7 @@ void test_ram_space(void){
 
     RTCenable();
 
-    printf("\nTesting RAM space.\n\n");
+    printf("\nTesting RAM space.\n");
 
     totalTests = g_totalTests;
     failedTests = g_failedTests;
@@ -230,6 +230,19 @@ void test_ram_space(void){
     PWD_PTR->PWDRST = PWD_RST_KEY;
     for (;;);
 
+}
+
+void test_exception_counter(void)
+{
+    if (csr_read(mexcount) != 0)
+    {
+        printf("\nTesting exceptions counter.\n");
+        assertEq(csr_read(mexcount),1023); // should be max
+        csr_write(mexcount,143);
+        assertEq(csr_read(mexcount),143);
+        csr_write(mexcount,0);
+        assertEq(csr_read(mexcount),0);
+    }
 }
 
 int main(void)
@@ -300,7 +313,7 @@ int main(void)
 
     }
 
-    printf("\nTesting non-word load access.\n\n");
+    printf("\nTesting non-word load access.\n");
 
     test_nonword_load_access(0xF000FE00,0xF0010200,64,0);
     test_nonword_load_access(0xF000FE00,0xF0010200,64,1);
@@ -309,7 +322,7 @@ int main(void)
     test_nonword_load_access(0x82000000,0x80000204,64,0);
     test_nonword_load_access(0x82000000,0x80000204,64,1);
 
-    printf("\nTesting non-word store access.\n\n");
+    printf("\nTesting non-word store access.\n");
 
     test_nonword_store_access(0xF000FE00,0xF0010200,64,0);
     test_nonword_store_access(0xF000FE00,0xF0010200,64,1);
@@ -319,6 +332,8 @@ int main(void)
     test_nonword_store_access(0xE2000000,0xE0000204,64,1);
 
     test_ram_space();
+
+    test_exception_counter();
 
     printf("\nDone.\n");
 

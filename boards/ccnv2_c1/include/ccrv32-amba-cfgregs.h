@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2017 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2024-12-20 15:31:17 +0100 (pią, 20 gru 2024) $
-* $Revision: 1119 $
+* $Date: 2025-08-10 17:22:10 +0200 (nie, 10 sie 2025) $
+* $Revision: 1157 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -514,8 +514,9 @@ enum
      CFGREG_BALUN_MIXER25_CONF_BALUN_EN_MASK                      = 0x00000002,  /*!<  BALUN and MIXER 25 Configuration Register Mask Value */
      CFGREG_BALUN_MIXER25_CONF_MIXER_EN_MASK                      = 0x00000001,  /*!<  BALUN and MIXER 25 Configuration Register Mask Value */
 
-     CFGREG_PMU_CONF_FLASH_POR_EN_MASK                            = 0x00020000,  /*!<  PMU Configuration register Mask Value */
-     CFGREG_PMU_CONF_FLASH_BOD_EN_MASK                            = 0x00010000,  /*!<  PMU Configuration register Mask Value */
+     CFGREG_PMU_CONF_FLASH_POR_EN_MASK                            = 0x00040000,  /*!<  PMU Configuration register Mask Value */
+     CFGREG_PMU_CONF_FLASH_BOD_EN_MASK                            = 0x00020000,  /*!<  PMU Configuration register Mask Value */
+     CFGREG_PMU_CONF_DCDC_VOUT_LOW_MASK                           = 0x00010000,  /*!<  PMU Configuration register Mask Value */
      CFGREG_PMU_CONF_DCDC_MODE_MASK                               = 0x00008000,  /*!<  PMU Configuration register Mask Value */
      CFGREG_PMU_CONF_DCDC_GENTRIM_SRC_MASK                        = 0x00004000,  /*!<  PMU Configuration register Mask Value */
      CFGREG_PMU_CONF_DCDC_GENTRIM_MASK                            = 0x00003800,  /*!<  PMU Configuration register Mask Value */
@@ -893,8 +894,9 @@ enum
      CFGREG_BALUN_MIXER25_CONF_BALUN_EN_SHIFT                     =  1,  /*!<  BALUN and MIXER 25 Configuration Register Shift Value */
      CFGREG_BALUN_MIXER25_CONF_MIXER_EN_SHIFT                     =  0,  /*!<  BALUN and MIXER 25 Configuration Register Shift Value */
 
-     CFGREG_PMU_CONF_FLASH_POR_EN_SHIFT                           = 17,  /*!<  PMU Configuration register Shift Value */
-     CFGREG_PMU_CONF_FLASH_BOD_EN_SHIFT                           = 16,  /*!<  PMU Configuration register Shift Value */
+     CFGREG_PMU_CONF_FLASH_POR_EN_SHIFT                           = 18,  /*!<  PMU Configuration register Shift Value */
+     CFGREG_PMU_CONF_FLASH_BOD_EN_SHIFT                           = 17,  /*!<  PMU Configuration register Shift Value */
+     CFGREG_PMU_CONF_DCDC_VOUT_LOW_SHIFT                          = 16,  /*!<  PMU Configuration register Shift Value */
      CFGREG_PMU_CONF_DCDC_MODE_SHIFT                              = 15,  /*!<  PMU Configuration register Shift Value */
      CFGREG_PMU_CONF_DCDC_GENTRIM_SRC_SHIFT                       = 14,  /*!<  PMU Configuration register Shift Value */
      CFGREG_PMU_CONF_DCDC_GENTRIM_SHIFT                           = 11,  /*!<  PMU Configuration register Shift Value */
@@ -1272,6 +1274,7 @@ enum
 
 #define CFGREG_PMU_CONF_FLASH_POR_EN_BITS_SET(x)                               ((x << CFGREG_PMU_CONF_FLASH_POR_EN_SHIFT) & CFGREG_PMU_CONF_FLASH_POR_EN_MASK)                                          /*!<  PMU Configuration register Bits Set */
 #define CFGREG_PMU_CONF_FLASH_BOD_EN_BITS_SET(x)                               ((x << CFGREG_PMU_CONF_FLASH_BOD_EN_SHIFT) & CFGREG_PMU_CONF_FLASH_BOD_EN_MASK)                                          /*!<  PMU Configuration register Bits Set */
+#define CFGREG_PMU_CONF_DCDC_VOUT_LOW_BITS_SET(x)                              ((x << CFGREG_PMU_CONF_DCDC_VOUT_LOW_SHIFT) & CFGREG_PMU_CONF_DCDC_VOUT_LOW_MASK)                                        /*!<  PMU Configuration register Bits Set */
 #define CFGREG_PMU_CONF_DCDC_MODE_BITS_SET(x)                                  ((x << CFGREG_PMU_CONF_DCDC_MODE_SHIFT) & CFGREG_PMU_CONF_DCDC_MODE_MASK)                                                /*!<  PMU Configuration register Bits Set */
 #define CFGREG_PMU_CONF_DCDC_GENTRIM_SRC_BITS_SET(x)                           ((x << CFGREG_PMU_CONF_DCDC_GENTRIM_SRC_SHIFT) & CFGREG_PMU_CONF_DCDC_GENTRIM_SRC_MASK)                                  /*!<  PMU Configuration register Bits Set */
 #define CFGREG_PMU_CONF_DCDC_GENTRIM_BITS_SET(x)                               ((x << CFGREG_PMU_CONF_DCDC_GENTRIM_SHIFT) & CFGREG_PMU_CONF_DCDC_GENTRIM_MASK)                                          /*!<  PMU Configuration register Bits Set */
@@ -1648,6 +1651,7 @@ enum
 
 #define CFGREG_PMU_CONF_FLASH_POR_EN_BITS_GET(x)                               ((x & CFGREG_PMU_CONF_FLASH_POR_EN_MASK) >> CFGREG_PMU_CONF_FLASH_POR_EN_SHIFT)                                          /*!<  PMU Configuration register Bits Get */
 #define CFGREG_PMU_CONF_FLASH_BOD_EN_BITS_GET(x)                               ((x & CFGREG_PMU_CONF_FLASH_BOD_EN_MASK) >> CFGREG_PMU_CONF_FLASH_BOD_EN_SHIFT)                                          /*!<  PMU Configuration register Bits Get */
+#define CFGREG_PMU_CONF_DCDC_VOUT_LOW_BITS_GET(x)                              ((x & CFGREG_PMU_CONF_DCDC_VOUT_LOW_MASK) >> CFGREG_PMU_CONF_DCDC_VOUT_LOW_SHIFT)                                        /*!<  PMU Configuration register Bits Get */
 #define CFGREG_PMU_CONF_DCDC_MODE_BITS_GET(x)                                  ((x & CFGREG_PMU_CONF_DCDC_MODE_MASK) >> CFGREG_PMU_CONF_DCDC_MODE_SHIFT)                                                /*!<  PMU Configuration register Bits Get */
 #define CFGREG_PMU_CONF_DCDC_GENTRIM_SRC_BITS_GET(x)                           ((x & CFGREG_PMU_CONF_DCDC_GENTRIM_SRC_MASK) >> CFGREG_PMU_CONF_DCDC_GENTRIM_SRC_SHIFT)                                  /*!<  PMU Configuration register Bits Get */
 #define CFGREG_PMU_CONF_DCDC_GENTRIM_BITS_GET(x)                               ((x & CFGREG_PMU_CONF_DCDC_GENTRIM_MASK) >> CFGREG_PMU_CONF_DCDC_GENTRIM_SHIFT)                                          /*!<  PMU Configuration register Bits Get */

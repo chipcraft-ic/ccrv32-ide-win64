@@ -2,8 +2,8 @@
 *
 * Copyright (c) 2019 ChipCraft Sp. z o.o. All rights reserved
 *
-* $Date: 2025-05-16 14:07:05 +0200 (Fri, 16 May 2025) $
-* $Revision: 1152 $
+* $Date: 2025-09-16 15:32:05 +0200 (wto, 16 wrz 2025) $
+* $Revision: 1160 $
 *
 *  ----------------------------------------------------------------------
 * Redistribution and use in source and binary forms, with or without
@@ -85,8 +85,11 @@ enum gnss_ise_rfafe_enum
 
 // cosine BOC modulation define
 #define GNSS_ISE_BOC_COS    (1<<4);
-// TM modulation for L2C
-#define GNSS_ISE_L2C_TM     (2<<5);
+// L2C modulation
+#define GNSS_ISE_L2CM_TM    (2<<5);
+#define GNSS_ISE_L2CL_TM    (1<<5);
+#define GNSS_ISE_L2C_GPS    (1<<23);
+#define GNSS_ISE_L2C_QZS    (1<<22);
 
 /// define EXTRACT
 #define EXTRACT(a, size, offset) (((~(~0 << size) << offset) & a) >> offset)
@@ -614,7 +617,7 @@ INLINE int32_t GNSS_DLL_DISC(uint8_t ebb, int32_t I0, int32_t Q0, int32_t I2, in
     {
 
         volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (5 << 2)) + 0x1000);
-        GNSS_CLUSTER_PTR->OP1 = Q0;
+        GNSS_CLUSTER_PTR->OP2 = Q0;
         *tmp = I0;
 
         tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (261 << 2)) + 0x1000);
@@ -792,6 +795,21 @@ INLINE void GNSS_PLL_FLT_AID(uint8_t ebb, uint32_t aid)
     else
     {
         CUSTOM_INSTRUCTION_MACRO_1I(aid, 23);
+    }
+}
+
+/// FLL filter set coefficients (second order)
+INLINE void GNSS_FLL_FLT_COEF(uint8_t ebb, uint32_t c1, uint32_t c2)
+{
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (30 << 2)) + 0x1000);
+        GNSS_CLUSTER_PTR->OP2 = c2;
+        *tmp = c1;
+    }
+    else
+    {
+        CUSTOM_INSTRUCTION_MACRO_2I(c1, c2, 30);
     }
 }
 
@@ -1154,6 +1172,23 @@ INLINE uint32_t GNSS_M2_SCL_GET(uint8_t ebb)
     {
         uint32_t res;
         CUSTOM_INSTRUCTION_MACRO_1O(res, 151);
+        return res;
+    }
+}
+
+/// fault test
+INLINE int32_t GNSS_FAULT_TST(uint8_t ebb)
+{
+    if (ebb == 1)
+    {
+        volatile uint32_t* tmp = (uint32_t*)((AMBA_APB3_CLUSTER + (382 << 2)) + 0x1000);
+        GNSS_CLUSTER_PTR->OP1 = 0xDEADA55A;
+        return *tmp;
+    }
+    else
+    {
+        uint32_t res;
+        CUSTOM_INSTRUCTION_MACRO_1I1O(res, 0xDEADA55A, 382);
         return res;
     }
 }
