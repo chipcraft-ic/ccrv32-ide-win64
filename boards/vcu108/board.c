@@ -36,6 +36,7 @@
 #include <ccrv32.h>
 #include <ccrv32-csr.h>
 
+#include "board.h"
 #include "max2771.h"
 
 /**
